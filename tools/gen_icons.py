@@ -1,113 +1,153 @@
 #!/usr/bin/env python3
-"""Generates the per-card-type launcher icons and the code that refers to them.
+"""Generates the launcher icons: one per card type, each a miniature of that card's face.
+
+Needs Pillow (pip install pillow). Run from the repo root after editing ICONS:
+
+    python3 tools/gen_icons.py
 
 Writes into app/src/main:
-  res/drawable/ic_launcher_fg_<id>.xml   adaptive-icon foreground (stroke-font monogram)
-  res/mipmap-anydpi/ic_launcher_<id>.xml adaptive icon (background colour + foreground + monochrome)
-  res/values/icon_colors.xml             background colours
-  java/.../icon/IconResources.kt         id -> drawable/colour/alias map used by the app
-and prints the <activity-alias> block for AndroidManifest.xml (between the ICON-ALIASES markers,
-which this script rewrites in place).
+  res/mipmap-<density>/ic_launcher_{bg,fg,mono}_<id>.png  adaptive-icon layers
+  res/mipmap-anydpi/ic_launcher_<id>.xml                  adaptive icon
+  java/.../icon/IconResources.kt                          id -> resources/alias map
+and rewrites the <activity-alias> block in AndroidManifest.xml between the ICON-ALIASES markers.
 
-Run from the repo root after editing ICONS:  python3 tools/gen_icons.py
+Layouts follow ui/CardDesigns.kt. Coordinates below are in the icon's visible square (u, v in
+0..1 covers the central 72 of 108 dp), and may run past it to bleed under the mask.
 """
+import math
 import pathlib
 import re
 
+from PIL import Image, ImageDraw, ImageFont
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent / "app" / "src" / "main"
 PKG = "io.github.grillza.icreader"
+FONT = pathlib.Path(__file__).resolve().parent / "fonts" / "OpenSans-Bold.ttf"
+DENSITIES = {"mdpi": 108, "hdpi": 162, "xhdpi": 216, "xxhdpi": 324, "xxxhdpi": 432}
+S = 864  # render size (px for 108 dp), downsampled per density
 
-# id, label, monogram, background, foreground. Ids must match CardType.id (plus "default").
+PEARL = ("#F7F8F9", "#E2E5E8")
+SILVER = ("#E7E9EC", "#C5C9CE")
+
+# id, label, base gradient, brand text, text colour, text centre (u, v), text width (fraction), shapes
 ICONS = [
-    ("default", "IC Reader", None, "#1F2A44", "#FFFFFF"),
-    ("suica", "Suica", "S", "#1E9E4A", "#FFFFFF"),
-    ("pasmo", "PASMO", "P", "#E8338A", "#FFFFFF"),
-    ("icoca", "ICOCA", "I", "#1D50A2", "#FFFFFF"),
-    ("toica", "TOICA", "T", "#F39800", "#FFFFFF"),
-    ("manaca", "manaca", "M", "#9B2A8C", "#FFFFFF"),
-    ("kitaca", "Kitaca", "K", "#3FB59A", "#FFFFFF"),
-    ("sugoca", "SUGOCA", "SG", "#00A3AF", "#FFFFFF"),
-    ("nimoca", "nimoca", "NI", "#F6C200", "#2B2B2B"),
-    ("hayakaken", "Hayakaken", "H", "#D6001C", "#FFFFFF"),
-    ("pitapa", "PiTaPa", "PT", "#14286E", "#FFFFFF"),
-    ("transit", "Transit IC", "IC", "#455A64", "#FFFFFF"),
-    ("edy", "Rakuten Edy", "E", "#BF0000", "#FFFFFF"),
-    ("nanaco", "nanaco", "NA", "#F5A200", "#2B2B2B"),
-    ("waon", "WAON", "W", "#00A0E9", "#FFFFFF"),
+    ("default", "IC Reader", ("#26324F", "#1A2238"), None, None, None, 0, "default"),
+    ("suica", "Suica", PEARL, "Suica", "#FFFFFF", (0.45, 0.68), 0.62, "suica"),
+    ("pasmo", "PASMO", SILVER, "PASMO", "#EA5A9C", (0.5, 0.74), 0.74, "pasmo"),
+    ("icoca", "ICOCA", ("#2A66C9", "#4F92E6"), "ICOCA", "#E3EEFF", (0.5, 0.5), 0.74, None),
+    ("toica", "TOICA", SILVER, "toica", "#FFFFFF", (0.5, 0.76), 0.62, "toica"),
+    ("manaca", "manaca", ("#D3D6DF", "#BBC0CC"), "manaca", "#8E95A6", (0.5, 0.5), 0.70, "manaca"),
+    ("kitaca", "Kitaca", PEARL, "Kitaca", "#6FA82B", (0.5, 0.36), 0.66, "kitaca"),
+    ("sugoca", "SUGOCA", PEARL, "SUGOCA", "#E4462E", (0.5, 0.72), 0.78, "sugoca"),
+    ("nimoca", "nimoca", PEARL, "nimoca", "#FFFFFF", (0.5, 0.5), 0.66, "nimoca"),
+    ("hayakaken", "Hayakaken", PEARL, "Hayakaken", "#2E86C1", (0.5, 0.34), 0.84, "hayakaken"),
+    ("pitapa", "PiTaPa", SILVER, "PiTaPa", "#E6E8EC", (0.62, 0.62), 0.58, "pitapa"),
+    ("transit", "Transit IC", SILVER, "IC", "#FFFFFF", (0.5, 0.76), 0.34, "transit"),
+    ("edy", "Rakuten Edy", ("#FFFFFF", "#EDEEF0"), "Edy", "#D0000F", (0.42, 0.40), 0.52, "edy"),
+    ("nanaco", "nanaco", ("#FFF8E7", "#F7EBCB"), "nanaco", "#E38D00", (0.5, 0.38), 0.70, "nanaco"),
+    ("waon", "WAON", ("#CDEBF8", "#86CFEF"), "WAON", "#1C6FD0", (0.5, 0.5), 0.72, "waon"),
 ]
 
-# Single-stroke capitals in a 6 x 10 box (origin top-left).
-GLYPHS = {
-    "S": "M5.6,1.6 C4.6,-0.4 0.4,-0.2 0.4,2.6 C0.4,5.4 5.6,4.6 5.6,7.4 C5.6,10.3 1.2,10.4 0.2,8.2",
-    "P": "M0.5,10 L0.5,0 L3.4,0 C6.6,0 6.6,5.2 3.4,5.2 L0.5,5.2",
-    "I": "M1,0 L5,0 M3,0 L3,10 M1,10 L5,10",
-    "T": "M0,0 L6,0 M3,0 L3,10",
-    "M": "M0.2,10 L0.2,0 L3,6.5 L5.8,0 L5.8,10",
-    "K": "M0.5,0 L0.5,10 M5.8,0 L0.5,6 M2.4,3.9 L6,10",
-    "G": "M5.7,1.8 C4.6,-0.6 0.3,-0.6 0.3,5 C0.3,10.6 5.7,10.6 5.7,6.2 L5.7,5.6 L3.4,5.6",
-    "N": "M0.3,10 L0.3,0 L5.7,10 L5.7,0",
-    "H": "M0.3,0 L0.3,10 M5.7,0 L5.7,10 M0.3,5 L5.7,5",
-    "E": "M5.6,0 L0.5,0 L0.5,10 L5.6,10 M0.5,5 L4.8,5",
-    "A": "M0,10 L3,0 L6,10 M1.1,6.6 L4.9,6.6",
-    "W": "M0,0 L1.5,10 L3,3.2 L4.5,10 L6,0",
-    "C": "M5.7,1.8 C4.6,-0.6 0.3,-0.6 0.3,5 C0.3,10.6 4.8,10.6 5.8,8.2",
-}
+
+def px(u: float) -> float:
+    """Visible-square coordinate to render pixels (visible square is 18..90 of 108 dp)."""
+    return S * (18 + 72 * u) / 108
 
 
-def monogram(text: str, color: str) -> str:
-    n = len(text)
-    scale = 3.2 if n == 1 else 2.6
-    gap = 2.2  # glyph units between letters
-    width = (n * 6 + (n - 1) * gap) * scale
-    height = 10 * scale
-    x0 = (108 - width) / 2
-    y0 = (108 - height) / 2
-    parts = []
-    for i, ch in enumerate(text):
-        tx = x0 + i * (6 + gap) * scale
-        parts.append(
-            f'    <group android:translateX="{tx:.2f}" android:translateY="{y0:.2f}" '
-            f'android:scaleX="{scale}" android:scaleY="{scale}">\n'
-            f'        <path android:pathData="{GLYPHS[ch]}" android:strokeColor="{color}" '
-            f'android:strokeWidth="1.75" android:strokeLineCap="round" android:strokeLineJoin="round" />\n'
-            f'    </group>'
-        )
-    return "\n".join(parts)
+def hex_rgba(c: str, a: int = 255):
+    c = c.lstrip("#")
+    return tuple(int(c[i:i + 2], 16) for i in (0, 2, 4)) + (a,)
 
 
-def default_glyph(color: str) -> str:
-    # A card with a chip and contactless waves.
-    return f"""    <group android:translateX="54" android:translateY="54" android:scaleX="0.72" android:scaleY="0.72">
-    <group android:translateX="-54" android:translateY="-54">
-    <path android:pathData="M30,38 h48 a6,6 0 0 1 6,6 v20 a6,6 0 0 1 -6,6 h-48 a6,6 0 0 1 -6,-6 v-20 a6,6 0 0 1 6,-6 z"
-        android:strokeColor="{color}" android:strokeWidth="4" />
-    <path android:pathData="M32,46 h10 v8 h-10 z" android:fillColor="{color}" />
-    <path android:pathData="M58,48 a8,8 0 0 1 0,12 M64,44 a14,14 0 0 1 0,20 M70,40 a20,20 0 0 1 0,28"
-        android:strokeColor="{color}" android:strokeWidth="3.5" android:strokeLineCap="round" />
-    </group>
-    </group>"""
+def gradient(c1: str, c2: str) -> Image.Image:
+    a, b = hex_rgba(c1), hex_rgba(c2)
+    img = Image.new("RGBA", (S, S))
+    d = ImageDraw.Draw(img)
+    for i in range(2 * S):  # diagonal, top-left to bottom-right
+        t = i / (2 * S - 1)
+        d.line([(i, 0), (0, i)], fill=tuple(int(a[k] + (b[k] - a[k]) * t) for k in range(4)), width=2)
+    return img
 
 
-def foreground(icon) -> str:
-    ident, _, mono, _, fg = icon
-    body = default_glyph(fg) if mono is None else monogram(mono, fg)
-    return f"""<?xml version="1.0" encoding="utf-8"?>
-<!-- Generated by tools/gen_icons.py -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp"
-    android:viewportWidth="108" android:viewportHeight="108">
-{body}
-</vector>
-"""
+def P(u, v):
+    return (px(u), px(v))
+
+
+def R(u0, v0, u1, v1):
+    return [px(u0), px(v0), px(u1), px(v1)]
+
+
+def draw_shapes(img: Image.Image, kind: str):
+    d = ImageDraw.Draw(img)
+    if kind == "default":
+        w = S / 108 * 0.74  # scaled about the centre to stay inside the mask
+        o = S * 0.13
+        d = ImageDraw.Draw(img)
+        d.rounded_rectangle([o + 30 * w, o + 38 * w, o + 78 * w, o + 70 * w], radius=6 * w, outline="#FFFFFF", width=int(4.5 * w))
+        d.rectangle([o + 34 * w, o + 46 * w, o + 44 * w, o + 54 * w], fill="#FFFFFF")
+        for r in (8, 14, 20):
+            d.arc([o + 52 * w - r * w, o + 54 * w - r * w, o + 52 * w + r * w, o + 54 * w + r * w], -38, 38, fill="#FFFFFF", width=int(4 * w))
+    elif kind == "suica":
+        # Green panel on the left; its right edge slants down to the bottom-right.
+        d.polygon([P(-0.4, 0.30), P(0.62, 0.30), P(1.30, 1.25), P(-0.4, 1.25)], fill="#62BD2F")
+    elif kind == "pasmo":
+        for v in (0.10, 0.34):
+            d.rounded_rectangle(R(0.10, v, 0.66, v + 0.17), radius=(px(0.06) - px(0)), fill="#EA5A9C")
+            d.ellipse(R(0.73, v + 0.02, 0.87, v + 0.16), fill="#EA5A9C")
+    elif kind == "toica":
+        pts = []
+        for i in range(61):
+            u = -0.4 + 1.8 * i / 60
+            pts.append(P(u, 0.56 + 0.11 * math.sin((u + 0.1) * 2 * math.pi)))
+        d.polygon(pts + [P(1.4, 1.4), P(-0.4, 1.4)], fill="#17A9E1")
+    elif kind == "manaca":
+        d.ellipse(R(0.02, 0.02, 0.98, 0.98), fill="#F1E63B")
+    elif kind in ("kitaca", "hayakaken", "edy"):
+        a, b = {"kitaca": ("#9CCB3B", "#7AB52E"), "hayakaken": ("#7FC3E8", "#3E9ED6"), "edy": ("#E60012", "#BF0000")}[kind]
+        d.polygon([P(0.25, 1.3), P(1.3, 0.40), P(1.3, 1.3)], fill=a)
+        d.polygon([P(0.0, 1.25), P(0.12, 1.25), P(1.25, 0.28), P(1.25, 0.17)], fill=b)
+    elif kind == "sugoca":
+        d.ellipse(R(0.45, -0.25, 1.25, 0.55), fill="#B7CFA2")
+    elif kind == "nimoca":
+        d.ellipse(R(0.03, 0.03, 0.97, 0.97), fill="#45A2CB")
+    elif kind == "pitapa":
+        d.rectangle(R(0.30, -0.4, 1.4, 1.4), fill="#8D8EC8")
+        d.ellipse(R(-0.12, 0.10, 0.36, 0.58), fill="#8D8EC8")
+    elif kind == "transit":
+        d.polygon([P(-0.4, 0.62), P(0.2, 0.44), P(0.6, 0.66), P(1.4, 0.48), P(1.4, 1.4), P(-0.4, 1.4)], fill="#607D8B")
+    elif kind == "nanaco":
+        d.ellipse(R(0.30, 0.55, 1.50, 1.75), fill="#6CC3E8")
+        d.ellipse(R(-0.10, 0.62, 0.90, 1.62), fill="#F7A800")
+    elif kind == "waon":
+        for (u, v, r) in ((0.82, 0.22, 0.22), (0.18, 0.80, 0.16), (0.88, 0.86, 0.12), (0.2, 0.15, 0.08)):
+            d.ellipse(R(u - r, v - r, u + r, v + r), fill=(255, 255, 255, 120))
+
+
+def wordmark(text: str, color: str, center, width_frac: float) -> Image.Image:
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    target = (px(1) - px(0)) * width_frac
+    size = 10
+    while ImageFont.truetype(str(FONT), size + 4).getlength(text) < target:
+        size += 4
+    font = ImageFont.truetype(str(FONT), size)
+    ImageDraw.Draw(img).text((px(center[0]), px(center[1])), text, font=font, fill=color, anchor="mm")
+    return img
+
+
+def save(img: Image.Image, name: str):
+    for dens, size in DENSITIES.items():
+        out = ROOT / f"res/mipmap-{dens}/{name}.png"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        img.resize((size, size), Image.LANCZOS).save(out, optimize=True)
 
 
 def adaptive(ident: str) -> str:
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <!-- Generated by tools/gen_icons.py -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/icon_bg_{ident}" />
-    <foreground android:drawable="@drawable/ic_launcher_fg_{ident}" />
-    <monochrome android:drawable="@drawable/ic_launcher_fg_{ident}" />
+    <background android:drawable="@mipmap/ic_launcher_bg_{ident}" />
+    <foreground android:drawable="@mipmap/ic_launcher_fg_{ident}" />
+    <monochrome android:drawable="@mipmap/ic_launcher_mono_{ident}" />
 </adaptive-icon>
 """
 
@@ -117,23 +157,33 @@ def camel(ident: str) -> str:
 
 
 def main():
-    (ROOT / "res/drawable").mkdir(parents=True, exist_ok=True)
-    (ROOT / "res/mipmap-anydpi").mkdir(parents=True, exist_ok=True)
-    (ROOT / "res/values").mkdir(parents=True, exist_ok=True)
-    colors = ['<?xml version="1.0" encoding="utf-8"?>', "<!-- Generated by tools/gen_icons.py -->", "<resources>"]
-    for icon in ICONS:
-        ident = icon[0]
-        (ROOT / f"res/drawable/ic_launcher_fg_{ident}.xml").write_text(foreground(icon))
+    # Remove outputs of the old vector-based generator.
+    for old in list((ROOT / "res/drawable").glob("ic_launcher_fg_*.xml")) + [ROOT / "res/values/icon_colors.xml"]:
+        old.unlink(missing_ok=True)
+
+    for ident, _label, base, text, color, center, width, shapes in ICONS:
+        bg = gradient(*base)
+        if shapes and shapes != "default":
+            draw_shapes(bg, shapes)
+        if shapes == "default":
+            fg = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+            draw_shapes(fg, "default")
+        else:
+            fg = wordmark(text, color, center, width)
+        # Themed icons: the system tints this single-colour layer.
+        mono = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+        mono.paste((0, 0, 0, 255), mask=fg.split()[3])
+        save(bg.convert("RGB"), f"ic_launcher_bg_{ident}")
+        save(fg, f"ic_launcher_fg_{ident}")
+        save(mono, f"ic_launcher_mono_{ident}")
+        (ROOT / "res/mipmap-anydpi").mkdir(parents=True, exist_ok=True)
         (ROOT / f"res/mipmap-anydpi/ic_launcher_{ident}.xml").write_text(adaptive(ident))
-        colors.append(f'    <color name="icon_bg_{ident}">{icon[3]}</color>')
-    colors.append("</resources>\n")
-    (ROOT / "res/values/icon_colors.xml").write_text("\n".join(colors))
 
     entries = ",\n".join(
-        f'    AppIcon("{i[0]}", "{i[1]}", "$PKG.Launcher{camel(i[0])}", '
-        f"R.drawable.ic_launcher_fg_{i[0]}, R.color.icon_bg_{i[0]})"
+        f'    AppIcon("{i[0]}", "{i[1]}", "{PKG}.Launcher{camel(i[0])}", '
+        f"R.mipmap.ic_launcher_fg_{i[0]}, R.mipmap.ic_launcher_bg_{i[0]})"
         for i in ICONS
-    ).replace("$PKG", PKG)
+    )
     kt = f"""// Generated by tools/gen_icons.py - do not edit.
 package {PKG}.icon
 
@@ -143,7 +193,6 @@ val APP_ICONS: List<AppIcon> = listOf(
 {entries},
 )
 """
-    (ROOT / f"java/{PKG.replace('.', '/')}/icon/IconResources.kt").parent.mkdir(parents=True, exist_ok=True)
     (ROOT / f"java/{PKG.replace('.', '/')}/icon/IconResources.kt").write_text(kt)
 
     aliases = []

@@ -59,8 +59,9 @@ or the `ICR_*` environment variables. Without either, `assembleRelease` produces
 - `data/`: models, `CardRepository` (JSON in app storage), `HistoryMerge`, `StationDb`, `Codes`
 - `icon/`: `AppIconManager` (activity-alias switching); `IconResources.kt` is generated
 - `ui/`: Compose screens
-- `tools/gen_icons.py`: generates the launcher icons, colours, `IconResources.kt` and the manifest
-  aliases. Edit `ICONS` there and re-run it to add or change an icon.
+- `tools/gen_icons.py`: renders the launcher icons (a miniature of each card face, as PNG layers
+  per density), `IconResources.kt` and the manifest aliases. Needs Pillow; uses the bundled
+  Open Sans Bold (`tools/fonts`, SIL OFL). Edit `ICONS` and re-run to add or change an icon.
 
 Station data (`assets/StationCode.csv`) is the community-maintained Suica station code list that
 circulates in open-source FeliCa readers. English names (`assets/StationNamesEn.csv`) are built from

@@ -1,7 +1,6 @@
 package io.github.grillza.icreader.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -94,11 +92,9 @@ private fun IconOption(icon: AppIcon, selected: Boolean, onClick: () -> Unit) {
 /** Renders an adaptive icon the way a circular launcher mask would. */
 @Composable
 fun AppIconPreview(icon: AppIcon, modifier: Modifier = Modifier) {
-    Box(
-        modifier.clip(CircleShape).background(colorResource(icon.background)),
-        contentAlignment = Alignment.Center,
-    ) {
-        // The foreground is 108dp with a 72dp visible area, so draw it 1.5x the mask size.
+    Box(modifier.clip(CircleShape), contentAlignment = Alignment.Center) {
+        // Layers are 108dp with a 72dp visible area, so draw them 1.5x the mask size.
+        Image(painterResource(icon.background), null, Modifier.requiredSize(93.dp))
         Image(painterResource(icon.foreground), null, Modifier.requiredSize(93.dp))
     }
 }
