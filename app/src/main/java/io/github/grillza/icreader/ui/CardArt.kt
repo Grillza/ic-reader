@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -68,8 +69,11 @@ fun CardArt(
         modifier
             .fillMaxWidth()
             .aspectRatio(CARD_RATIO)
-            .shadow(elevation, shape)
-            .clip(shape),
+            // Shadows don't follow the notch reliably (a pale patch shows there), so notched
+            // cards get a fine edge line instead.
+            .then(if (shape is NotchedCardShape) Modifier else Modifier.shadow(elevation, shape))
+            .clip(shape)
+            .border(0.75.dp, Color.Black.copy(alpha = if (shape is NotchedCardShape) 0.18f else 0.06f), shape),
     ) {
         val photo = bitmap
         if (photo != null) {
