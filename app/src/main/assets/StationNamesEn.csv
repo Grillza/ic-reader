@@ -1,11 +1,11 @@
 0,0,0,Tottori,
-0,0,1,,
-0,0,2,,
-0,0,3,,
-0,0,4,,
-0,0,5,,
-0,0,6,,
-0,0,7,,
+0,0,1,Terminal test,
+0,0,2,Terminal test,
+0,0,3,Terminal test,
+0,0,4,Terminal test,
+0,0,5,Terminal test,
+0,0,6,Terminal test,
+0,0,7,Terminal test,
 0,1,1,Tokyo,JR East
 0,1,2,Yūrakuchō,JR East
 0,1,3,Shimbashi,JR East
@@ -20,13 +20,13 @@
 0,1,16,Shin-Koyasu,JR East
 0,1,17,Higashi-Kanagawa,JR East
 0,1,18,Yokohama,JR East
-0,1,20,,JR East
+0,1,20,Hodogaya,JR East
 0,1,21,Higashi-Totsuka,JR East
 0,1,22,Totsuka,JR East
 0,1,24,Ōfuna,JR East
 0,1,25,Fujisawa,JR East
 0,1,26,Tsujidō,JR East
-0,1,27,,JR East
+0,1,27,Chigasaki,JR East
 0,1,29,Hiratsuka,JR East
 0,1,30,Ōiso,JR East
 0,1,32,Ninomiya,JR East
@@ -86,7 +86,7 @@
 0,1,117,Mikawa Miya,JR Central
 0,1,118,Gamagōri,JR Central
 0,1,119,Mikawa-Shiotsu,JR Central
-0,1,120,,JR Central
+0,1,120,Sangane,JR Central
 0,1,121,Kōda,JR Central
 0,1,124,Okazaki,JR Central
 0,1,125,Nishi-Okazaki,JR Central
@@ -118,7 +118,7 @@
 0,1,168,Sekigahara,JR Central
 0,1,170,Kashiwabara,JR Central
 0,1,171,Ōmi-Nagaoka,JR Central
-0,1,173,,JR Central
+0,1,173,Samegai,JR Central
 0,1,175,Maibara,JR West
 0,1,177,Hikone,JR West
 0,1,178,Minami-Hikone,JR West
@@ -152,7 +152,7 @@
 0,1,225,Kishibe,JR West
 0,1,226,Suita,JR West
 0,1,229,Higashi-Yodogawa,JR West
-0,1,230,,JR West
+0,1,230,Shin-Ōsaka,JR West
 0,1,232,Ōsaka,JR West
 0,1,234,Tsukamoto,JR West
 0,1,236,Amagasaki,JR West
@@ -174,7 +174,7 @@
 0,2,3,Akihabara,JR East
 0,2,4,Okachimachi,JR East
 0,2,6,Ueno,JR East
-0,2,7,,JR East
+0,2,7,Uguisudani,JR East
 0,2,8,Nippori,JR East
 0,2,9,Nishi-Nippori,JR East
 0,2,11,Tabata,JR East
@@ -274,7 +274,7 @@
 0,2,128,Kogota,JR East
 0,2,130,Tajiri,JR East
 0,2,132,Semine,JR East
-0,2,133,,JR East
+0,2,133,Umegasawa,JR East
 0,2,134,Nitta,JR East
 0,2,136,Ishikoshi,JR East
 0,2,137,Yushima,JR East
@@ -287,7 +287,7 @@
 0,2,146,Maesawa,JR East
 0,2,148,Rikuchū-Orii,JR East
 0,2,149,Mizusawa,JR East
-0,2,150,,JR East
+0,2,150,Kanegasaki,JR East
 0,2,151,Rokuhara,JR East
 0,2,153,Kitakami,JR East
 0,2,154,Murasakino,JR East
@@ -300,7 +300,7 @@
 0,2,163,Iwate-Iioka,JR East
 0,2,164,Senbokuchō,JR East
 0,2,165,Morioka,JR East
-0,2,166,,IGR Iwate Galaxy Railway
+0,2,166,Kuriyagawa,IGR Iwate Galaxy Railway
 0,2,168,Takizawa,IGR Iwate Galaxy Railway
 0,2,169,Shibutami,IGR Iwate Galaxy Railway
 0,2,170,Kōma,IGR Iwate Galaxy Railway
@@ -341,25 +341,25 @@
 0,2,213,Koyanagi,JR East
 0,2,214,Higashi-Aomori,JR East
 0,2,216,Aomori,JR East
-0,2,253,,JR East
-0,2,254,,JR East
-0,2,255,,JR East
+0,2,253,Mobile Suica,JR East
+0,2,254,Suica Internet Service,JR East
+0,2,255,Temporary counter,JR East
 0,3,1,Tokyo,JR East
 0,3,2,Kanda,JR East
 0,3,3,Ochanomizu,JR East
 0,3,4,Suidōbashi,JR East
 0,3,6,Iidabashi,JR East
-0,3,7,,JR East
+0,3,7,Ichigaya,JR East
 0,3,8,Yotsuya,JR East
 0,3,9,Shinanomachi,JR East
-0,3,11,,JR East
+0,3,11,Sendagaya,JR East
 0,3,12,Yoyogi,JR East
-0,3,13,,JR East
+0,3,13,Shinjuku,JR East
 0,3,14,Ōkubo,JR East
-0,3,16,,JR East
+0,3,16,Higashi-Nakano,JR East
 0,3,17,Nakano,JR East
 0,3,18,Kōenji,JR East
-0,3,19,,JR East
+0,3,19,Asagaya,JR East
 0,3,21,Ogikubo,JR East
 0,3,22,Nishi-Ogikubo,JR East
 0,3,23,Kichijōji,JR East
@@ -556,7 +556,7 @@
 0,5,2,Nippori,JR East
 0,5,3,Mikawashima,JR East
 0,5,4,Minami-Senju,JR East
-0,5,6,,JR East
+0,5,6,Kita-Senju,JR East
 0,5,7,Ayase,JR East
 0,5,8,Kameari,JR East
 0,5,9,Kanamachi,JR East
@@ -613,7 +613,7 @@
 0,5,97,Kashima,JR East
 0,5,99,Nittaki,JR East
 0,5,100,Sōma,JR East
-0,5,101,,JR East
+0,5,101,Komagamine,JR East
 0,5,102,Shinchi,JR East
 0,5,104,Sakamoto,JR East
 0,5,105,Yamashita,JR East
@@ -700,7 +700,7 @@
 0,6,159,Satsuma-Matsumoto,JR Kyushu
 0,6,160,Kami-Ijūin,JR Kyushu
 0,6,161,Hiroki,JR Kyushu
-0,6,162,Kagoshima‐Chūō,JR Kyushu
+0,6,162,Kagoshima-Chūō,JR Kyushu
 0,6,164,Kagoshima,JR Kyushu
 0,7,3,Minami-Kokura,JR Kyushu
 0,7,4,Jōno,JR Kyushu
@@ -858,7 +858,7 @@
 0,10,124,Minami-Iwakuni,JR West
 0,10,133,Yanaiminato,JR West
 0,10,142,Kudamatsu,JR West
-0,10,143,,JR West
+0,10,143,Kushigahama,JR West
 0,10,145,Tokuyama,JR West
 0,10,155,Shin-Yamaguchi,JR West
 0,10,156,Kagawa,JR West
@@ -974,7 +974,7 @@
 0,13,1,Hakodate,JR Hokkaido
 0,13,3,Goryōkaku,JR Hokkaido
 0,13,5,Kikyō,JR Hokkaido
-0,13,12,,JR Hokkaido
+0,13,12,Niyama,JR Hokkaido
 0,13,13,Ōnuma,JR Hokkaido
 0,13,19,Himekawa,JR Hokkaido
 0,13,20,Mori,JR Hokkaido
@@ -983,7 +983,7 @@
 0,13,32,,JR Hokkaido
 0,13,33,Yamasaki,JR Hokkaido
 0,13,39,Oshamambe,JR Hokkaido
-0,13,41,,JR Hokkaido
+0,13,41,Futamata,JR Hokkaido
 0,13,50,Niseko,JR Hokkaido
 0,13,51,Hirafu,JR Hokkaido
 0,13,52,Kutchan,JR Hokkaido
@@ -1034,9 +1034,9 @@
 0,13,147,Shirataki,JR Hokkaido
 0,13,177,Abashiri,JR Hokkaido
 0,14,13,Furano,JR Hokkaido
-0,14,17,,JR Hokkaido
+0,14,17,Shimo-Kanayama,JR Hokkaido
 0,14,18,Kanayama,JR Hokkaido
-0,14,21,,JR Hokkaido
+0,14,21,Ikutora,JR Hokkaido
 0,14,22,Ochiai,JR Hokkaido
 0,14,23,Shintoku,JR Hokkaido
 0,14,24,Tokachi-Shimizu,JR Hokkaido
@@ -1166,7 +1166,7 @@
 0,18,119,Hirosaki,JR East
 0,18,124,Namioka,JR East
 0,18,130,Shin-Aomori,JR East
-0,19,2,,JR East
+0,19,2,Kyōgase,JR East
 0,19,3,Suibara,JR East
 0,19,4,Kamiyama,JR East
 0,19,6,Tsukioka,JR East
@@ -1325,11 +1325,11 @@
 0,29,10,Negishi,JR East
 0,29,12,Yamate,JR East
 0,29,13,Ishikawachō,JR East
-0,29,14,,JR East
+0,29,14,Kannai,JR East
 0,29,15,Sakuragichō,JR East
 0,29,19,Ōguchi,JR East
 0,29,20,Kikuna,JR East
-0,29,22,Shin‐Yokohama,JR East
+0,29,22,Shin-Yokohama,JR East
 0,29,23,Kozukue,JR East
 0,29,25,Kamoi,JR East
 0,29,26,Nakayama,JR East
@@ -1348,7 +1348,7 @@
 0,29,42,Kita-Hachiōji,JR East
 0,29,43,Komiya,JR East
 0,29,46,Higashi-Fussa,JR East
-0,29,48,,JR East
+0,29,48,Hakonegasaki,JR East
 0,29,49,Kaneko,JR East
 0,29,51,Higashi-Hannō,JR East
 0,29,53,Komagawa,JR East
@@ -1403,7 +1403,7 @@
 0,31,175,Kita-Gosen,JR East
 0,31,176,Shinseki,JR East
 0,31,177,Higashi-Niitsu,JR East
-0,31,194,,JR Hokkaido
+0,31,194,Ikedaen,JR Hokkaido
 0,32,66,Bizen-Mikado,JR West
 0,32,67,Daianji,JR West
 0,32,68,Bizen-Ichinomiya,JR West
@@ -1452,7 +1452,7 @@
 0,35,72,Bitchū-Hirose,JR West
 0,35,73,Bitchū-Takahashi,JR West
 0,35,81,Niimi,JR West
-0,35,130,,JR East
+0,35,130,Tsutsujigaoka,JR East
 0,35,131,Miyaginohara,JR East
 0,35,132,Rikuzen-Haranomachi,JR East
 0,35,133,Nigatake,JR East
@@ -1514,7 +1514,7 @@
 0,36,213,Ishikari-Kanazawa,JR Hokkaido
 0,36,230,Shimotoppu,JR Hokkaido
 0,36,231,Nakatoppu,JR Hokkaido
-0,36,232,,JR Hokkaido
+0,36,232,Shin-Totsukawa,JR Hokkaido
 0,37,1,Shinagawa,JR East
 0,37,2,Ōsaki,JR East
 0,37,3,Gotanda,JR East
@@ -1523,11 +1523,11 @@
 0,37,7,Shibuya,JR East
 0,37,8,Harajuku,JR East
 0,37,9,Yoyogi,JR East
-0,37,10,,JR East
+0,37,10,Shinjuku,JR East
 0,37,12,Shin-Ōkubo,JR East
 0,37,13,Takadanobaba,JR East
 0,37,14,Mejiro,JR East
-0,37,15,,JR East
+0,37,15,Ikebukuro,JR East
 0,37,17,Ōtsuka,JR East
 0,37,18,Sugamo,JR East
 0,37,19,Komagome,JR East
@@ -1584,7 +1584,7 @@
 0,38,91,Saka,JR West
 0,38,92,Yano,JR West
 0,38,131,Mataki,JR East
-0,38,194,,JR Hokkaido
+0,38,194,New Chitose Airport,JR Hokkaido
 0,39,3,Nisshin,JR East
 0,39,4,Nishi-Ōmiya,JR East
 0,39,5,Sashiogi,JR East
@@ -1646,7 +1646,7 @@
 0,41,41,Ichikawaōno,JR East
 0,41,42,Funabashi-Hōten,JR East
 0,41,78,Ubemisaki,JR West
-0,41,132,,JR East
+0,41,132,Iwate-Wainai,JR East
 0,41,134,Oshikado,JR East
 0,42,12,Shin-Kawasaki,JR East
 0,42,13,Musashi-Kosugi,JR East
@@ -1734,7 +1734,7 @@
 0,45,77,Kabe,JR West
 0,46,1,Kiryū,Watarase Keikoku Railway
 0,46,130,Tōshōgū,JR East
-0,46,131,,JR East
+0,46,131,Kita-Sendai,JR East
 0,46,132,Kitayama,JR East
 0,46,133,Tōhoku-Fukushi-dai-mae,JR East
 0,46,134,Kunimi,JR East
@@ -1759,7 +1759,7 @@
 0,47,133,Furukawa,JR East
 0,47,165,Tsuya,JR East
 0,47,167,Furukuchi,JR East
-0,47,198,,JR Hokkaido
+0,47,198,Shikanotani,JR Hokkaido
 0,47,199,Yūbari,JR Hokkaido
 0,48,2,Shimotsuke-Hanaoka,JR East
 0,48,3,Niita,JR East
@@ -1775,7 +1775,7 @@
 0,48,134,Tatekawame,JR East
 0,48,140,Hottoyuda,JR East
 0,48,228,Nishi-Samani,JR Hokkaido
-0,48,229,,JR Hokkaido
+0,48,229,Samani,JR Hokkaido
 0,49,65,Yonago,JR West
 0,49,66,Bakurōmachi,JR West
 0,49,67,Fujimichō,JR West
@@ -1801,7 +1801,7 @@
 0,50,198,Ishikari-Numata,JR Hokkaido
 0,50,209,Rumoi,JR Hokkaido
 0,50,218,Hashibetsu,JR Hokkaido
-0,50,219,,JR Hokkaido
+0,50,219,Mashike,JR Hokkaido
 0,51,2,Minami-Sakaide,JR East
 0,51,66,Hamagōchi,JR West
 0,51,67,Nagato-Motoyama,JR West
@@ -1828,7 +1828,7 @@
 0,52,194,Gakuden,JR Hokkaido
 0,52,195,Shikauchi,JR Hokkaido
 0,52,196,Naka-Furano,JR Hokkaido
-0,52,197,,JR Hokkaido
+0,52,197,Lavender Farm,JR Hokkaido
 0,52,198,Nishinaka,JR Hokkaido
 0,52,199,Kami-Furano,JR Hokkaido
 0,52,200,Bibaushi,JR Hokkaido
@@ -2016,7 +2016,7 @@
 0,63,18,Kaihimmakuhari,JR East
 0,63,19,Kemigawahama,JR East
 0,63,20,Inage-Kaigan,JR East
-0,63,22,,JR East
+0,63,22,Chiba-Minato,JR East
 0,63,24,Soga,JR East
 0,63,134,Uzen-Kanezawa,JR East
 0,63,135,Uzen-Nagasaki,JR East
@@ -2087,7 +2087,7 @@
 0,66,26,Kaizu,Aichi Loop Railway
 0,66,27,Homi,Aichi Loop Railway
 0,66,29,Sasabara,Aichi Loop Railway
-0,66,31,,Aichi Loop Railway
+0,66,31,Yakusa,Aichi Loop Railway
 0,66,33,Yamaguchi,Aichi Loop Railway
 0,66,35,Setoguchi,Aichi Loop Railway
 0,66,37,Setoshi,Aichi Loop Railway
@@ -2111,7 +2111,7 @@
 0,68,3,Nagamori,JR Central
 0,68,4,Naka,JR Central
 0,68,6,Sohara,JR Central
-0,68,7,,JR Central
+0,68,7,Kagamigahara,JR Central
 0,68,9,Unuma,JR Central
 0,68,11,Sakahogi,JR Central
 0,68,12,Mino-Ōta,JR Central
@@ -2126,7 +2126,7 @@
 0,68,40,,JR Central
 0,70,1,Tokyo,JR Central
 0,70,3,Shinagawa,JR Central
-0,70,5,Shin‐Yokohama,JR Central
+0,70,5,Shin-Yokohama,JR Central
 0,70,9,Odawara,JR Central
 0,70,11,Atami,JR Central
 0,70,13,Mishima,JR Central
@@ -2140,8 +2140,8 @@
 0,70,33,Gifu-Hashima,JR Central
 0,70,35,Maibara,JR Central
 0,70,41,Kyōto,JR Central
-0,70,45,,JR Central
-0,70,51,Shin‐Kobe,JR West
+0,70,45,Shin-Ōsaka,JR Central
+0,70,51,Shin-Kobe,JR West
 0,70,53,Nishi-Akashi,JR West
 0,70,55,Himeji,JR West
 0,70,57,Aioi,JR West
@@ -2183,7 +2183,7 @@
 0,71,37,Shichinohe-Towada,JR East
 0,71,39,Shin-Aomori,JR East
 0,71,129,Hakata,JR Kyushu
-0,71,132,,JR Kyushu
+0,71,132,Shin-Tosu,JR Kyushu
 0,71,135,Kurume,JR Kyushu
 0,71,136,Chikugo-Funagoya,JR Kyushu
 0,71,138,Shin-Ōmuta,JR Kyushu
@@ -2193,7 +2193,7 @@
 0,71,150,Shin-Minamata,JR Kyushu
 0,71,153,Izumi,JR Kyushu
 0,71,156,Sendai,JR Kyushu
-0,71,159,Kagoshima‐Chūō,JR Kyushu
+0,71,159,Kagoshima-Chūō,JR Kyushu
 0,72,7,Kumagaya,JR East
 0,72,8,Honjō-Waseda,JR East
 0,72,9,Takasaki,JR East
@@ -2333,10 +2333,10 @@
 0,88,7,Shimogiri,JR Central
 0,88,9,Kani,JR Central
 0,88,10,Mino Kawai,JR Central
-0,88,66,,JR Kyushu
+0,88,66,Shin-Tosu,JR Kyushu
 0,88,67,Hizen-Fumoto,JR Kyushu
 0,88,69,Nakabaru,JR Kyushu
-0,88,71,,JR Kyushu
+0,88,71,Yoshinogari-Kōen,JR Kyushu
 0,88,72,Kanzaki,JR Kyushu
 0,88,74,Igaya,JR Kyushu
 0,88,76,Saga,JR Kyushu
@@ -2363,7 +2363,7 @@
 0,91,2,Fukushima,JR West
 0,91,3,Noda,JR West
 0,91,4,Nishikujō,JR West
-0,91,6,,JR West
+0,91,6,Bentenchō,JR West
 0,91,7,Taishō,JR West
 0,91,8,Ashiharabashi,JR West
 0,91,10,Imamiya,JR West
@@ -2440,8 +2440,8 @@
 0,95,28,Kamo,JR West
 0,95,30,Kasagi,JR West
 0,95,31,Ōgawara,JR West
-0,95,32,,JR West
-0,95,33,,JR West
+0,95,32,Tsukigaseguchi,JR West
+0,95,33,Shimagahara,JR West
 0,95,34,Iga-Ueno,JR West
 0,95,35,Sanagu,JR West
 0,95,36,Shindō,JR West
@@ -2463,13 +2463,13 @@
 0,95,65,Eiwa,JR Central
 0,95,66,Kanie,JR Central
 0,95,67,Haruta,JR Central
-0,95,68,,JR Central
+0,95,68,Hatta,JR Central
 0,96,1,Kyōto,JR West
 0,96,2,Tōfukuji,JR West
 0,96,3,Inari,JR West
 0,96,4,JR Fujinomori,JR West
 0,96,6,Momoyama,JR West
-0,96,7,,JR West
+0,96,7,Rokujizō,JR West
 0,96,8,Kohata,JR West
 0,96,9,Ōbaku,JR West
 0,96,12,Uji,JR West
@@ -2506,7 +2506,7 @@
 0,98,99,Yufuin,JR Kyushu
 0,99,2,Bishōen,JR West
 0,99,3,Minami-Tanabe,JR West
-0,99,4,,JR West
+0,99,4,Tsurugaoka,JR West
 0,99,6,Nagai,JR West
 0,99,7,Abikochō,JR West
 0,99,8,Sugimotochō,JR West
@@ -2561,7 +2561,7 @@
 0,102,75,Ippommatsu,JR Kyushu
 0,102,76,Tagawa-Ita,JR Kyushu
 0,102,77,Tagawa-Gotōji,JR Kyushu
-0,102,91,,JR Kyushu
+0,102,91,Imayama,JR Kyushu
 0,103,10,Teramae,JR West
 0,103,15,Fukusaki,JR West
 0,103,16,Mizoguchi,JR West
@@ -2575,7 +2575,7 @@
 0,103,134,Uchiko,JR Shikoku
 0,104,132,Futana,JR Shikoku
 0,104,134,Ōuchi,JR Shikoku
-0,105,11,,JR West
+0,105,11,Katamachi,JR West
 0,105,12,Kyōbashi,JR West
 0,105,13,Shigino,JR West
 0,105,14,Hanaten,JR West
@@ -2584,7 +2584,7 @@
 0,105,18,Suminodō,JR West
 0,105,19,Nozaki,JR West
 0,105,21,Shijōnawate,JR West
-0,105,22,,JR West
+0,105,22,Shinobugaoka,JR West
 0,105,23,,JR West
 0,105,24,Hoshida,JR West
 0,105,25,Kawachi-Iwafune,JR West
@@ -2685,7 +2685,7 @@
 0,111,94,Chikuzen-Yamae,JR Kyushu
 0,112,2,Higashi-Hagoromo,JR West
 0,112,34,Rinkū Town,JR West
-0,112,36,,JR West
+0,112,36,Kansai Airport,JR West
 0,113,1,Tsu,Ise Railway
 0,113,3,Higashi-Ishinden,Ise Railway
 0,113,5,Kawage,Ise Railway
@@ -2821,7 +2821,7 @@
 0,136,37,Shimodate,Kantō Railway
 0,138,1,Sanuki,Kantō Railway
 0,138,3,Ireji,Kantō Railway
-0,138,5,,Kantō Railway
+0,138,5,Ryūgasaki,Kantō Railway
 0,139,7,Sendai Airport,Sendai Airport Transit
 0,140,1,Chōshi,Choshi Electric Railway
 0,140,13,Inuboh,Choshi Electric Railway
@@ -2835,7 +2835,7 @@
 0,143,13,Koshigoe,Enoshima Electric Railway
 0,143,15,Kamakurakōkōmae,Enoshima Electric Railway
 0,143,17,Shichirigahama,Enoshima Electric Railway
-0,143,19,,Enoshima Electric Railway
+0,143,19,Inamuragasaki,Enoshima Electric Railway
 0,143,21,Gokurakuji,Enoshima Electric Railway
 0,143,23,Hase,Enoshima Electric Railway
 0,143,25,Yuigahama,Enoshima Electric Railway
@@ -2860,9 +2860,9 @@
 0,146,6,Wadamachi,Sagami Railway
 0,146,7,Kamihoshikawa,Sagami Railway
 0,146,8,Nishiya,Sagami Railway
-0,146,9,,Sagami Railway
+0,146,9,Tsurugamine,Sagami Railway
 0,146,10,Futamatagawa,Sagami Railway
-0,146,11,,Sagami Railway
+0,146,11,Kibōgaoka,Sagami Railway
 0,146,12,Mitsukyō,Sagami Railway
 0,146,13,Seya,Sagami Railway
 0,146,14,Yamato,Sagami Railway
@@ -2877,21 +2877,21 @@
 0,147,5,Izumino,Sagami Railway
 0,147,7,Izumi-chūō,Sagami Railway
 0,147,8,Yumegaoka,Sagami Railway
-0,147,9,,Sagami Railway
+0,147,9,Shōnandai,Sagami Railway
 0,148,1,Shin-Sugita,
-0,148,3,,
+0,148,3,Nambu-Shijō,
 0,148,4,Dome-mae,Hanshin Electric Railway
-0,148,5,,
-0,148,7,,
-0,148,9,,
-0,148,11,,
-0,148,13,,
-0,148,15,,
-0,148,17,,
-0,148,19,,
-0,148,21,,
-0,148,23,,
-0,148,25,,
+0,148,5,Torihama,
+0,148,7,Namiki-Kita,
+0,148,9,Namiki-Chūō,
+0,148,11,Sachiura,
+0,148,13,Sangyōshinkō Center,
+0,148,15,Fukuura,
+0,148,17,Shidai-Igakubu,
+0,148,19,Hakkeijima,
+0,148,21,Uminokōen-Shibaguchi,
+0,148,23,Uminokōen-Minamiguchi,
+0,148,25,Nojimakōen,
 0,148,27,Kanazawa-hakkei,
 0,149,1,Mito,Kashima Rinkai Railway
 0,149,3,Higashi-Mito,Kashima Rinkai Railway
@@ -2908,7 +2908,7 @@
 0,149,24,Chōjagahama Shiosai Hamanasu Kōenmae,Kashima Rinkai Railway
 0,149,25,Kōyadai,Kashima Rinkai Railway
 0,149,27,Kashima Soccer Stadium,Kashima Rinkai Railway
-0,151,4,,Yokohama Subway
+0,151,4,Kannai,Yokohama Subway
 0,151,6,Isezaki-chōjamachi,Yokohama Subway
 0,151,8,Bandōbashi,Yokohama Subway
 0,151,10,Yoshinochō,Yokohama Subway
@@ -2924,8 +2924,8 @@
 0,151,30,Nakada,Yokohama Subway
 0,151,32,Tateba,Yokohama Subway
 0,151,34,Shimoiida,Yokohama Subway
-0,151,36,,Yokohama Subway
-0,153,20,,Yokohama Subway
+0,151,36,Shōnandai,Yokohama Subway
+0,153,20,Kannai,Yokohama Subway
 0,153,22,Sakuragichō,Yokohama Subway
 0,153,24,Takashimachō,Yokohama Subway
 0,153,26,Yokohama,Yokohama Subway
@@ -2933,7 +2933,7 @@
 0,153,30,Mitsuzawa-kamichō,Yokohama Subway
 0,153,32,Katakurachō,Yokohama Subway
 0,153,34,Kishine-kōen,Yokohama Subway
-0,153,36,Shin‐Yokohama,Yokohama Subway
+0,153,36,Shin-Yokohama,Yokohama Subway
 0,153,38,Kita Shin-Yokohama,Yokohama Subway
 0,153,40,Nippa,Yokohama Subway
 0,153,42,Nakamachidai,Yokohama Subway
@@ -2956,10 +2956,10 @@
 0,157,2,,Tobu Railway
 0,157,3,Hikifune,Tobu Railway
 0,157,4,Higashi-Mukōjima,Tobu Railway
-0,157,5,,Tobu Railway
+0,157,5,Kanegafuchi,Tobu Railway
 0,157,6,Horikiri,Tobu Railway
 0,157,7,Ushida,Tobu Railway
-0,157,8,,Tobu Railway
+0,157,8,Kita-Senju,Tobu Railway
 0,157,9,Kosuge,Tobu Railway
 0,157,10,Gotanno,Tobu Railway
 0,157,11,Umejima,Tobu Railway
@@ -3120,7 +3120,7 @@
 0,165,48,Funabashi,Tobu Railway
 0,168,1,Hikifune,Tobu Railway
 0,168,3,Oshiage,Tobu Railway
-0,169,1,,Tobu Railway
+0,169,1,Ikebukuro,Tobu Railway
 0,169,2,Kita-Ikebukuro,Tobu Railway
 0,169,3,Shimo-Itabashi,Tobu Railway
 0,169,4,Ōyama,Tobu Railway
@@ -3173,7 +3173,7 @@
 0,175,1,Keisei Ueno,Keisei Electric Railway
 0,175,3,Nippori,Keisei Electric Railway
 0,175,4,Shim-Mikawashima,Keisei Electric Railway
-0,175,5,,Keisei Electric Railway
+0,175,5,Machiya,Keisei Electric Railway
 0,175,6,Senjuōhashi,Keisei Electric Railway
 0,175,7,Keisei Sekiya,Keisei Electric Railway
 0,175,8,Horikiri-Shōbuen,Keisei Electric Railway
@@ -3259,7 +3259,7 @@
 0,182,17,Takifudō,Shin-Keisei Electric Railway
 0,182,18,Takanekōdan,Shin-Keisei Electric Railway
 0,182,19,Takanekido,Shin-Keisei Electric Railway
-0,182,20,,Shin-Keisei Electric Railway
+0,182,20,Kita-Narashino,Shin-Keisei Electric Railway
 0,182,21,Narashino,Shin-Keisei Electric Railway
 0,182,22,Yakuendai,Shin-Keisei Electric Railway
 0,182,23,Maebara,Shin-Keisei Electric Railway
@@ -3268,7 +3268,7 @@
 0,184,1,Nishi-Funabashi,Tōyō Rapid Railway
 0,184,3,Higashi-Kaijin,Tōyō Rapid Railway
 0,184,6,Hasama,Tōyō Rapid Railway
-0,184,8,,Tōyō Rapid Railway
+0,184,8,Kita-Narashino,Tōyō Rapid Railway
 0,184,9,Funabashi-Nichidaimae,Tōyō Rapid Railway
 0,184,11,Yachiyo-Midorigaoka,Tōyō Rapid Railway
 0,184,14,Yachiyo-Chūō,Tōyō Rapid Railway
@@ -3282,14 +3282,14 @@
 0,185,7,Higashi-Matsudo,Hokuso-Railway
 0,185,12,Matsuhidai,Hokuso-Railway
 0,185,14,Ōmachi,Hokuso-Railway
-0,185,16,,Hokuso-Railway
+0,185,16,Shin-Kamagaya,Hokuso-Railway
 0,185,18,Nishi-Shiroi,Hokuso-Railway
 0,185,20,Shiroi,Hokuso-Railway
 0,185,22,Komuro,Hokuso-Railway
 0,185,25,Chiba Newtown Chūō,Hokuso-Railway
 0,185,29,Inzai-Makinohara,Hokuso-Railway
 0,185,33,Inba-Nihon-Idai,Hokuso-Railway
-0,186,1,,Seibu Railway
+0,186,1,Ikebukuro,Seibu Railway
 0,186,3,Shiinamachi,Seibu Railway
 0,186,4,Higashi-Nagasaki,Seibu Railway
 0,186,5,Ekoda,Seibu Railway
@@ -3304,7 +3304,7 @@
 0,186,14,Shakujii-kōen,Seibu Railway
 0,186,15,Ōizumi-gakuen,Seibu Railway
 0,186,16,Hōya,Seibu Railway
-0,186,18,,Seibu Railway
+0,186,18,Hibarigaoka,Seibu Railway
 0,186,19,Higashi-Kurume,Seibu Railway
 0,186,20,Kiyose,Seibu Railway
 0,186,22,Akitsu,Seibu Railway
@@ -3331,10 +3331,10 @@
 0,186,66,Ashigakubo,Seibu Railway
 0,186,69,Yokoze,Seibu Railway
 0,186,71,Seibu-Chichibu,Seibu Railway
-0,189,1,,Seibu Railway
+0,189,1,Seibu-Shinjuku,Seibu Railway
 0,189,3,Takadanobaba,Seibu Railway
 0,189,4,Shimo-Ochiai,Seibu Railway
-0,189,5,,Seibu Railway
+0,189,5,Nakai,Seibu Railway
 0,189,6,Araiyakushi-mae,Seibu Railway
 0,189,7,Numabukuro,Seibu Railway
 0,189,8,Nogata,Seibu Railway
@@ -3399,7 +3399,7 @@
 0,196,7,Shin-Okachimachi,Metropolitan Intercity Railway Company
 0,196,9,Asakusa,Metropolitan Intercity Railway Company
 0,196,11,Minami-Senju,Metropolitan Intercity Railway Company
-0,196,13,,Metropolitan Intercity Railway Company
+0,196,13,Kita-Senju,Metropolitan Intercity Railway Company
 0,196,16,Aoi,Metropolitan Intercity Railway Company
 0,196,18,Rokuchō,Metropolitan Intercity Railway Company
 0,196,21,Yashio,Metropolitan Intercity Railway Company
@@ -3415,9 +3415,9 @@
 0,196,48,Bampaku-kinenkōen,Metropolitan Intercity Railway Company
 0,196,51,Kenkyū-gakuen,Metropolitan Intercity Railway Company
 0,196,54,Tsukuba,Metropolitan Intercity Railway Company
-0,197,1,,Keio
+0,197,1,Shinjuku,Keio
 0,197,2,Hatsudai,Keio
-0,197,3,,Keio
+0,197,3,Hatagaya,Keio
 0,197,4,Sasazuka,Keio
 0,197,5,Daitabashi,Keio
 0,197,6,Meidaimae,Keio
@@ -3428,7 +3428,7 @@
 0,197,11,Roka-kōen,Keio
 0,197,12,Chitose-Karasuyama,Keio
 0,197,13,Sengawa,Keio
-0,197,14,,Keio
+0,197,14,Tsutsujigaoka,Keio
 0,197,15,Shibasaki,Keio
 0,197,16,Kokuryō,Keio
 0,197,17,Fuda,Keio
@@ -3441,7 +3441,7 @@
 0,197,24,Fuchū,Keio
 0,197,25,Bubaigawara,Keio
 0,197,26,Nakagawara,Keio
-0,197,27,,Keio
+0,197,27,Seiseki-Sakuragaoka,Keio
 0,197,28,Mogusaen,Keio
 0,197,29,Takahatafudō,Keio
 0,197,30,Minamidaira,Keio
@@ -3485,7 +3485,7 @@
 0,203,10,Nishi-Eifuku,Keio
 0,203,11,Hamadayama,Keio
 0,203,12,Takaido,Keio
-0,203,13,,Keio
+0,203,13,Fujimigaoka,Keio
 0,203,14,Kugayama,Keio
 0,203,15,Mitakadai,Keio
 0,203,16,Inokashira-kōen,Keio
@@ -3696,7 +3696,7 @@
 0,222,6,Odakyu Nagayama,Odakyu Electric Railway
 0,222,8,Odakyu Tama Center,Odakyu Electric Railway
 0,222,10,Karakida,Odakyu Electric Railway
-0,224,1,,Odakyu Electric Railway
+0,224,1,Shinjuku,Odakyu Electric Railway
 0,224,2,Minami-Shinjuku,Odakyu Electric Railway
 0,224,3,Sangūbashi,Odakyu Electric Railway
 0,224,4,Yoyogi-Hachiman,Odakyu Electric Railway
@@ -3752,7 +3752,7 @@
 0,225,8,Sakuragaoka,Odakyu Electric Railway
 0,225,9,Kōza-Shibuya,Odakyu Electric Railway
 0,225,11,Chōgo,Odakyu Electric Railway
-0,225,12,,Odakyu Electric Railway
+0,225,12,Shōnandai,Odakyu Electric Railway
 0,225,13,Mutsuai-Nichidaimae,Odakyu Electric Railway
 0,225,14,Zengyō,Odakyu Electric Railway
 0,225,15,Fujisawa-Hommachi,Odakyu Electric Railway
@@ -3764,39 +3764,39 @@
 0,227,45,Tawaramachi,Tokyo Metro
 0,227,46,Inarimachi,Tokyo Metro
 0,227,47,Ueno,Tokyo Metro
-0,227,48,,Tokyo Metro
+0,227,48,Ueno-hirokōji,Tokyo Metro
 0,227,49,Suehirochō,Tokyo Metro
 0,227,50,Kanda,Tokyo Metro
-0,227,51,,Tokyo Metro
+0,227,51,Mitsukoshimae,Tokyo Metro
 0,227,52,Nihombashi,Tokyo Metro
 0,227,53,Kyōbashi,Tokyo Metro
-0,227,54,,Tokyo Metro
+0,227,54,Ginza,Tokyo Metro
 0,227,55,Shimbashi,Tokyo Metro
-0,227,56,,Tokyo Metro
-0,227,57,,Tokyo Metro
-0,227,58,,Tokyo Metro
+0,227,56,Toranomon,Tokyo Metro
+0,227,57,Tameike-Sannō,Tokyo Metro
+0,227,58,Akasaka-mitsuke,Tokyo Metro
 0,227,59,Aoyama-itchōme,Tokyo Metro
-0,227,60,,Tokyo Metro
-0,227,61,,Tokyo Metro
+0,227,60,Gaiemmae,Tokyo Metro
+0,227,61,Omotesandō,Tokyo Metro
 0,227,62,Shibuya,Tokyo Metro
 0,227,71,Kita-Ayase,Tokyo Metro
 0,227,72,Ayase,Tokyo Metro
-0,227,74,,Tokyo Metro
-0,227,76,,Tokyo Metro
+0,227,74,Kita-Senju,Tokyo Metro
+0,227,76,Machiya,Tokyo Metro
 0,227,77,Nishi-Nippori,Tokyo Metro
-0,227,78,,Tokyo Metro
-0,227,79,,Tokyo Metro
+0,227,78,Sendagi,Tokyo Metro
+0,227,79,Nezu,Tokyo Metro
 0,227,80,Yushima,Tokyo Metro
-0,227,81,,Tokyo Metro
+0,227,81,Shin-Ochanomizu,Tokyo Metro
 0,227,83,Ōtemachi,Tokyo Metro
 0,227,84,Nijūbashimae,Tokyo Metro
-0,227,85,,Tokyo Metro
+0,227,85,Hibiya,Tokyo Metro
 0,227,86,Kasumigaseki,Tokyo Metro
-0,227,87,,Tokyo Metro
+0,227,87,Kokkai-gijidō-mae,Tokyo Metro
 0,227,88,Akasaka,Tokyo Metro
 0,227,89,Nogizaka,Tokyo Metro
-0,227,91,,Tokyo Metro
-0,227,92,,Tokyo Metro
+0,227,91,Omotesandō,Tokyo Metro
+0,227,92,Meiji-Jingūmae,Tokyo Metro
 0,227,93,Yoyogi-Kōen,Tokyo Metro
 0,227,94,Yoyogi-Uehara,Tokyo Metro
 0,227,101,Wakōshi,Tokyo Metro
@@ -3807,14 +3807,14 @@
 0,227,109,Kotake-mukaihara,Tokyo Metro
 0,227,110,Senkawa,Tokyo Metro
 0,227,111,Kanamechō,Tokyo Metro
-0,227,112,,Tokyo Metro
+0,227,112,Ikebukuro,Tokyo Metro
 0,227,113,Higashi-Ikebukuro,Tokyo Metro
 0,227,114,Gokokuji,Tokyo Metro
 0,227,115,Edogawabashi,Tokyo Metro
 0,227,117,Iidabashi,Tokyo Metro
-0,227,118,,Tokyo Metro
+0,227,118,Ichigaya,Tokyo Metro
 0,227,119,Kōjimachi,Tokyo Metro
-0,227,120,,Tokyo Metro
+0,227,120,Nagatachō,Tokyo Metro
 0,227,121,Sakuradamon,Tokyo Metro
 0,227,122,Yūrakuchō,Tokyo Metro
 0,227,123,Ginza-itchōme,Tokyo Metro
@@ -3823,42 +3823,42 @@
 0,227,126,Toyosu,Tokyo Metro
 0,227,127,Tatsumi,Tokyo Metro
 0,227,128,Shin-Kiba,Tokyo Metro
-0,228,37,,Tokyo Metro
+0,228,37,Kita-Senju,Tokyo Metro
 0,228,39,Minami-Senju,Tokyo Metro
-0,228,40,,Tokyo Metro
+0,228,40,Minowa,Tokyo Metro
 0,228,41,Iriya,Tokyo Metro
 0,228,42,Ueno,Tokyo Metro
-0,228,43,,Tokyo Metro
+0,228,43,Naka-Okachimachi,Tokyo Metro
 0,228,44,Akihabara,Tokyo Metro
-0,228,45,,Tokyo Metro
-0,228,46,,Tokyo Metro
-0,228,47,,Tokyo Metro
+0,228,45,Kodemmachō,Tokyo Metro
+0,228,46,Ningyōchō,Tokyo Metro
+0,228,47,Kayabachō,Tokyo Metro
 0,228,48,Hatchōbori,Tokyo Metro
-0,228,49,,Tokyo Metro
-0,228,50,,Tokyo Metro
-0,228,51,,Tokyo Metro
-0,228,52,,Tokyo Metro
+0,228,49,Tsukiji,Tokyo Metro
+0,228,50,Higashi-ginza,Tokyo Metro
+0,228,51,Ginza,Tokyo Metro
+0,228,52,Hibiya,Tokyo Metro
 0,228,53,Kasumigaseki,Tokyo Metro
-0,228,55,,Tokyo Metro
-0,228,57,,Tokyo Metro
-0,228,59,,Tokyo Metro
+0,228,55,Kamiyachō,Tokyo Metro
+0,228,57,Roppongi,Tokyo Metro
+0,228,59,Hiroo,Tokyo Metro
 0,228,61,Ebisu,Tokyo Metro
 0,228,62,Naka-Meguro,Tokyo Metro
 0,228,65,Nakano,Tokyo Metro
 0,228,67,Ochiai,Tokyo Metro
 0,228,69,Takadanobaba,Tokyo Metro
-0,228,71,,Tokyo Metro
-0,228,72,,Tokyo Metro
+0,228,71,Waseda,Tokyo Metro
+0,228,72,Kagurazaka,Tokyo Metro
 0,228,73,Iidabashi,Tokyo Metro
-0,228,74,,Tokyo Metro
-0,228,75,,Tokyo Metro
+0,228,74,Kudanshita,Tokyo Metro
+0,228,75,Takebashi,Tokyo Metro
 0,228,76,Ōtemachi,Tokyo Metro
 0,228,77,Nihombashi,Tokyo Metro
-0,228,78,,Tokyo Metro
-0,228,80,,Tokyo Metro
+0,228,78,Kayabachō,Tokyo Metro
+0,228,80,Monzen-Nakachō,Tokyo Metro
 0,228,81,Kiba,Tokyo Metro
-0,228,82,,Tokyo Metro
-0,228,83,,Tokyo Metro
+0,228,82,Tōyōchō,Tokyo Metro
+0,228,83,Minami-Sunamachi,Tokyo Metro
 0,228,84,Nishi-Kasai,Tokyo Metro
 0,228,85,Kasai,Tokyo Metro
 0,228,87,Urayasu,Tokyo Metro
@@ -3867,80 +3867,80 @@
 0,228,90,Myōden,Tokyo Metro
 0,228,92,Baraki-Nakayama,Tokyo Metro
 0,228,94,Nishi-Funabashi,Tokyo Metro
-0,229,33,,Tokyo Metro
-0,229,35,,Tokyo Metro
+0,229,33,Ikebukuro,Tokyo Metro
+0,229,35,Shin-ōtsuka,Tokyo Metro
 0,229,36,Myōgadani,Tokyo Metro
 0,229,38,Kōrakuen,Tokyo Metro
-0,229,39,,Tokyo Metro
+0,229,39,Hongō-sanchōme,Tokyo Metro
 0,229,40,Ochanomizu,Tokyo Metro
-0,229,41,,Tokyo Metro
+0,229,41,Awajicho,Tokyo Metro
 0,229,42,Ōtemachi,Tokyo Metro
 0,229,43,Tokyo,Tokyo Metro
-0,229,44,,Tokyo Metro
+0,229,44,Ginza,Tokyo Metro
 0,229,45,Kasumigaseki,Tokyo Metro
-0,229,46,,Tokyo Metro
-0,229,47,,Tokyo Metro
+0,229,46,Kokkai-gijidō-mae,Tokyo Metro
+0,229,47,Akasaka-mitsuke,Tokyo Metro
 0,229,48,,Tokyo Metro
-0,229,49,,Tokyo Metro
-0,229,50,,Tokyo Metro
-0,229,51,,Tokyo Metro
-0,229,52,,Tokyo Metro
-0,229,53,,Tokyo Metro
-0,229,54,,Tokyo Metro
-0,229,55,,Tokyo Metro
-0,229,56,,Tokyo Metro
-0,229,57,,Tokyo Metro
-0,229,58,,Tokyo Metro
+0,229,49,Yotsuya-sanchōme,Tokyo Metro
+0,229,50,Shinjuku-gyoemmae,Tokyo Metro
+0,229,51,Shinjuku-sanchōme,Tokyo Metro
+0,229,52,Shinjuku,Tokyo Metro
+0,229,53,Nishi-Shinjuku,Tokyo Metro
+0,229,54,Nakano-sakaue,Tokyo Metro
+0,229,55,Shin-Nakano,Tokyo Metro
+0,229,56,Higashi-Kōenji,Tokyo Metro
+0,229,57,Shin-Kōenji,Tokyo Metro
+0,229,58,Minami-asagaya,Tokyo Metro
 0,229,60,Ogikubo,Tokyo Metro
-0,229,65,,Tokyo Metro
-0,229,66,,Tokyo Metro
-0,229,67,,Tokyo Metro
+0,229,65,Nakano-sakaue,Tokyo Metro
+0,229,66,Nakano-shimbashi,Tokyo Metro
+0,229,67,Nakano-fujimichō,Tokyo Metro
 0,229,68,Honancho,Tokyo Metro
 0,230,33,Shibuya,Tokyo Metro
-0,230,38,,Tokyo Metro
+0,230,38,Nagatachō,Tokyo Metro
 0,230,39,Hanzōmon,Tokyo Metro
-0,230,40,,Tokyo Metro
+0,230,40,Kudanshita,Tokyo Metro
 0,230,41,Jimbocho,Tokyo Metro
 0,230,43,Ōtemachi,Tokyo Metro
-0,230,44,,Tokyo Metro
+0,230,44,Mitsukoshimae,Tokyo Metro
 0,230,45,Suitengūmae,Tokyo Metro
 0,230,47,Kiyosumi-shirakawa,Tokyo Metro
 0,230,49,Sumiyoshi,Tokyo Metro
 0,230,51,Kinshichō,Tokyo Metro
 0,230,53,Oshiage,Tokyo Metro
 0,231,1,Kotake-mukaihara,Tokyo Metro
-0,231,4,,Tokyo Metro
+0,231,4,Ikebukuro,Tokyo Metro
 0,231,5,Fujisaki,Fukuoka Subway
 0,231,6,Zoshigaya,Tokyo Metro
 0,231,8,Nishi-Waseda,Tokyo Metro
 0,231,10,Higashi-Shinjuku,Tokyo Metro
-0,231,12,,Tokyo Metro
+0,231,12,Shinjuku-sanchōme,Tokyo Metro
 0,231,14,Kitasandō,Tokyo Metro
-0,231,16,,Tokyo Metro
+0,231,16,Meiji-Jingūmae,Tokyo Metro
 0,231,18,Shibuya,Tokyo Metro
 0,231,36,Meguro,Tokyo Metro
 0,231,37,Shirokanedai,Tokyo Metro
 0,231,38,Shirokane-takanawa,Tokyo Metro
 0,231,40,Azabu-Jūban,Tokyo Metro
 0,231,41,Roppongi-itchōme,Tokyo Metro
-0,231,42,,Tokyo Metro
-0,231,44,,Tokyo Metro
+0,231,42,Tameike-Sannō,Tokyo Metro
+0,231,44,Nagatachō,Tokyo Metro
 0,231,46,,Tokyo Metro
-0,231,48,,Tokyo Metro
+0,231,48,Ichigaya,Tokyo Metro
 0,231,50,Iidabashi,Tokyo Metro
 0,231,51,Kōrakuen,Tokyo Metro
 0,231,52,Tōdaimae,Tokyo Metro
 0,231,53,Hon-komagome,Tokyo Metro
 0,231,54,Komagome,Tokyo Metro
-0,231,55,,Tokyo Metro
+0,231,55,Nishigahara,Tokyo Metro
 0,231,56,Ōji,Tokyo Metro
 0,231,57,Ōji-Kamiya,Tokyo Metro
 0,231,59,Shimo,Tokyo Metro
 0,231,60,Akabane-iwabuchi,Tokyo Metro
 0,237,1,Akabane-iwabuchi,Saitama Railway
 0,237,2,Kawaguchi-Motogō,Saitama Railway
-0,237,4,,Saitama Railway
-0,237,6,,Saitama Railway
+0,237,4,Minami-Hatogaya,Saitama Railway
+0,237,6,Hatogaya,Saitama Railway
 0,237,8,Araijuku,Saitama Railway
 0,237,10,Tozuka-angyō,Saitama Railway
 0,237,12,Higashi-Kawaguchi,Saitama Railway
@@ -3955,10 +3955,10 @@
 0,239,4,Kuramae,Toei
 0,239,5,Asakusabashi,Toei
 0,239,6,Higashi-Nihonbashi,Toei
-0,239,7,,Toei
+0,239,7,Ningyōchō,Toei
 0,239,8,Nihombashi,Toei
 0,239,9,Takarachō,Toei
-0,239,10,,Toei
+0,239,10,Higashi-ginza,Toei
 0,239,11,Shimbashi,Toei
 0,239,12,Daimon,Toei
 0,239,13,Mita,Toei
@@ -3988,7 +3988,7 @@
 0,240,55,Suidōbashi,Toei
 0,240,56,Jimbocho,Toei
 0,240,57,Ōtemachi,Toei
-0,240,58,,Toei
+0,240,58,Hibiya,Toei
 0,240,59,Uchisaiwaichō,Toei
 0,240,60,Onarimon,Toei
 0,240,61,Shibakōen,Toei
@@ -3996,30 +3996,30 @@
 0,240,64,Shirokane-takanawa,Toei
 0,240,66,Shirokanedai,Toei
 0,240,68,Meguro,Toei
-0,241,1,,Toei
-0,241,2,,Toei
-0,241,3,,Toei
-0,241,4,,Toei
-0,241,5,,Toei
+0,241,1,Shinjuku,Toei
+0,241,2,Shinjuku-sanchōme,Toei
+0,241,3,Akebonobashi,Toei
+0,241,4,Ichigaya,Toei
+0,241,5,Kudanshita,Toei
 0,241,6,Jimbocho,Toei
 0,241,7,Ogawamachi,Toei
-0,241,8,,Toei
-0,241,9,,Toei
-0,241,10,,Toei
+0,241,8,Iwamotochō,Toei
+0,241,9,Bakuro-yokoyama,Toei
+0,241,10,Hamachō,Toei
 0,241,11,Morishita,Toei
 0,241,12,Kikugawa,Toei
 0,241,13,Sumiyoshi,Toei
-0,241,14,,Toei
+0,241,14,Nishi-ōjima,Toei
 0,241,15,Oshima,Toei
 0,241,17,Higashi-ōjima,Toei
 0,241,19,Funabori,Toei
-0,241,21,,Toei
-0,241,23,,Toei
-0,241,25,,Toei
+0,241,21,Ichinoe,Toei
+0,241,23,Mizue,Toei
+0,241,25,Shinozaki,Toei
 0,241,27,Motoyawata,Toei
 0,242,4,Morishita,Toei
 0,242,6,Kiyosumi-shirakawa,Toei
-0,242,8,,Toei
+0,242,8,Monzen-Nakachō,Toei
 0,242,10,Tsukishima,Toei
 0,242,12,Kachidoki,Toei
 0,242,14,Tsukijishijō,Toei
@@ -4027,16 +4027,16 @@
 0,242,18,Daimon,Toei
 0,242,20,Akabanebashi,Toei
 0,242,22,Azabu-Jūban,Toei
-0,242,24,,Toei
+0,242,24,Roppongi,Toei
 0,242,26,Aoyama-itchōme,Toei
 0,242,28,Kokuritsu-Kyōgijō,Toei
 0,242,30,Yoyogi,Toei
-0,242,32,,Toei
+0,242,32,Shinjuku,Toei
 0,242,34,Tochōmae,Toei
 0,242,36,Nishi-Shinjuku-gochōme,Toei
-0,242,38,,Toei
-0,242,40,,Toei
-0,242,42,,Toei
+0,242,38,Nakano-sakaue,Toei
+0,242,40,Higashi-Nakano,Toei
+0,242,42,Nakai,Toei
 0,242,44,Ochiai-minami-nagasaki,Toei
 0,242,46,Shin-egota,Toei
 0,242,48,Nerima,Toei
@@ -4048,7 +4048,7 @@
 0,243,7,Kuramae,Toei
 0,243,9,Shin-Okachimachi,Toei
 0,243,11,Ueno-okachimachi,Toei
-0,243,13,,Toei
+0,243,13,Hongō-sanchōme,Toei
 0,243,15,Kasuga,Toei
 0,243,17,Iidabashi,Toei
 0,243,19,Ushigome-kagurazaka,Toei
@@ -4059,77 +4059,77 @@
 0,243,29,Tochōmae,Toei
 0,244,6,Nippori,Toei
 0,244,8,Nishi-Nippori,Toei
-0,244,10,,Toei
+0,244,10,Akado-shōgakkōmae,Toei
 0,244,12,Kumanomae,Toei
-0,244,14,,Toei
-0,244,16,,Toei
+0,244,14,Adachi-Odai,Toei
+0,244,16,Ōgi-ōhashi,Toei
 0,244,18,Takano,Toei
 0,244,20,Kōhoku,Toei
-0,244,22,,Toei
-0,244,24,,Toei
-0,244,26,,Toei
-0,244,28,,Toei
-0,244,30,,Toei
+0,244,22,Nishiaraidaishi-nishi,Toei
+0,244,24,Yazaike,Toei
+0,244,26,Toneri-kōen,Toei
+0,244,28,Toneri,Toei
+0,244,30,Minumadai-shinsuikōen,Toei
 0,246,31,Tama-Center,Tokyo Tama Intercity Monorail
-0,246,33,,Tokyo Tama Intercity Monorail
-0,246,35,,Tokyo Tama Intercity Monorail
-0,246,37,,Tokyo Tama Intercity Monorail
+0,246,33,Matsugaya,Tokyo Tama Intercity Monorail
+0,246,35,Ōtsuka-Teikyō-Daigaku,Tokyo Tama Intercity Monorail
+0,246,37,Chūō-Daigaku-Meisei-Daigaku,Tokyo Tama Intercity Monorail
 0,246,39,Tama-Dōbutsukōen,Tokyo Tama Intercity Monorail
-0,246,41,,Tokyo Tama Intercity Monorail
+0,246,41,Hodokubo,Tokyo Tama Intercity Monorail
 0,246,43,Takahatafudō,Tokyo Tama Intercity Monorail
-0,246,45,,Tokyo Tama Intercity Monorail
-0,246,47,,Tokyo Tama Intercity Monorail
-0,246,49,,Tokyo Tama Intercity Monorail
-0,246,51,,Tokyo Tama Intercity Monorail
-0,246,53,,Tokyo Tama Intercity Monorail
+0,246,45,Manganji,Tokyo Tama Intercity Monorail
+0,246,47,Kōshū-Kaidō,Tokyo Tama Intercity Monorail
+0,246,49,Shibasaki-Taiikukan,Tokyo Tama Intercity Monorail
+0,246,51,Tachikawa-Minami,Tokyo Tama Intercity Monorail
+0,246,53,Tachikawa-Kita,Tokyo Tama Intercity Monorail
 0,246,55,Takamatsu,Tokyo Tama Intercity Monorail
-0,246,57,,Tokyo Tama Intercity Monorail
-0,246,59,,Tokyo Tama Intercity Monorail
-0,246,61,,Tokyo Tama Intercity Monorail
+0,246,57,Tachihi,Tokyo Tama Intercity Monorail
+0,246,59,Izumi-Taiikukan,Tokyo Tama Intercity Monorail
+0,246,61,Sunagawa-Nanaban,Tokyo Tama Intercity Monorail
 0,246,63,Tamagawa-Jōsui,Tokyo Tama Intercity Monorail
-0,246,65,,Tokyo Tama Intercity Monorail
-0,246,67,,Tokyo Tama Intercity Monorail
+0,246,65,Sakura-Kaidō,Tokyo Tama Intercity Monorail
+0,246,67,Kamikitadai,Tokyo Tama Intercity Monorail
 0,247,1,Ōtsuki,
 0,249,1,Chiba,Chiba Urban Monorail
-0,249,3,,Chiba Urban Monorail
-0,249,5,,Chiba Urban Monorail
-0,249,7,,Chiba Urban Monorail
+0,249,3,Chiba-kōen,Chiba Urban Monorail
+0,249,5,Sakusabe,Chiba Urban Monorail
+0,249,7,Tendai,Chiba Urban Monorail
 0,249,9,Anagawa,Chiba Urban Monorail
-0,249,11,,Chiba Urban Monorail
-0,249,13,,Chiba Urban Monorail
-0,249,15,,Chiba Urban Monorail
+0,249,11,Sports Center,Chiba Urban Monorail
+0,249,13,Dōbutsukōen,Chiba Urban Monorail
+0,249,15,Mitsuwadai,Chiba Urban Monorail
 0,249,17,Tsuga,Chiba Urban Monorail
 0,249,19,Sakuragi,Chiba Urban Monorail
-0,249,21,,Chiba Urban Monorail
-0,249,23,,Chiba Urban Monorail
-0,249,25,,Chiba Urban Monorail
-0,249,65,,Chiba Urban Monorail
+0,249,21,Oguradai,Chiba Urban Monorail
+0,249,23,Chishirodai-Kita,Chiba Urban Monorail
+0,249,25,Chishirodai,Chiba Urban Monorail
+0,249,65,Chiba-Minato,Chiba Urban Monorail
 0,249,67,Shiyakusho-mae,Chiba Urban Monorail
 0,249,69,Chiba,Chiba Urban Monorail
 0,249,71,Sakaemachi,Chiba Urban Monorail
-0,249,73,,Chiba Urban Monorail
+0,249,73,Yoshikawa-kōen,Chiba Urban Monorail
 0,249,75,Kenchō-mae,Chiba Urban Monorail
-0,250,1,,Tokyo Monorail
+0,250,1,Monorail Hamamatsuchō,Tokyo Monorail
 0,250,3,Tennōzu Isle,Tokyo Monorail
-0,250,4,,Tokyo Monorail
-0,250,5,,Tokyo Monorail
-0,250,6,,Tokyo Monorail
-0,250,7,,Tokyo Monorail
+0,250,4,Ōi Keibajō-mae,Tokyo Monorail
+0,250,5,Ryūtsū Center,Tokyo Monorail
+0,250,6,Shōwajima,Tokyo Monorail
+0,250,7,Seibijō,Tokyo Monorail
 0,250,8,,Tokyo Monorail
 0,250,9,Tenkūbashi,Tokyo Monorail
 0,250,10,,Tokyo Monorail
 0,250,10,,Tokyo Monorail
-0,250,11,,Tokyo Monorail
-0,250,12,,Tokyo Monorail
-0,250,13,,Tokyo Monorail
+0,250,11,Shin-Seibijō,Tokyo Monorail
+0,250,12,Haneda Airport Terminal 1,Tokyo Monorail
+0,250,13,Haneda Airport Terminal 2,Tokyo Monorail
 0,251,1,Ōfuna,
 0,251,3,Fujimichō,
-0,251,5,,
-0,251,7,,
-0,251,9,,
-0,251,11,,
-0,251,13,,
-0,251,15,,
+0,251,5,Shōnan-Machiya,
+0,251,7,Shōnan-Fukasawa,
+0,251,9,Nishi-Kamakura,
+0,251,11,Kataseyama,
+0,251,13,Mejiroyamashita,
+0,251,15,Shōnan-Enoshima,
 0,252,1,Yūkarigaoka,Yamaman
 0,253,2,Mishima,Izuhakone Railway
 0,253,4,Mishima-Hirokōji,Izuhakone Railway
@@ -4173,7 +4173,7 @@
 0,255,28,Rendaiji,Izukyū Corporation
 0,255,30,Izukyū Shimoda,Izukyū Corporation
 1,129,40,Takabata,Nagoya Subway
-1,129,42,,Nagoya Subway
+1,129,42,Hatta,Nagoya Subway
 1,129,44,Iwatsuka,Nagoya Subway
 1,129,48,Nakamura Kōen,Nagoya Subway
 1,129,50,Nakamura Nisseki,Nagoya Subway
@@ -4205,12 +4205,12 @@
 1,130,32,Kamimaezu,Nagoya Subway
 1,130,34,Yabachō,Nagoya Subway
 1,130,36,Sakae,Nagoya Subway
-1,130,38,,Nagoya Subway
+1,130,38,Hisaya-ōdōri,Nagoya Subway
 1,130,40,,Nagoya Subway
 1,130,44,Meijō Kōen,Nagoya Subway
 1,130,48,Kurokawa,Nagoya Subway
 1,130,52,Shiga-hondōri,Nagoya Subway
-1,130,54,,Nagoya Subway
+1,130,54,Heian-dōri,Nagoya Subway
 1,130,56,Ōzone,Nagoya Subway
 1,131,30,Kami-Otai,Nagoya Subway
 1,131,32,Shōnai Ryokuchi Kōen,Nagoya Subway
@@ -4234,7 +4234,7 @@
 1,131,88,Akaike,Nagoya Subway
 1,132,6,Nishi Takakura,Nagoya Subway
 1,132,8,,Nagoya Subway
-1,132,12,,Nagoya Subway
+1,132,12,Temmachō,Nagoya Subway
 1,132,16,Horita,Nagoya Subway
 1,132,18,Myōon-dōri,Nagoya Subway
 1,132,20,Aratama-bashi,Nagoya Subway
@@ -4244,7 +4244,7 @@
 1,132,34,Nagoya Daigaku,Nagoya Subway
 1,132,36,Motoyama,Nagoya Subway
 1,132,38,Jiyūgaoka,Nagoya Subway
-1,132,40,,Nagoya Subway
+1,132,40,Chayagasaka,Nagoya Subway
 1,132,42,Sunadabashi,Nagoya Subway
 1,132,44,Nagoya Dome-mae Yada,Nagoya Subway
 1,133,50,Kamiiida,Nagoya Subway
@@ -4279,7 +4279,7 @@
 1,143,16,Kōen-nishi,
 1,143,19,Aichikyūhaku-kinen-kōen,
 1,143,22,Tōji-shiryōkan-minami,
-1,143,25,,
+1,143,25,Yakusa,
 1,165,50,Toyohashi,Nagoya Railroad
 1,165,52,Ina,Nagoya Railroad
 1,165,54,Odabuchi,Nagoya Railroad
@@ -4336,7 +4336,7 @@
 1,165,156,Shin-Kisogawa,Nagoya Railroad
 1,165,158,Kuroda,Nagoya Railroad
 1,165,160,Kisogawazutsumi,Nagoya Railroad
-1,165,162,,Nagoya Railroad
+1,165,162,Higashi Kasamatsu,Nagoya Railroad
 1,165,164,Kasamatsu,Nagoya Railroad
 1,165,166,Ginan,Nagoya Railroad
 1,165,168,Chajo,Nagoya Railroad
@@ -4399,7 +4399,7 @@
 1,171,8,Umetsubo,Nagoya Railroad
 1,171,10,Kamitoyota,Nagoya Railroad
 1,171,12,Jōsui,Nagoya Railroad
-1,171,14,,Nagoya Railroad
+1,171,14,Miyoshigaoka,Nagoya Railroad
 1,171,16,Kurozasa,Nagoya Railroad
 1,171,18,Komenoki,Nagoya Railroad
 1,171,20,Nisshin,Nagoya Railroad
@@ -4428,14 +4428,14 @@
 1,172,50,Taya,Nagoya Railroad
 1,172,52,Tokoname,Nagoya Railroad
 1,172,54,Rinkū-Tokoname,Nagoya Railroad
-1,172,56,,Nagoya Railroad
+1,172,56,Central Japan International Airport,Nagoya Railroad
 1,173,8,Ōe,Nagoya Railroad
 1,173,10,Higashi-Nagoyakō,Nagoya Railroad
 1,174,8,Ōtagawa,Nagoya Railroad
 1,174,10,Takayokosuka,Nagoya Railroad
 1,174,12,Minami-Kagiya,Nagoya Railroad
 1,174,14,Yawata Shinden,Nagoya Railroad
-1,174,16,,Nagoya Railroad
+1,174,16,Tatsumigaoka,Nagoya Railroad
 1,174,18,Shirasawa,Nagoya Railroad
 1,174,20,Sakabe,Nagoya Railroad
 1,174,21,Agui,Nagoya Railroad
@@ -4449,7 +4449,7 @@
 1,174,36,Age,Nagoya Railroad
 1,174,38,Chita-Taketoyo,Nagoya Railroad
 1,174,40,Fuki,Nagoya Railroad
-1,174,42,,Nagoya Railroad
+1,174,42,Futto,Nagoya Railroad
 1,174,44,Kōwaguchi,Nagoya Railroad
 1,174,46,Kōwa,Nagoya Railroad
 1,175,8,Fuki,Nagoya Railroad
@@ -4483,7 +4483,7 @@
 1,177,36,Hibino,Nagoya Railroad
 1,177,38,Saya,Nagoya Railroad
 1,177,40,Gonosan,Nagoya Railroad
-1,177,42,,Nagoya Railroad
+1,177,42,Yatomiguchi,Nagoya Railroad
 1,177,44,Yatomi,Nagoya Railroad
 1,178,8,Meitetsu-Ichinomiya,Nagoya Railroad
 1,178,10,Nishi-Ichinomiya,Nagoya Railroad
@@ -4559,14 +4559,14 @@
 1,185,30,Mikakino,Nagoya Railroad
 1,185,32,Nijikken,Nagoya Railroad
 1,185,34,Meiden Kakamigahara,Nagoya Railroad
-1,185,36,,Nagoya Railroad
+1,185,36,Ogase,Nagoya Railroad
 1,185,38,Haba,Nagoya Railroad
 1,185,40,Unumajuku,Nagoya Railroad
 1,185,42,Shin-Unuma,Nagoya Railroad
 1,186,10,Sakaemachi,Nagoya Railroad
 1,186,14,Higashiōte,Nagoya Railroad
 1,186,18,Shimizu,Nagoya Railroad
-1,186,20,,Nagoya Railroad
+1,186,20,Amagasaka,Nagoya Railroad
 1,186,22,Morishita,Nagoya Railroad
 1,186,24,Ōzone,Nagoya Railroad
 1,186,26,Yada,Nagoya Railroad
@@ -4583,14 +4583,14 @@
 1,186,46,Shin-Seto,Nagoya Railroad
 1,186,48,Seto-Shiyakusho-mae,Nagoya Railroad
 1,186,50,Owari Seto,Nagoya Railroad
-1,188,40,,Nagoya Railroad
+1,188,40,Hon Ibi,Nagoya Railroad
 1,190,8,,Nagoya Railroad
 1,190,10,,Nagoya Railroad
 1,190,12,,Nagoya Railroad
 1,199,1,Komaki,
 1,199,4,Komakihara,
 1,199,7,Higashi-Tanaka,
-1,199,10,,
+1,199,10,Kamisue,
 1,199,13,Tokadai Nishi,
 1,199,16,Tokadai Center,
 1,199,19,Tokadaihigashi,
@@ -4607,7 +4607,7 @@
 1,213,16,Kenritsu Bijutsukanmae,Shizuoka Railway
 1,213,17,Kusanagi,Shizuoka Railway
 1,213,21,Mikadodai,Shizuoka Railway
-1,213,23,,Shizuoka Railway
+1,213,23,Kitsunegasaki,Shizuoka Railway
 1,213,25,Sakurabashi,Shizuoka Railway
 1,213,27,Irieoka,Shizuoka Railway
 1,213,29,Shin-Shimizu,Shizuoka Railway
@@ -4615,13 +4615,13 @@
 2,129,1,,Osaka Metro
 2,129,21,Esaka,Osaka Metro
 2,129,22,Higashi-Mikuni,Osaka Metro
-2,129,23,,Osaka Metro
+2,129,23,Shin-Ōsaka,Osaka Metro
 2,129,24,Nishinakajima-Minamigata,Osaka Metro
 2,129,27,Nakatsu,Osaka Metro
-2,129,28,,Osaka Metro
+2,129,28,Umeda,Osaka Metro
 2,129,31,Yodoyabashi,Osaka Metro
 2,129,33,Hommachi,Osaka Metro
-2,129,35,,Osaka Metro
+2,129,35,Shinsaibashi,Osaka Metro
 2,129,36,,Osaka Metro
 2,129,37,Daikokuchō,Osaka Metro
 2,129,40,Dōbutsuen-mae,Osaka Metro
@@ -4636,7 +4636,7 @@
 2,129,135,,Osaka Metro
 2,130,18,Dainichi,Osaka Metro
 2,130,20,Moriguchi,Osaka Metro
-2,130,21,,Osaka Metro
+2,130,21,Taishibashi-Imaichi,Osaka Metro
 2,130,22,Sembayashi-Omiya,Osaka Metro
 2,130,23,Sekime-Takadono,Osaka Metro
 2,130,24,Noe-Uchindai,Osaka Metro
@@ -4674,9 +4674,9 @@
 2,132,22,Cosmosquare,Osaka Metro
 2,132,23,Ōsakakō,Osaka Metro
 2,132,24,Asashiobashi,Osaka Metro
-2,132,25,,Osaka Metro
+2,132,25,Bentenchō,Osaka Metro
 2,132,29,Kujō,Osaka Metro
-2,132,31,,Osaka Metro
+2,132,31,Awaza,Osaka Metro
 2,132,33,Hommachi,Osaka Metro
 2,132,34,Sakaisuji-Hommachi,Osaka Metro
 2,132,36,Tanimachi Yonchōme,Osaka Metro
@@ -4687,8 +4687,8 @@
 2,132,43,Nagata,Osaka Metro
 2,133,27,Nodahanshin,Osaka Metro
 2,133,29,Tamagawa,Osaka Metro
-2,133,31,,Osaka Metro
-2,133,33,,Osaka Metro
+2,133,31,Awaza,Osaka Metro
+2,133,33,Nishi-Nagahori,Osaka Metro
 2,133,35,Sakuragawa,Osaka Metro
 2,133,36,,Osaka Metro
 2,133,37,Nihombashi,Osaka Metro
@@ -4708,9 +4708,9 @@
 2,134,37,Nihombashi,Osaka Metro
 2,134,38,Ebisuchō,Osaka Metro
 2,134,40,Dōbutsuen-mae,Osaka Metro
-2,134,42,,Osaka Metro
+2,134,42,Tengachaya,Osaka Metro
 2,135,7,Kadoma-minami,Osaka Metro
-2,135,8,,Osaka Metro
+2,135,8,Tsurumi-ryokuchi,Osaka Metro
 2,135,10,Yokozutsumi,Osaka Metro
 2,135,11,Imafuku-Tsurumi,Osaka Metro
 2,135,12,Gamō-yonchōme,Osaka Metro
@@ -4721,15 +4721,15 @@
 2,135,20,Tanimachi Rokuchōme,Osaka Metro
 2,135,21,Matsuyamachi,Osaka Metro
 2,135,22,Nagahoribashi,Osaka Metro
-2,135,23,,Osaka Metro
-2,135,25,,Osaka Metro
-2,135,26,,Osaka Metro
+2,135,23,Shinsaibashi,Osaka Metro
+2,135,25,Nishiōhashi,Osaka Metro
+2,135,26,Nishi-Nagahori,Osaka Metro
 2,135,27,Dome-mae Chiyozaki,Osaka Metro
 2,135,28,Taishō,Osaka Metro
 2,136,7,Itakano,Osaka Metro
 2,136,9,Zuikō Yonchōme,Osaka Metro
 2,136,11,Daidō-Toyosato,Osaka Metro
-2,136,13,,Osaka Metro
+2,136,13,Taishibashi-Imaichi,Osaka Metro
 2,136,15,Shimizu,Osaka Metro
 2,136,17,Shimmori-Furuichi,Osaka Metro
 2,136,19,Sekime-Seiiku,Osaka Metro
@@ -4752,7 +4752,7 @@
 2,138,168,Jūjō,Kyoto Subway
 2,138,169,Kuinabashi,Kyoto Subway
 2,138,170,Takeda,Kyoto Subway
-2,139,147,,Kyoto Subway
+2,139,147,Rokujizō,Kyoto Subway
 2,139,149,Ishida,Kyoto Subway
 2,139,151,Daigo,Kyoto Subway
 2,139,153,Ono,Kyoto Subway
@@ -4796,7 +4796,7 @@
 2,144,72,Kōsoku Kōbe,Hankyu Corporation
 2,144,73,Shinkaichi,Hankyu Corporation
 2,145,79,Minatogawa,
-2,147,1,,Hanshin Electric Railway
+2,147,1,Umeda,Hanshin Electric Railway
 2,147,3,Fukushima,Hanshin Electric Railway
 2,147,5,Noda,Hanshin Electric Railway
 2,147,7,Yodogawa,Hanshin Electric Railway
@@ -4827,7 +4827,7 @@
 2,147,55,Nishinada,Hanshin Electric Railway
 2,147,56,Iwaya,Hanshin Electric Railway
 2,147,58,Kasuganomichi,Hanshin Electric Railway
-2,147,60,,Hanshin Electric Railway
+2,147,60,Kobe City Subway Sannomiya,Hanshin Electric Railway
 2,147,62,Motomachi,Hanshin Electric Railway
 2,148,1,Ōsaka Namba,Hanshin Electric Railway
 2,148,3,Sakuragawa,Hanshin Electric Railway
@@ -4842,7 +4842,7 @@
 2,149,25,Higashi-Naruo,Hanshin Electric Railway
 2,149,26,Suzaki,Hanshin Electric Railway
 2,149,27,Mukogawadanchimae,Hanshin Electric Railway
-2,157,1,,Hankyu Corporation
+2,157,1,Umeda,Hankyu Corporation
 2,157,3,Nakatsu,Hankyu Corporation
 2,157,5,Jūsō,Hankyu Corporation
 2,157,7,Kanzakigawa,Hankyu Corporation
@@ -4857,8 +4857,8 @@
 2,157,28,Rokkō,Hankyu Corporation
 2,157,30,Ōji-kōen,Hankyu Corporation
 2,157,32,Kasuganomichi,Hankyu Corporation
-2,157,34,,Hankyu Corporation
-2,158,1,,Hankyu Corporation
+2,157,34,Kobe City Subway Sannomiya,Hankyu Corporation
+2,158,1,Umeda,Hankyu Corporation
 2,158,3,Nakatsu,Hankyu Corporation
 2,158,5,Jūsō,Hankyu Corporation
 2,158,7,Mikuni,Hankyu Corporation
@@ -4867,7 +4867,7 @@
 2,158,13,Sone,Hankyu Corporation
 2,158,15,Okamachi,Hankyu Corporation
 2,158,17,Toyonaka,Hankyu Corporation
-2,158,19,,Hankyu Corporation
+2,158,19,Hotarugaike,Hankyu Corporation
 2,158,21,Ishibashi,Hankyu Corporation
 2,158,23,Ikeda,Hankyu Corporation
 2,158,25,Kawanishi-Noseguchi,Hankyu Corporation
@@ -4877,7 +4877,7 @@
 2,158,33,Mefu-Jinja,Hankyu Corporation
 2,158,35,Kiyoshikōjin,Hankyu Corporation
 2,158,37,Takarazuka,Hankyu Corporation
-2,159,1,,Hankyu Corporation
+2,159,1,Umeda,Hankyu Corporation
 2,159,5,Jūsō,Hankyu Corporation
 2,159,7,Minamikata,Hankyu Corporation
 2,159,9,Sōzenji,Hankyu Corporation
@@ -4941,24 +4941,24 @@
 2,165,47,Kami-Katsura,Hankyu Corporation
 2,165,49,Matsuo,Hankyu Corporation
 2,165,51,Arashiyama,Hankyu Corporation
-2,171,1,,
-2,171,3,,
+2,171,1,Osaka Airport,
+2,171,3,Hotarugaike,
 2,171,5,,
-2,171,7,,
+2,171,7,Shōji,
 2,171,9,Senri-chuo,
 2,171,11,Yamada,
 2,171,13,Bampaku-kinenkōen,
-2,171,15,,
+2,171,15,Unobe,
 2,171,17,Minami-Ibaraki,
-2,171,19,,
-2,171,21,,
-2,171,23,,
+2,171,19,Sawaragi,
+2,171,21,Settsu,
+2,171,23,Minami Settsu,
 2,171,25,Dainichi,
 2,171,27,Kadoma-shi,
-2,172,15,,
-2,172,17,,
+2,172,15,Kōen-higashiguchi,
+2,172,17,Handai-byōin-mae,
 2,172,19,Toyokawa,
-2,172,21,,
+2,172,21,Saito-nishi,
 2,173,25,Kawanishi-Noseguchi,Nose Electric Railway
 2,173,27,Kinunobebashi,Nose Electric Railway
 2,173,29,Takiyama,Nose Electric Railway
@@ -4979,7 +4979,7 @@
 2,177,3,Imamiyaebisu,Nankai Electric Railway
 2,177,5,Shin-Imamiya,Nankai Electric Railway
 2,177,7,Haginochaya,Nankai Electric Railway
-2,177,9,,Nankai Electric Railway
+2,177,9,Tengachaya,Nankai Electric Railway
 2,177,11,Kishinosato-Tamade,Nankai Electric Railway
 2,177,15,Kohama,Nankai Electric Railway
 2,177,17,Sumiyoshitaisha,Nankai Electric Railway
@@ -5061,7 +5061,7 @@
 2,178,75,Kii-Hosokawa,Nankai Electric Railway
 2,178,77,Kii-Kamiya,Nankai Electric Railway
 2,178,79,Gokurakubashi,Nankai Electric Railway
-2,178,81,,Nankai Electric Railway
+2,178,81,Kōyasan,Nankai Electric Railway
 2,179,87,Wakayama,Nankai Electric Railway
 2,179,111,Kishi,Nankai Electric Railway
 2,180,85,Higashi-Matsue,Nankai Electric Railway
@@ -5077,10 +5077,10 @@
 2,182,35,Kyarabashi,Nankai Electric Railway
 2,182,37,Takashinohama,Nankai Electric Railway
 2,183,3,Rinkū Town,Nankai Electric Railway
-2,183,5,,Nankai Electric Railway
+2,183,5,Kansai Airport,Nankai Electric Railway
 2,186,29,Nakamozu,
 2,186,103,Fukai,
-2,186,107,,
+2,186,107,Izumigaoka,
 2,186,109,Toga-Mikita,
 2,186,111,Kōmyōike,
 2,186,113,Izumi-Chūō,
@@ -5153,7 +5153,7 @@
 2,198,112,Kisaichi,Keihan Electric Railway
 2,199,114,Kangetsukyō,Keihan Electric Railway
 2,199,116,Momoyama-minamiguchi,Keihan Electric Railway
-2,199,118,,Keihan Electric Railway
+2,199,118,Rokujizō,Keihan Electric Railway
 2,199,120,Kowata,Keihan Electric Railway
 2,199,122,Ōbaku,Keihan Electric Railway
 2,199,124,Mimurodo,Keihan Electric Railway
@@ -5235,7 +5235,7 @@
 2,214,124,Ono,Kobe Electric Railway
 2,214,126,Hata,Kobe Electric Railway
 2,214,128,Ao,Kobe Electric Railway
-2,215,96,Shin‐Kobe,
+2,215,96,Shin-Kobe,
 2,215,98,Tanigami,
 2,217,80,Nishidai,Sanyo Electric Railway
 2,217,82,Itayado,Sanyo Electric Railway
@@ -5568,7 +5568,7 @@
 2,241,9,Oiwake,"Kintetsu Railway Co., Ltd."
 2,241,10,Ogoso,"Kintetsu Railway Co., Ltd."
 2,241,11,Utsube,"Kintetsu Railway Co., Ltd."
-2,241,65,,"Kintetsu Railway Co., Ltd."
+2,241,65,Nishihino,"Kintetsu Railway Co., Ltd."
 2,242,3,Nakagawara,"Kintetsu Railway Co., Ltd."
 2,242,4,Ise-Matsumoto,"Kintetsu Railway Co., Ltd."
 2,242,6,Ise-Kawashima,"Kintetsu Railway Co., Ltd."
@@ -5617,8 +5617,8 @@
 2,250,185,Minatogawa-kōen,Kobe Subway
 2,250,187,Ōkurayama,Kobe Subway
 2,250,189,Kenchō-mae,Kobe Subway
-2,250,190,,Kobe Subway
-2,250,191,Shin‐Kobe,Kobe Subway
+2,250,190,Kobe City Subway Sannomiya,Kobe Subway
+2,250,191,Shin-Kobe,Kobe Subway
 2,251,202,Komagabayashi,Kobe Subway
 2,251,204,Karumo,Kobe Subway
 2,251,206,Misaki-Kōen,Kobe Subway
@@ -5630,25 +5630,25 @@
 2,251,217,Sannomiya-Hanadokeimae,Kobe Subway
 2,254,161,Sumiyoshi,
 2,254,163,Uozaki,
-2,254,165,,
-2,254,167,,
-2,254,169,,
-2,254,171,,
-2,255,181,,
-2,255,183,,
-2,255,185,,
-2,255,187,,
+2,254,165,Minami-Uozaki,
+2,254,167,Island Kitaguchi,
+2,254,169,Island Center,
+2,254,171,Marine Park,
+2,255,181,Kobe City Subway Sannomiya,
+2,255,183,Bōeki Center,
+2,255,185,Port Terminal,
+2,255,187,Naka Koen,
 2,255,189,,
-2,255,189,,
-2,255,191,,
-2,255,193,,
-2,255,195,,
+2,255,189,Minatojima,
+2,255,191,Shimin Hiroba,
+2,255,193,Minami Kōen,
+2,255,195,Naka Futō,
 2,255,197,Kita Futō,
 2,255,199,,
-2,255,199,,
+2,255,199,Iryo Center,
 2,255,201,,
 2,255,201,,
-2,255,203,,
+2,255,203,Kobe Airport,
 3,40,65,Kawanishi,Nishikigawa Tetsudo
 3,45,129,Tsukinoki,Abukuma Express
 3,45,131,Higashi-Funaoka,Abukuma Express
@@ -5829,7 +5829,7 @@
 3,214,53,Miyajidake,Nishi-Nippon Railroad
 3,214,55,Nishitetsu-Fukuma,Nishi-Nippon Railroad
 3,214,57,Hanami,Nishi-Nippon Railroad
-3,214,59,,Nishi-Nippon Railroad
+3,214,59,Nishitetsu-Koga,Nishi-Nippon Railroad
 3,214,61,Koga-Golfjomae,Nishi-Nippon Railroad
 3,214,63,Nishitetsu Shingū,Nishi-Nippon Railroad
 3,214,65,Mitoma,Nishi-Nippon Railroad
@@ -5871,7 +5871,7 @@
 3,215,145,Kushiwara,Nishi-Nippon Railroad
 3,215,147,Nishitetsu Kurume,Nishi-Nippon Railroad
 3,215,149,Hanabatake,Nishi-Nippon Railroad
-3,215,151,,Nishi-Nippon Railroad
+3,215,151,Terminal test,Nishi-Nippon Railroad
 3,215,153,Tsubuku,Nishi-Nippon Railroad
 3,215,155,Yasutake,Nishi-Nippon Railroad
 3,215,157,Daizenji,Nishi-Nippon Railroad
@@ -5896,12 +5896,12 @@
 3,231,11,Ōhorikōen,Fukuoka Subway
 3,231,13,Akasaka,Fukuoka Subway
 3,231,15,Tenjin,Fukuoka Subway
-3,231,17,,Fukuoka Subway
+3,231,17,Nakasu-Kawabata,Fukuoka Subway
 3,231,19,Gion,Fukuoka Subway
 3,231,21,Hakata,Fukuoka Subway
 3,231,23,Higashi-Hie,Fukuoka Subway
 3,231,25,Fukuokakūkō,Fukuoka Subway
-3,232,1,,Fukuoka Subway
+3,232,1,Nakasu-Kawabata,Fukuoka Subway
 3,232,3,Gofukumachi,Fukuoka Subway
 3,232,5,Chiyo-Kenchōguchi,Fukuoka Subway
 3,232,7,Maidashi-Kyūdai-byōin-mae,Fukuoka Subway
@@ -5924,5 +5924,5 @@
 3,233,27,Yakuin,Fukuoka Subway
 3,233,29,Watanabe-dōri,Fukuoka Subway
 3,233,31,Tenjin-minami,Fukuoka Subway
-3,249,65,,Chiba Urban Monorail
+3,249,65,Chiba-Minato,Chiba Urban Monorail
 3,249,75,Kenchō-mae,Chiba Urban Monorail

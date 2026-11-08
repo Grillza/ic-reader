@@ -43,6 +43,17 @@ OPERATOR_OVERRIDES = {
 }
 
 
+# Names Wikidata doesn't match (special entries and a few renamed stations).
+MANUAL = {
+    "羽田空港第1ビル": "Haneda Airport Terminal 1",
+    "羽田空港第2ビル": "Haneda Airport Terminal 2",
+    "羽田空港第3ビル": "Haneda Airport Terminal 3",
+    "モバイルSuica": "Mobile Suica",
+    "Suicaインターネットサービス": "Suica Internet Service",
+    "臨時窓口": "Temporary counter",
+}
+
+
 def sparql(query: str) -> list[dict]:
     # The query service may rate-limit hard (1 request/min); wait it out.
     for attempt in range(6):
@@ -109,7 +120,7 @@ def clean_ja(s: str) -> str:
 
 
 def clean_en(s: str) -> str:
-    s = re.sub(r"\s*\(.*?\)", "", s).strip()
+    s = re.sub(r"\s*\(.*?\)", "", s).strip().replace("\u2010", "-").replace("\u2011", "-")
     s = re.sub(r"\s+(Station|station|Stop|stop|Tram Stop|Stn\.?)$", "", s).strip()
     return s
 
@@ -169,6 +180,8 @@ def main():
             en = collections.Counter(same_op).most_common(1)[0][0]
         elif cands:
             en = collections.Counter(e for _, e in cands).most_common(1)[0][0]
+        if not en:
+            en = MANUAL.get(fold(name)) or ("Terminal test" if "試験" in name else None)
         if en:
             matched += 1
         out.append([area, line, station, en or "", op_en.get(company, "")])
