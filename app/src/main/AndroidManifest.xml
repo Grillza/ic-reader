@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
+
+    <application
+        android:name=".IcReaderApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher_default"
+        android:roundIcon="@mipmap/ic_launcher_default"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.IcReader">
+
+        <!-- Launched by the aliases below and directly by the system when a FeliCa card is tapped. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+        </activity>
+
+        <!-- One launcher entry per app icon; exactly one is enabled at a time (see AppIconManager). -->
+        <!-- ICON-ALIASES-START -->
+        <activity-alias
+            android:name=".LauncherDefault"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_default"
+            android:roundIcon="@mipmap/ic_launcher_default"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherSuica"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_suica"
+            android:roundIcon="@mipmap/ic_launcher_suica"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherPasmo"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_pasmo"
+            android:roundIcon="@mipmap/ic_launcher_pasmo"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherIcoca"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_icoca"
+            android:roundIcon="@mipmap/ic_launcher_icoca"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherToica"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_toica"
+            android:roundIcon="@mipmap/ic_launcher_toica"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherManaca"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_manaca"
+            android:roundIcon="@mipmap/ic_launcher_manaca"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherKitaca"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_kitaca"
+            android:roundIcon="@mipmap/ic_launcher_kitaca"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherSugoca"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_sugoca"
+            android:roundIcon="@mipmap/ic_launcher_sugoca"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherNimoca"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_nimoca"
+            android:roundIcon="@mipmap/ic_launcher_nimoca"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherHayakaken"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_hayakaken"
+            android:roundIcon="@mipmap/ic_launcher_hayakaken"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherPitapa"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_pitapa"
+            android:roundIcon="@mipmap/ic_launcher_pitapa"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherTransit"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_transit"
+            android:roundIcon="@mipmap/ic_launcher_transit"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherEdy"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_edy"
+            android:roundIcon="@mipmap/ic_launcher_edy"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherNanaco"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_nanaco"
+            android:roundIcon="@mipmap/ic_launcher_nanaco"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherWaon"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_waon"
+            android:roundIcon="@mipmap/ic_launcher_waon"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <!-- ICON-ALIASES-END -->
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+</manifest>
