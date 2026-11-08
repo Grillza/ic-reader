@@ -94,9 +94,7 @@ fun CardEditorSheet(
                 Text(summary, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Spacer(Modifier.height(16.dp))
-            CardArt(type, image = image, modifier = Modifier.padding(horizontal = 32.dp)) {
-                CardOverlay(type, image != null, nickname.takeIf { it.isNotBlank() }, null)
-            }
+            CardArt(type, image = image, modifier = Modifier.padding(horizontal = 32.dp))
             Spacer(Modifier.height(20.dp))
             OutlinedTextField(
                 value = nickname,

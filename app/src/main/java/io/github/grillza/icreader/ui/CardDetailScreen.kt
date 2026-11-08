@@ -163,7 +163,7 @@ fun CardDetailScreen(
         ) {
             item {
                 CardArt(card.type, image = image, modifier = Modifier.padding(horizontal = 16.dp)) {
-                    CardOverlay(card.type, image != null, card.nickname?.takeIf { it.isNotBlank() }, card.balance, large = true)
+                    CardBalance(card.balance, large = true)
                 }
             }
             if (isPreview) {

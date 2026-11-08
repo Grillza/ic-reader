@@ -200,7 +200,7 @@ private fun WalletCard(
                 image = image,
                 modifier = Modifier.combinedClickable(onClick = onOpen, onLongClick = { menu = true }),
             ) {
-                CardOverlay(card.type, image != null, card.nickname?.takeIf { it.isNotBlank() }, card.balance)
+                CardBalance(card.balance)
             }
             DropdownMenu(menu, onDismissRequest = { menu = false }) {
                 if (canMoveUp) {

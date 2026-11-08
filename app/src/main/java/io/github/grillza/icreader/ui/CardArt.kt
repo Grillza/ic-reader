@@ -90,36 +90,18 @@ fun CardArt(
     }
 }
 
-/** Standard overlay: name bottom-left, balance bottom-right, on pills so they read over any art. */
+/** Balance in the bottom-right corner, on a pill so it reads over any art or photo. */
 @Composable
-fun BoxScope.CardOverlay(type: CardType, hasPhoto: Boolean, title: String?, balance: Int?, large: Boolean = false) {
-    val pill = Color.Black.copy(alpha = 0.5f)
-    val shape = RoundedCornerShape(50)
-    if (title != null) {
-        Text(
-            title,
-            color = Color.White,
-            fontSize = if (large) 14.sp else 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 14.dp, bottom = 14.dp, end = 150.dp)
-                .background(pill, shape)
-                .padding(horizontal = 10.dp, vertical = 4.dp),
-        )
-    }
-    if (balance != null) {
-        Text(
-            formatYen(balance),
-            color = Color.White,
-            fontSize = if (large) 26.sp else 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 12.dp, bottom = 12.dp)
-                .background(pill, shape)
-                .padding(horizontal = 14.dp, vertical = 4.dp),
-        )
-    }
+fun BoxScope.CardBalance(balance: Int, large: Boolean = false) {
+    Text(
+        formatYen(balance),
+        color = Color.White,
+        fontSize = if (large) 26.sp else 20.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .padding(end = 12.dp, bottom = 12.dp)
+            .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(50))
+            .padding(horizontal = 14.dp, vertical = 4.dp),
+    )
 }
