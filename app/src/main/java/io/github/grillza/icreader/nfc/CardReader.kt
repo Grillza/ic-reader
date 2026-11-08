@@ -40,12 +40,18 @@ object CardReader {
     }
 
     private fun readTransit(felica: Felica, idm: ByteArray, systems: List<Int>): ScanResult {
+        val pmm = felica.lastPmm
         val history = felica.readBlocks(idm, TransitParser.SERVICE_HISTORY, TransitParser.HISTORY_BLOCKS)
             .mapNotNull(TransitParser::history)
-        val balance = runCatching {
-            felica.readBlocks(idm, TransitParser.SERVICE_ATTRIBUTES, 1).firstOrNull()?.let(TransitParser::balance)
-        }.getOrNull() ?: history.firstOrNull()?.balance ?: 0
-        return ScanResult(idm.toHex(), CardFamily.TRANSIT, balance, history, systems)
+        val attributes = runCatching { felica.readBlocks(idm, TransitParser.SERVICE_ATTRIBUTES, 1).firstOrNull() }.getOrNull()
+        val balance = attributes?.let(TransitParser::balance) ?: history.firstOrNull()?.balance ?: 0
+        val info = buildMap {
+            put("IDm", idm.toHex())
+            pmm?.let { put("PMm", it.toHex()) }
+            attributes?.let { put("Attributes (008B)", it.toHex()) }
+            put("Systems", systems.joinToString(" ") { "%04X".format(it) })
+        }
+        return ScanResult(idm.toHex(), CardFamily.TRANSIT, balance, history, systems, cardInfo = info)
     }
 
     private fun readEdy(felica: Felica, idm: ByteArray, systems: List<Int>): ScanResult? {

@@ -12,9 +12,18 @@ across scans, and lets the launcher icon match your card.
 - **Wallet**: all saved cards with their balances and a total. Long-press a card to reorder it.
 - **History**: grouped by day, with station names (about 5,900 stations), fares worked out from
   balance changes, purchase times, and a details sheet with the raw record. Export it as CSV.
-- **Card type and artwork**: transit cards all use the same data format, so the brand can't be
-  read from the card. The app suggests one from where the card has been used, and you confirm or
-  change it. Artwork is drawn in each brand's colours; you can add a photo of your own card instead.
+- **Station names in English**: Settings → Station names switches between Japanese, English, or
+  English with Japanese ("Oshiage (押上)"). In English, the operator (e.g. Tokyo Metro) replaces the
+  line name, because line names are only available in Japanese.
+- **Card type**: transit cards all use the same data format and don't record their issuer, so
+  the brand is suggested and you confirm it. If the "new card issued" record is still on the card
+  (cards keep only their last 20 records), the issuing station decides. Otherwise the app works
+  out the region from your trips and marks that region's cards as likely (Kanto: Suica or PASMO,
+  Kansai: ICOCA or PiTaPa, Chubu: TOICA or manaca, Kyushu: SUGOCA, nimoca or Hayakaken).
+- **Artwork**: each brand's colour layout on a silver card with the transit-card notch (Suica's
+  green sweep, TOICA's cyan wave, manaca's yellow circle…). Logos and characters aren't
+  reproduced; add a photo of your own card for the real thing. Card info (menu) shows the
+  card's raw IDm, PMm and attributes block.
 - **App icon**: 15 launcher icons (one per brand plus a default), from the menu or from a card.
   The switch happens when you leave the app, because Android closes the app if its launcher alias
   is changed while it's open.
@@ -54,4 +63,5 @@ or the `ICR_*` environment variables. Without either, `assembleRelease` produces
   aliases. Edit `ICONS` there and re-run it to add or change an icon.
 
 Station data (`assets/StationCode.csv`) is the community-maintained Suica station code list that
-circulates in open-source FeliCa readers.
+circulates in open-source FeliCa readers. English names (`assets/StationNamesEn.csv`) are built from
+Wikidata (CC0) by `tools/gen_station_names.py`, which matches on Japanese name and operator.

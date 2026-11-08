@@ -24,6 +24,10 @@ object SystemCode {
  */
 class Felica(private val transport: FelicaTransport) {
 
+    /** PMm (manufacture parameters) from the last successful poll. */
+    var lastPmm: ByteArray? = null
+        private set
+
     /** Polls for [systemCode]; returns that system's IDm, or null if the card doesn't have it. */
     fun poll(systemCode: Int): ByteArray? {
         val frame = frame(0x00, byteArrayOf((systemCode shr 8).toByte(), systemCode.toByte(), 0x01, 0x00))
@@ -33,6 +37,7 @@ class Felica(private val transport: FelicaTransport) {
             return null
         }
         if (res.size < 18 || res[1] != 0x01.toByte()) return null
+        lastPmm = res.copyOfRange(10, 18)
         return res.copyOfRange(2, 10)
     }
 

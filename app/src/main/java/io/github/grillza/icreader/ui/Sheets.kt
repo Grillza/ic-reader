@@ -68,7 +68,7 @@ fun CardEditorSheet(
     isNew: Boolean,
     family: CardFamily,
     initialType: CardType,
-    suggestedType: CardType?,
+    suggestedTypes: List<CardType>,
     initialNickname: String,
     image: File?,
     summary: String?,
@@ -110,7 +110,10 @@ fun CardEditorSheet(
                 Spacer(Modifier.height(20.dp))
                 Text("Card type", style = MaterialTheme.typography.titleSmall)
                 Text(
-                    if (suggestedType != null && isNew) {
+                    if (suggestedTypes.size > 1 && isNew) {
+                        "The card doesn't say who issued it. From where it's been used it's likely " +
+                            suggestedTypes.joinToString(" or ") { it.displayName } + ", so pick yours."
+                    } else if (suggestedTypes.isNotEmpty() && isNew) {
                         "Suggested from where the card has been used. Transit cards all share one format, so check it's right."
                     } else {
                         "Transit cards all share one format, so the brand can't be read from the card."
@@ -121,7 +124,7 @@ fun CardEditorSheet(
                 Spacer(Modifier.height(12.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     options.forEach { option ->
-                        TypeChip(option, selected = option == type, suggested = option == suggestedType) { type = option }
+                        TypeChip(option, selected = option == type, suggested = option in suggestedTypes) { type = option }
                     }
                 }
             }
@@ -178,14 +181,7 @@ private fun TypeChip(type: CardType, selected: Boolean, suggested: Boolean, onCl
                 .padding(3.dp)
                 .clickable(onClick = onClick),
         ) {
-            CardArt(type, corner = 8.dp, elevation = 1.dp, showBrand = false) {
-                Text(
-                    type.displayName,
-                    color = androidx.compose.ui.graphics.Color(type.onColor),
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.align(Alignment.TopStart).padding(6.dp),
-                )
-            }
+            CardArt(type, corner = 8.dp, elevation = 1.dp)
             if (selected) {
                 Icon(
                     Icons.Default.CheckCircle,
@@ -196,7 +192,7 @@ private fun TypeChip(type: CardType, selected: Boolean, suggested: Boolean, onCl
             }
         }
         Text(
-            if (suggested) "Suggested" else " ",
+            if (suggested) "Likely" else " ",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.primary,
         )

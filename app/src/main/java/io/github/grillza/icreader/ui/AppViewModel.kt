@@ -12,6 +12,7 @@ import io.github.grillza.icreader.data.SavedCard
 import io.github.grillza.icreader.data.ScanResult
 import io.github.grillza.icreader.data.Station
 import io.github.grillza.icreader.data.StationRef
+import io.github.grillza.icreader.data.localized
 import io.github.grillza.icreader.nfc.CardReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,7 @@ sealed interface Screen {
     data object Cards : Screen
     data class Detail(val cardId: String) : Screen
     data object Icons : Screen
+    data object Settings : Screen
 
     /** A scanned card that isn't saved yet; shown read-only with a "Save card" action. */
     data object Preview : Screen
@@ -61,6 +63,19 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private val _iconId = MutableStateFlow(APP_ICON_UNKNOWN)
     val iconId: StateFlow<String> = _iconId.asStateFlow()
 
+    private val prefs = app.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
+
+    private val _stationLanguage = MutableStateFlow(
+        runCatching { io.github.grillza.icreader.data.StationLanguage.valueOf(prefs.getString("station_language", null)!!) }
+            .getOrDefault(io.github.grillza.icreader.data.StationLanguage.JAPANESE),
+    )
+    val stationLanguage: StateFlow<io.github.grillza.icreader.data.StationLanguage> = _stationLanguage.asStateFlow()
+
+    fun setStationLanguage(language: io.github.grillza.icreader.data.StationLanguage) {
+        _stationLanguage.value = language
+        prefs.edit().putString("station_language", language.name).apply()
+    }
+
     private val _stationsReady = MutableStateFlow(false)
     val stationsReady: StateFlow<Boolean> = _stationsReady.asStateFlow()
 
@@ -93,7 +108,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val result = withContext(Dispatchers.IO) {
                     val read = CardReader.read(tag)
-                    if (read.family == CardFamily.TRANSIT) read.copy(suggestedType = stations.suggestTransitType(read.transactions)) else read
+                    if (read.family == CardFamily.TRANSIT) read.copy(suggestedTypes = stations.suggestTransitTypes(read.transactions)) else read
                 }
                 _scan.value = ScanStatus.Idle
                 if (repo.get(result.idm) == null) {
@@ -127,7 +142,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         if (!demoAvailable) return
         viewModelScope.launch {
             val scan = withContext(Dispatchers.Default) { DemoData.scan() }
-            val result = scan.copy(suggestedType = withContext(Dispatchers.IO) { stations.suggestTransitType(scan.transactions) })
+            val result = scan.copy(suggestedTypes = withContext(Dispatchers.IO) { stations.suggestTransitTypes(scan.transactions) })
             if (repo.get(result.idm) == null) {
                 _pendingCard.value = result
                 backStack.value = listOf(Screen.Cards, Screen.Preview)
@@ -195,7 +210,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         _message.value = null
     }
 
-    fun station(ref: StationRef): Station? = if (_stationsReady.value) stations.lookup(ref) else null
+    fun station(ref: StationRef): Station? =
+        if (_stationsReady.value) stations.lookup(ref)?.localized(_stationLanguage.value) else null
 
     fun imageFile(name: String) = repo.imageFile(name)
 

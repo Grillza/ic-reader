@@ -3,6 +3,7 @@ package io.github.grillza.icreader
 import io.github.grillza.icreader.data.HistoryMerge
 import io.github.grillza.icreader.data.StationDb
 import io.github.grillza.icreader.data.StationRef
+import io.github.grillza.icreader.data.localized
 import io.github.grillza.icreader.data.TxKind
 import io.github.grillza.icreader.nfc.EdyParser
 import io.github.grillza.icreader.nfc.Felica
@@ -14,6 +15,7 @@ import io.github.grillza.icreader.data.CardFamily
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import io.github.grillza.icreader.data.CardType
 
 class ParserTest {
 
@@ -147,15 +149,40 @@ class ParserTest {
     @Test
     fun stationDbLooksUpAndSuggests() {
         val csv = "0,37,10,東日本旅客鉄道,山手線,渋谷\n0,37,20,ＪＲ東日本,山手線,新宿\n2,224,1,阪急電鉄,神戸線,梅田\n0,1,1,西日本鉄道,天神大牟田,福岡\n"
-        val db = StationDb { csv.byteInputStream() }
+        val db = StationDb({ csv.byteInputStream() })
         assertEquals("渋谷", db.lookup(StationRef(0, 37, 10))?.name)
         assertEquals("JR東日本", db.lookup(StationRef(0, 37, 20))?.company)
         // Falls back to other areas when the region bits are off.
         assertEquals("梅田", db.lookup(StationRef(0, 224, 1))?.name)
         val tx = TransitParser.history(transit(0x16, 0x01, 2026, 1, 2, 37, 10, 37, 20, balance = 0, seq = 1))!!
         assertEquals(io.github.grillza.icreader.data.CardType.SUICA, db.suggestTransitType(listOf(tx)))
-        // Nishitetsu (西日本鉄道) must not be mistaken for JR West.
+        // Nishitetsu (西日本鉄道) must not be mistaken for JR West: it suggests the Kyushu cards.
         val nishitetsu = TransitParser.history(transit(0x16, 0x01, 2026, 1, 3, 1, 1, 1, 1, balance = 0, seq = 2))!!
-        assertEquals(io.github.grillza.icreader.data.CardType.NIMOCA, db.suggestTransitType(listOf(nishitetsu)))
+        val kyushu = db.suggestTransitTypes(listOf(nishitetsu))
+        assert(CardType.NIMOCA in kyushu && CardType.ICOCA !in kyushu) { kyushu.toString() }
+    }
+
+    @Test
+    fun subwayHeavySuicaSuggestsKantoWithSuicaFirst() {
+        // Mostly Tokyo Metro trips, a few on JR East: can't tell Suica from PASMO, so offer both.
+        val csv = "0,37,10,東日本旅客鉄道,山手,新宿\n0,227,54,東京地下鉄,3号線銀座,銀座\n0,227,61,東京地下鉄,3号線銀座,表参道\n"
+        val db = StationDb({ csv.byteInputStream() })
+        val metro = (1..5).map { TransitParser.history(transit(0x16, 0x01, 2026, 1, it, 227, 54, 227, 61, balance = 0, seq = it))!! }
+        val jr = TransitParser.history(transit(0x16, 0x01, 2026, 1, 9, 37, 10, 37, 10, balance = 0, seq = 9))!!
+        assertEquals(listOf(CardType.SUICA, CardType.PASMO), db.suggestTransitTypes(metro + jr))
+    }
+
+    @Test
+    fun englishNamesLocalize() {
+        val csv = "0,227,54,東京地下鉄,3号線銀座,銀座\n0,1,1,東日本旅客鉄道,東海道本,東京\n"
+        val en = "0,227,54,Ginza,Tokyo Metro\n0,1,1,,JR East\n"
+        val db = StationDb({ csv.byteInputStream() }, { en.byteInputStream() })
+        val ginza = db.lookup(StationRef(0, 227, 54))!!
+        assertEquals("Ginza", ginza.localized(io.github.grillza.icreader.data.StationLanguage.ENGLISH).name)
+        assertEquals("Tokyo Metro", ginza.localized(io.github.grillza.icreader.data.StationLanguage.ENGLISH).line)
+        assertEquals("Ginza (銀座)", ginza.localized(io.github.grillza.icreader.data.StationLanguage.BOTH).name)
+        assertEquals("銀座", ginza.localized(io.github.grillza.icreader.data.StationLanguage.JAPANESE).name)
+        // No English name: falls back to Japanese.
+        assertEquals("東京", db.lookup(StationRef(0, 1, 1))!!.localized(io.github.grillza.icreader.data.StationLanguage.ENGLISH).name)
     }
 }

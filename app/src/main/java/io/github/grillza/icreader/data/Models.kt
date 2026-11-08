@@ -105,6 +105,8 @@ data class SavedCard(
     val balance: Int,
     val addedAt: Long,
     val lastScanned: Long,
+    /** Raw public card info (attributes block, PMm) from the last scan, for diagnostics. */
+    val cardInfo: Map<String, String> = emptyMap(),
     /** File name of a user photo under filesDir/card_images, shown instead of the generated art. */
     val customImage: String? = null,
     val transactions: List<Transaction> = emptyList(),
@@ -120,6 +122,13 @@ data class ScanResult(
     val balance: Int,
     val transactions: List<Transaction>,
     val systemCodes: List<Int>,
-    /** Best guess at the brand; null when there is nothing to go on. */
-    val suggestedType: CardType? = null,
-)
+    /**
+     * Likely brands, best first. Transit brands in the same region can't be told apart from the
+     * card's data, so this is usually a region's set (e.g. Suica and PASMO for Kanto).
+     */
+    val suggestedTypes: List<CardType> = emptyList(),
+    /** Raw public card info (attributes block, PMm), kept for diagnostics. */
+    val cardInfo: Map<String, String> = emptyMap(),
+) {
+    val suggestedType: CardType? get() = suggestedTypes.firstOrNull()
+}

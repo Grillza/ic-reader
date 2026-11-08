@@ -40,6 +40,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
     val pending by vm.pendingCard.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
     val iconId by vm.iconId.collectAsStateWithLifecycle()
+    val stationLanguage by vm.stationLanguage.collectAsStateWithLifecycle()
     vm.stationsReady.collectAsStateWithLifecycle().value // recompose once names are loaded
 
     val snackbar = remember { SnackbarHostState() }
@@ -72,7 +73,8 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
         val id = editing
         if (uri != null && id != null) vm.setCustomImage(id, uri)
     }
-    val station: (StationRef) -> io.github.grillza.icreader.data.Station? = vm::station
+    // A new lambda per language so screens recompose with the new names.
+    val station: (StationRef) -> io.github.grillza.icreader.data.Station? = remember(stationLanguage) { { ref -> vm.station(ref) } }
 
     AnimatedContent(
         targetState = stack.last(),
@@ -95,6 +97,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                 onMove = { card, delta -> vm.moveCard(card.id, delta) },
                 onScan = { vm.clearScanError(); scanSheet = true },
                 onIcons = { vm.navigate(Screen.Icons) },
+                onSettings = { vm.navigate(Screen.Settings) },
                 onEnableNfc = { openNfcSettings(context) },
                 onDemo = if (vm.demoAvailable) vm::loadDemoCard else null,
             )
@@ -134,6 +137,12 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                     )
                 }
             }
+            Screen.Settings -> SettingsScreen(
+                stationLanguage = stationLanguage,
+                onStationLanguage = vm::setStationLanguage,
+                onIcons = { vm.navigate(Screen.Icons) },
+                onBack = { vm.back() },
+            )
             Screen.Icons -> IconsScreen(iconId, snackbar, onBack = { vm.back() }, onSelect = { vm.selectIcon(it.id) })
         }
     }
@@ -149,7 +158,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
             isNew = true,
             family = toSave.family,
             initialType = preview.type,
-            suggestedType = toSave.suggestedType,
+            suggestedTypes = toSave.suggestedTypes,
             initialNickname = "",
             image = null,
             summary = "${formatYen(toSave.balance)} · ${toSave.transactions.size} records on the card",
@@ -174,7 +183,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                 isNew = false,
                 family = card.family,
                 initialType = card.type,
-                suggestedType = null,
+                suggestedTypes = emptyList(),
                 initialNickname = card.nickname.orEmpty(),
                 image = card.customImage?.let(vm::imageFile),
                 summary = null,

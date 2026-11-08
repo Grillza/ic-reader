@@ -49,8 +49,29 @@ class MainActivity : ComponentActivity() {
             !nfc.isEnabled -> NfcState.Disabled
             else -> NfcState.Enabled
         }
-        // While the app is in front, any FeliCa tap comes straight here instead of to other apps.
-        nfc?.enableReaderMode(
+        enableReader()
+        // Android can reject reader mode if asked a moment before it counts us as foreground
+        // ("Caller is not in foreground"); ask again shortly after, and on focus below.
+        window.decorView.postDelayed({ if (isResumed()) enableReader() }, 400)
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) enableReader()
+    }
+
+    override fun onTopResumedActivityChanged(isTopResumedActivity: Boolean) {
+        super.onTopResumedActivityChanged(isTopResumedActivity)
+        if (isTopResumedActivity) enableReader()
+    }
+
+    private fun isResumed() = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
+
+    /** While the app is in front, any FeliCa tap comes straight here instead of to other apps. */
+    private fun enableReader() {
+        val nfc = adapter ?: return
+        if (!nfc.isEnabled || !isResumed()) return
+        nfc.enableReaderMode(
             this,
             ::onTag,
             NfcAdapter.FLAG_READER_NFC_F or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK or NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS,

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Contactless
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material3.AlertDialog
@@ -65,6 +66,7 @@ fun CardListScreen(
     onMove: (SavedCard, Int) -> Unit,
     onScan: () -> Unit,
     onIcons: () -> Unit,
+    onSettings: () -> Unit,
     onEnableNfc: () -> Unit,
     onDemo: (() -> Unit)? = null,
 ) {
@@ -84,6 +86,11 @@ fun CardListScreen(
                             text = { Text("App icon") },
                             leadingIcon = { Icon(Icons.Default.Palette, null) },
                             onClick = { menu = false; onIcons() },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            leadingIcon = { Icon(Icons.Default.Settings, null) },
+                            onClick = { menu = false; onSettings() },
                         )
                         if (onDemo != null) {
                             DropdownMenuItem(

@@ -55,6 +55,7 @@ class CardRepository(private val context: Context) {
                     addedAt = now,
                     lastScanned = now,
                     transactions = HistoryMerge.merge(emptyList(), scan.transactions),
+                    cardInfo = scan.cardInfo,
                 )
                 (cards + card) to ScanSaved(card, true, scan.transactions.size, 0)
             } else {
@@ -62,6 +63,7 @@ class CardRepository(private val context: Context) {
                     balance = scan.balance,
                     lastScanned = now,
                     transactions = HistoryMerge.merge(existing.transactions, scan.transactions),
+                    cardInfo = scan.cardInfo.ifEmpty { existing.cardInfo },
                 )
                 cards.map { if (it.id == card.id) card else it } to
                     ScanSaved(card, false, HistoryMerge.newCount(existing.transactions, scan.transactions), scan.balance - existing.balance)

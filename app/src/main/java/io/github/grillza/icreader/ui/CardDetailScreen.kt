@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Receipt
@@ -96,6 +97,7 @@ fun CardDetailScreen(
     var menu by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf<Transaction?>(null) }
+    var showInfo by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -118,6 +120,13 @@ fun CardDetailScreen(
                                 enabled = card.transactions.isNotEmpty(),
                                 onClick = { menu = false; onExport() },
                             )
+                            if (card.cardInfo.isNotEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("Card info") },
+                                    leadingIcon = { Icon(Icons.Default.Info, null) },
+                                    onClick = { menu = false; showInfo = true },
+                                )
+                            }
                             DropdownMenuItem(
                                 text = { Text("Remove card") },
                                 leadingIcon = { Icon(Icons.Default.Delete, null) },
@@ -195,6 +204,23 @@ fun CardDetailScreen(
 
     selected?.let { tx ->
         TransactionSheet(tx, card.family, station, onDismiss = { selected = null })
+    }
+    if (showInfo) {
+        AlertDialog(
+            onDismissRequest = { showInfo = false },
+            title = { Text("Card info") },
+            text = {
+                SelectionContainer {
+                    Column {
+                        card.cardInfo.forEach { (k, v) ->
+                            Text(k, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(v.chunked(2).joinToString(" "), fontFamily = FontFamily.Monospace, modifier = Modifier.padding(bottom = 10.dp))
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showInfo = false }) { Text("Close") } },
+        )
     }
     if (confirmDelete) {
         AlertDialog(
@@ -366,7 +392,7 @@ private fun TransactionSheet(tx: Transaction, family: CardFamily, station: (Stat
 
 private fun stationText(ref: StationRef, station: (StationRef) -> Station?): String {
     val s = station(ref) ?: return "Unknown station (line %02X, station %02X)".format(ref.line, ref.station)
-    return "${s.name}\n${s.company} ${s.line}"
+    return if (s.line == s.company) "${s.name}\n${s.company}" else "${s.name}\n${s.company} ${s.line}"
 }
 
 @Composable
