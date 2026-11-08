@@ -185,4 +185,44 @@ class ParserTest {
         // No English name: falls back to Japanese.
         assertEquals("東京", db.lookup(StationRef(0, 1, 1))!!.localized(io.github.grillza.icreader.data.StationLanguage.ENGLISH).name)
     }
+
+    private fun fakeTransitCard(maxBlocksPerRead: Int, frames: MutableList<Int>): FelicaTransport {
+        val idm = "0101020304050607".hexToBytes()
+        val history = (0 until 20).map { transit(0x16, 0x01, 2026, 1, 1 + it % 28, balance = 1000 - it, seq = 100 - it) }
+        return FelicaTransport { frame ->
+            frames += frame[1].toInt()
+            when (frame[1].toInt()) {
+                0x0C -> byteArrayOf(13, 0x0D) + idm + byteArrayOf(1, 0x00, 0x03)
+                0x00 -> byteArrayOf(18, 0x01) + idm + ByteArray(8)
+                0x06 -> {
+                    val service = (frame[11].toInt() and 0xFF) or ((frame[12].toInt() and 0xFF) shl 8)
+                    val n = frame[13].toInt()
+                    if (n > maxBlocksPerRead) return@FelicaTransport byteArrayOf(12, 0x07) + idm + byteArrayOf(0x01, 0xA2.toByte())
+                    val data = (0 until n).map { i ->
+                        val b = frame[15 + i * 2].toInt()
+                        if (service == TransitParser.SERVICE_ATTRIBUTES) ByteArray(16) else history[b]
+                    }
+                    byteArrayOf(0, 0x07) + idm + byteArrayOf(0, 0, n.toByte()) + data.fold(ByteArray(0)) { a, x -> a + x }
+                }
+                else -> throw java.io.IOException("unexpected")
+            }
+        }
+    }
+
+    @Test
+    fun readsHistoryInTwoBatches() {
+        val frames = mutableListOf<Int>()
+        val result = CardReader.read(Felica(fakeTransitCard(15, frames)), "0101020304050607".hexToBytes())
+        assertEquals(20, result.transactions.size)
+        // system codes, poll, 2 history reads, 1 attributes read
+        assertEquals(listOf(0x0C, 0x00, 0x06, 0x06, 0x06), frames)
+    }
+
+    @Test
+    fun stepsDownForCardsThatCapBatchSize() {
+        val frames = mutableListOf<Int>()
+        val result = CardReader.read(Felica(fakeTransitCard(4, frames)), "0101020304050607".hexToBytes())
+        assertEquals(20, result.transactions.size)
+        assertEquals(listOf(100, 99, 81), result.transactions.map { it.seq }.let { listOf(it.first(), it[1], it.last()) })
+    }
 }

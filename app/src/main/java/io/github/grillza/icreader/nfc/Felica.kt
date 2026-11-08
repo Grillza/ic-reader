@@ -60,22 +60,28 @@ class Felica(private val transport: FelicaTransport) {
      * Reads blocks [first, first+count) of [serviceCode]. Stops early (returning what it has) when
      * the card reports an error, which is how "past the last block" shows up.
      */
+    /**
+     * Blocks per Read Without Encryption. Fewer round trips make a tap quicker and less likely to
+     * fail if the card moves; 10 blocks (173-byte response) is safe for transit cards. Cards that
+     * refuse a batch make it step down, and the smaller size is kept for the rest of the tap.
+     */
+    private var batch = BATCH_SIZES.first()
+
     fun readBlocks(idm: ByteArray, serviceCode: Int, count: Int, first: Int = 0): List<ByteArray> {
         val out = ArrayList<ByteArray>(count)
-        var chunk = 4
         var next = first
         while (next < first + count) {
-            val n = minOf(chunk, first + count - next)
+            val n = minOf(batch, first + count - next)
             val blocks = try {
                 readWithoutEncryption(idm, serviceCode, (next until next + n).toList())
             } catch (e: FelicaException) {
-                if (chunk > 1) {
-                    // Some cards cap blocks-per-read; fall back to one at a time.
-                    chunk = 1
+                val smaller = BATCH_SIZES.firstOrNull { it < n }
+                if (smaller != null) {
+                    batch = smaller
                     continue
                 }
                 if (out.isEmpty() && next == first) throw e
-                break
+                break // past the last block of this service
             }
             out += blocks
             next += n
@@ -102,6 +108,10 @@ class Felica(private val transport: FelicaTransport) {
         val n = res[12].toInt() and 0xFF
         if (res.size < 13 + n * 16) throw FelicaException("Short response")
         return (0 until n).map { i -> res.copyOfRange(13 + i * 16, 13 + (i + 1) * 16) }
+    }
+
+    private companion object {
+        val BATCH_SIZES = intArrayOf(10, 4, 1)
     }
 
     private fun frame(command: Int, payload: ByteArray): ByteArray {
