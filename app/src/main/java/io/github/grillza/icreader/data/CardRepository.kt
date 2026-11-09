@@ -14,6 +14,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 @Serializable
 private data class Store(val version: Int = 1, val cards: List<SavedCard> = emptyList())
@@ -23,6 +28,11 @@ data class ScanSaved(val card: SavedCard, val isNew: Boolean, val newTransaction
 
 /** Saved cards, kept in one JSON file in app storage (a handful of cards, a few hundred records). */
 class CardRepository(private val context: Context) {
+
+    private companion object {
+        const val MAX_CARDS_BYTES = 32 * 1024 * 1024
+        const val MAX_IMAGE_BYTES = 16 * 1024 * 1024
+    }
 
     private val file = File(context.filesDir, "cards.json")
     private val imageDir = File(context.filesDir, "card_images").apply { mkdirs() }
@@ -103,6 +113,78 @@ class CardRepository(private val context: Context) {
     }
 
     fun imageFile(name: String): File = File(imageDir, name)
+
+    /** Writes every card, its history and its photo to [out] as a zip. Returns the card count. */
+    suspend fun exportBackup(out: OutputStream): Int = withContext(Dispatchers.IO) {
+        val cards = mutex.withLock { _cards.value }
+        ZipOutputStream(out.buffered()).use { zip ->
+            zip.putNextEntry(ZipEntry(BackupFile.CARDS_ENTRY))
+            zip.write(json.encodeToString(BackupFile(createdAt = System.currentTimeMillis(), cards = cards)).toByteArray())
+            zip.closeEntry()
+            cards.mapNotNull { it.customImage }.distinct().forEach { name ->
+                val image = File(imageDir, name)
+                if (!image.isFile) return@forEach
+                zip.putNextEntry(ZipEntry(BackupFile.IMAGES_DIR + name))
+                image.inputStream().use { it.copyTo(zip) }
+                zip.closeEntry()
+            }
+        }
+        cards.size
+    }
+
+    /**
+     * Merges a backup made by [exportBackup] into the saved cards (see [BackupMerge]). Throws
+     * [IllegalArgumentException] if the file isn't an IC Reader backup.
+     */
+    suspend fun importBackup(input: InputStream): RestoreResult = withContext(Dispatchers.IO) {
+        var backup: BackupFile? = null
+        val images = mutableMapOf<String, ByteArray>()
+        ZipInputStream(input.buffered()).use { zip ->
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                when {
+                    entry.name == BackupFile.CARDS_ENTRY -> {
+                        val text = zip.readLimited(MAX_CARDS_BYTES).decodeToString()
+                        backup = runCatching { json.decodeFromString<BackupFile>(text) }.getOrNull()
+                    }
+                    entry.name.startsWith(BackupFile.IMAGES_DIR) -> {
+                        val name = entry.name.removePrefix(BackupFile.IMAGES_DIR)
+                        if (BackupMerge.isSafeImageName(name)) images[name] = zip.readLimited(MAX_IMAGE_BYTES)
+                    }
+                }
+            }
+        }
+        val file = backup?.takeIf { it.format == BackupFile.FORMAT }
+            ?: throw IllegalArgumentException("Not an IC Reader backup")
+        // Keep only photos the backup's cards use, with names the app would have made.
+        val backupCards = file.cards.map { card ->
+            card.copy(customImage = card.customImage?.takeIf { it in images && BackupMerge.isSafeImageName(it) })
+        }
+        // Photos go in first, so a restored card never shows without its photo.
+        val written = backupCards.mapNotNull { it.customImage }.distinct().filter { name ->
+            val target = File(imageDir, name)
+            !target.exists() && run { target.writeBytes(images.getValue(name)); true }
+        }
+        val (result, used) = update { cards ->
+            val (merged, result) = BackupMerge.merge(cards, backupCards)
+            merged to (result to merged.mapNotNull { it.customImage }.toSet())
+        }
+        // A card already here keeps its own photo; drop the backup's copy.
+        written.filter { it !in used }.forEach { File(imageDir, it).delete() }
+        result
+    }
+
+    private fun InputStream.readLimited(max: Int): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(16 * 1024)
+        while (true) {
+            val n = read(buf)
+            if (n < 0) break
+            out.write(buf, 0, n)
+            if (out.size() > max) throw IllegalArgumentException("Backup entry too large")
+        }
+        return out.toByteArray()
+    }
 
     private fun decodeScaled(uri: Uri, maxSide: Int): Bitmap? {
         val resolver = context.contentResolver

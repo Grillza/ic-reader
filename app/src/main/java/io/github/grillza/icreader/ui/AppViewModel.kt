@@ -111,6 +111,36 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Saves every card, its history and photo to [uri] (a file the user picked). */
+    fun backup(uri: Uri) = viewModelScope.launch {
+        val resolver = getApplication<Application>().contentResolver
+        _message.value = runCatching {
+            resolver.openOutputStream(uri)?.use { repo.exportBackup(it) } ?: error("can't open $uri")
+        }.fold(
+            onSuccess = { n -> "Backed up $n ${if (n == 1) "card" else "cards"}" },
+            onFailure = { "Couldn't save the backup" },
+        )
+    }
+
+    /** Adds the cards and history from a backup file (see CardRepository.importBackup). */
+    fun restore(uri: Uri) = viewModelScope.launch {
+        val resolver = getApplication<Application>().contentResolver
+        _message.value = runCatching {
+            resolver.openInputStream(uri)?.use { repo.importBackup(it) } ?: error("can't open $uri")
+        }.fold(
+            onSuccess = { r ->
+                when {
+                    r.added == 0 && r.updated == 0 -> "The backup has no cards"
+                    r.updated == 0 -> "Restored ${r.added} ${if (r.added == 1) "card" else "cards"}"
+                    else -> "Restored ${r.added + r.updated} cards (${r.added} new, history added to ${r.updated})"
+                }
+            },
+            onFailure = { e ->
+                if (e is IllegalArgumentException) "That file isn't an IC Reader backup" else "Couldn't read the backup"
+            },
+        )
+    }
+
     fun showMessage(text: String) {
         _message.value = text
     }

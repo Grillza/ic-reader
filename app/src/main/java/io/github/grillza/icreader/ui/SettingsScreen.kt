@@ -10,6 +10,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Watch
@@ -41,6 +43,8 @@ fun SettingsScreen(
     onInstallWatchApp: () -> Unit,
     onOpenOnWatch: () -> Unit,
     snackbar: SnackbarHostState,
+    onBackup: () -> Unit,
+    onRestore: () -> Unit,
     onBack: () -> Unit,
 ) {
     Scaffold(
@@ -81,6 +85,27 @@ fun SettingsScreen(
                 supportingContent = { Text("Match the home-screen icon to your card") },
                 leadingContent = { Icon(Icons.Default.Palette, null) },
                 modifier = Modifier.selectable(selected = false, onClick = onIcons),
+            )
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            SectionHeader("Backup")
+            ListItem(
+                headlineContent = { Text("Back up cards") },
+                supportingContent = { Text("Save your cards, their history and photos to a file") },
+                leadingContent = { Icon(Icons.Default.Save, null) },
+                modifier = Modifier.selectable(selected = false, onClick = onBackup),
+            )
+            ListItem(
+                headlineContent = { Text("Restore from backup") },
+                supportingContent = { Text("Add the cards and history from a backup file") },
+                leadingContent = { Icon(Icons.Default.Restore, null) },
+                modifier = Modifier.selectable(selected = false, onClick = onRestore),
+            )
+            Text(
+                "Restoring adds to what's here and never removes anything: a card you already have keeps " +
+                    "its newer balance and gains the backup's older history.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             PebbleSection(pebble, onInstallWatchApp, onOpenOnWatch)

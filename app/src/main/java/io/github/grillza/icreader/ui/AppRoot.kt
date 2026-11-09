@@ -40,6 +40,12 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
     val pending by vm.pendingCard.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
     val pebble by vm.pebble.collectAsStateWithLifecycle()
+    val backupLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/zip"),
+    ) { uri -> uri?.let(vm::backup) }
+    val restoreLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
+    ) { uri -> uri?.let(vm::restore) }
     val iconId by vm.iconId.collectAsStateWithLifecycle()
     val stationLanguage by vm.stationLanguage.collectAsStateWithLifecycle()
     vm.stationsReady.collectAsStateWithLifecycle().value // recompose once names are loaded
@@ -146,6 +152,14 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                 onInstallWatchApp = { installWatchApp(context, vm::showMessage) },
                 onOpenOnWatch = { vm.openOnWatch() },
                 snackbar = snackbar,
+                onBackup = {
+                    holdIcon(context)
+                    backupLauncher.launch("ic-reader-backup-${java.time.LocalDate.now()}.zip")
+                },
+                onRestore = {
+                    holdIcon(context)
+                    restoreLauncher.launch(arrayOf("application/zip", "application/octet-stream"))
+                },
                 onBack = { vm.back() },
             )
             Screen.Icons -> IconsScreen(iconId, snackbar, onBack = { vm.back() }, onSelect = { vm.selectIcon(it.id) })

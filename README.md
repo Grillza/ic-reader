@@ -27,6 +27,11 @@ across scans, lets the launcher icon match your card, and shows your cards on a 
 - **App icon**: 15 launcher icons (one per brand plus a default), from the menu or from a card.
   The switch happens when you leave the app, because Android closes the app if its launcher alias
   is changed while it's open.
+- **Backup**: Settings → Backup saves every card, its history and its photo to a `.zip` you
+  pick a place for, and restores from one. Restoring merges: new cards are added, and a card
+  you already have keeps its newer balance and gains the backup's older history. Use it before
+  reinstalling or moving phones (or switching between debug and release builds, which are signed
+  differently and can't update each other).
 - **Pebble watch**: see [below](#pebble-watch).
 
 ## Pebble watch
