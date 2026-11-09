@@ -2,7 +2,7 @@
 
 Android app for reading Japanese FeliCa IC cards: balance and history for Suica, PASMO, ICOCA and the
 other transit cards, plus Rakuten Edy, nanaco and WAON. Saves multiple cards, builds up history
-across scans, and lets the launcher icon match your card.
+across scans, lets the launcher icon match your card, and shows your cards on a Pebble watch.
 
 ## Features
 
@@ -27,6 +27,40 @@ across scans, and lets the launcher icon match your card.
 - **App icon**: 15 launcher icons (one per brand plus a default), from the menu or from a card.
   The switch happens when you leave the app, because Android closes the app if its launcher alias
   is changed while it's open.
+- **Pebble watch**: see [below](#pebble-watch).
+
+## Pebble watch
+
+The IC Reader watch app shows one card at a time: the card's face (the same design or photo
+as in the app), its name, its balance and when you last scanned it ("Scanned today 14:20").
+
+- **UP / DOWN**: previous / next card. The dots at the bottom show where you are.
+- **SELECT**: the card's history (last 50 records), newest first; UP / DOWN scroll. Each row
+  has the route or description, the date and time, and the amount (money in shows green).
+- The watch saves the card list, so balances show straight away and while the phone is away
+  ("Offline"). Card faces and history come from the phone each time.
+- Station names are in English on the watch, because its fonts have no Japanese. A station without
+  an English name shows as its code (Station 1A-2B).
+
+Set up in the app under **Settings → Pebble watch**:
+
+1. Install the Pebble app and pair your watch.
+2. Tap **Install on watch**. The Pebble app opens and installs IC Reader on the watch.
+3. Tap **Open on watch**, or open IC Reader from the watch's app menu.
+
+The phone and watch talk over [PebbleKit 2](https://github.com/pebble-dev/PebbleKitAndroid2).
+When the watch app opens, the Pebble app starts IC Reader's `PebbleListenerService`; the watch
+says hello with the card art size it wants, and the phone answers with the card list and each
+card's face. A scan while the watch app is open sends the new balance at once. The watch app
+names this app as its companion (`companionApp` in `watchapp/package.json`), so the Pebble app
+only passes its messages to IC Reader.
+
+Card faces are drawn on the phone at the watch's size, in flat colours rounded to the Pebble's
+64, and sent run-length compressed (1-2 KB a card). Black-and-white watches get a black and white
+version.
+
+It runs on every Pebble: Time 2, Round 2, Time, Time Round, Pebble 2 and 2 Duo, and the
+original Pebble (6 cards there).
 
 ## What can be read
 
@@ -49,6 +83,14 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 Debug builds have **Load demo card** in the menu, which runs a made-up Suica scan through the
 normal flow so you can try the UI on an emulator with no NFC.
 
+The watch app is in `watchapp/`. The Android app bundles it as `assets/watch/ic-reader.pbw`, which
+is committed so the Android build doesn't need the Pebble SDK. After changing the watch app, run
+`tools/build_watchapp.sh` (needs [pebble-tool](https://developer.repebble.com/sdk/)): it runs
+the watch's host tests (`watchapp/tests`), builds it and updates the bundled copy.
+
+Run `connectedDebugAndroidTest` on an emulator to check that every card face fits on every watch
+(not on your own phone: it uninstalls the app afterwards, and your saved cards with it).
+
 Release signing uses `keystore.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`)
 or the `ICR_*` environment variables. Without either, `assembleRelease` produces an unsigned APK.
 
@@ -59,6 +101,11 @@ or the `ICR_*` environment variables. Without either, `assembleRelease` produces
 - `data/`: models, `CardRepository` (JSON in app storage), `HistoryMerge`, `StationDb`, `Codes`
 - `icon/`: `AppIconManager` (activity-alias switching); `IconResources.kt` is generated
 - `ui/`: Compose screens
+- `pebble/`: the watch link: `WatchSync` (what to send when), `WatchProtocol` (message layout,
+  shared with `watchapp/src/c/protocol.h` and `codec.h`), `WatchArt` (card faces for the
+  watch) and `PebbleListenerService`
+- `watchapp/`: the Pebble watch app (C): `card_window` and `history_window` are the two
+  screens, `cards` holds the list, art and history, `comms` the AppMessage link
 - `tools/gen_icons.py`: renders the launcher icons (a miniature of each card face, as PNG layers
   per density), `IconResources.kt` and the manifest aliases. Needs Pillow; uses the bundled
   Open Sans Bold (`tools/fonts`, SIL OFL). Edit `ICONS` and re-run to add or change an icon.

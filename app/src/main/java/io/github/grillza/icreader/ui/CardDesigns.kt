@@ -29,9 +29,9 @@ import io.github.grillza.icreader.data.CardType
  * colour shape) so a card is recognisable at a glance. They deliberately don't reproduce logos
  * or characters; users who want the real thing can attach a photo of their card.
  */
-private enum class Motif { SUICA_PANEL, CIRCLE_RIGHT, CIRCLE_LEFT, PLAIN, SWOOSH_RIGHT, BARS_LEFT, BUBBLES, WAVE_BOTTOM, CIRCLE, BLOCK_RIGHT, BAND_DIAGONAL, ARC_BOTTOM }
+internal enum class Motif { SUICA_PANEL, CIRCLE_RIGHT, CIRCLE_LEFT, PLAIN, SWOOSH_RIGHT, BARS_LEFT, BUBBLES, WAVE_BOTTOM, CIRCLE, BLOCK_RIGHT, BAND_DIAGONAL, ARC_BOTTOM }
 
-private data class Design(
+internal data class Design(
     val base: List<Color>,
     val motif: Motif,
     val accent: List<Color>,
@@ -45,24 +45,30 @@ private data class Design(
     val brandShift: Float = 0f,
     /** True when no reference photo was available and the layout is a best guess. */
     val approximate: Boolean = false,
+    /**
+     * Flat-colour (watch) overrides, where the usual colours round to the wrong Pebble colour or
+     * to the same one as the card behind them.
+     */
+    val flatAccent: Color? = null,
+    val flatBrandColor: Color? = null,
 )
 
 private val SILVER = listOf(Color(0xFFE7E9EC), Color(0xFFC5C9CE), Color(0xFFDDE0E3))
 private val WHITE = listOf(Color(0xFFFFFFFF), Color(0xFFEDEEF0))
 private val PEARL = listOf(Color(0xFFF7F8F9), Color(0xFFE4E6E9), Color(0xFFF0F1F3))
 
-private fun design(type: CardType): Design = when (type) {
+internal fun design(type: CardType): Design = when (type) {
     // References: photos of the cards (Suica, PASMO, TOICA, manaca, PiTaPa, SUGOCA, nimoca, ICOCA).
     CardType.SUICA -> Design(PEARL, Motif.SUICA_PANEL, listOf(Color(0xFF62BD2F)), "Suica", Color.White, Alignment.BottomStart)
     CardType.PASMO -> Design(SILVER, Motif.BARS_LEFT, listOf(Color(0xFFEA5A9C)), "PASMO", Color(0xFFEA5A9C), Alignment.BottomStart)
     CardType.ICOCA -> Design(listOf(Color(0xFF2A66C9), Color(0xFF4F92E6)), Motif.PLAIN, listOf(Color.White), "ICOCA", Color(0xFFDCE9FF), Alignment.Center, brandExact = true)
     CardType.TOICA -> Design(SILVER, Motif.WAVE_BOTTOM, listOf(Color(0xFF17A9E1)), "toica", Color.White, Alignment.BottomEnd)
     CardType.MANACA -> Design(listOf(Color(0xFFD3D6DF), Color(0xFFBBC0CC)), Motif.CIRCLE, listOf(Color(0xFFF1E63B)), "manaca", Color(0xFF9DA3B3), Alignment.Center)
-    CardType.KITACA -> Design(PEARL, Motif.BAND_DIAGONAL, listOf(Color(0xFF9CCB3B), Color(0xFF7AB52E)), "Kitaca", Color(0xFF6FA82B), Alignment.TopStart, approximate = true)
+    CardType.KITACA -> Design(PEARL, Motif.BAND_DIAGONAL, listOf(Color(0xFF9CCB3B), Color(0xFF7AB52E)), "Kitaca", Color(0xFF6FA82B), Alignment.TopStart, approximate = true, flatAccent = Color(0xFF55AA55))
     CardType.SUGOCA -> Design(PEARL, Motif.CIRCLE_RIGHT, listOf(Color(0xFFB7CFA2)), "SUGOCA", Color(0xFFE4462E), Alignment.BottomStart)
     CardType.NIMOCA -> Design(PEARL, Motif.CIRCLE_LEFT, listOf(Color(0xFF45A2CB)), "nimoca", Color.White, Alignment.Center, brandExact = true, brandShift = -0.13f)
     CardType.HAYAKAKEN -> Design(PEARL, Motif.BAND_DIAGONAL, listOf(Color(0xFF7FC3E8), Color(0xFF3E9ED6)), "Hayakaken", Color(0xFF2E86C1), Alignment.TopStart, approximate = true)
-    CardType.PITAPA -> Design(SILVER, Motif.BLOCK_RIGHT, listOf(Color(0xFF8D8EC8)), "PiTaPa", Color(0xFFC9CCD2), Alignment.TopEnd)
+    CardType.PITAPA -> Design(SILVER, Motif.BLOCK_RIGHT, listOf(Color(0xFF8D8EC8)), "PiTaPa", Color(0xFFC9CCD2), Alignment.TopEnd, flatAccent = Color(0xFF5555AA), flatBrandColor = Color.White)
     CardType.TRANSIT -> Design(SILVER, Motif.WAVE_BOTTOM, listOf(Color(0xFF607D8B)), "IC", Color.White, Alignment.BottomEnd)
     CardType.EDY -> Design(WHITE, Motif.BAND_DIAGONAL, listOf(Color(0xFFE60012), Color(0xFFBF0000)), "Edy", Color(0xFFD0000F), Alignment.TopStart, approximate = true)
     CardType.NANACO -> Design(listOf(Color(0xFFFFF8E7), Color(0xFFF7EBCB)), Motif.ARC_BOTTOM, listOf(Color(0xFFF7A800), Color(0xFF6CC3E8)), "nanaco", Color(0xFFE38D00), Alignment.TopStart, approximate = true)
@@ -72,26 +78,7 @@ private fun design(type: CardType): Design = when (type) {
 @Composable
 internal fun BoxScope.GeneratedArt(type: CardType, showBrand: Boolean) {
     val d = design(type)
-    Canvas(Modifier.matchParentSize()) {
-        drawRect(Brush.linearGradient(d.base, start = Offset.Zero, end = Offset(size.width, size.height)))
-        // Soft sheen like a metallic print.
-        drawRect(
-            Brush.radialGradient(
-                listOf(Color.White.copy(alpha = 0.45f), Color.Transparent),
-                center = Offset(size.width * 0.3f, size.height * 0.2f),
-                radius = size.width * 0.6f,
-            ),
-        )
-        drawMotif(d)
-        // Tap-direction arrow found at the top-left of most IC cards.
-        if (d.brandAlign != Alignment.TopStart && d.motif != Motif.BUBBLES) {
-            val y = size.height * 0.09f
-            val x0 = size.width * 0.05f
-            val c = Color(0xFF2B5FA8)
-            drawLine(c, Offset(x0, y), Offset(x0 + size.width * 0.06f, y), size.height * 0.012f)
-            drawLine(c, Offset(x0, y), Offset(x0 + size.width * 0.015f, y - size.height * 0.02f), size.height * 0.012f)
-        }
-    }
+    Canvas(Modifier.matchParentSize()) { drawCardBackground(type, flat = false) }
     if (showBrand) {
         BoxWithConstraints(Modifier.matchParentSize()) {
             val w = maxWidth
@@ -122,10 +109,54 @@ internal fun BoxScope.GeneratedArt(type: CardType, showBrand: Boolean) {
     }
 }
 
-private fun DrawScope.drawMotif(d: Design) {
+/**
+ * Everything on the card face except the brand name. [flat] drops the gradients and sheen, for
+ * screens with few colours (the Pebble's 64), where gradients turn into bands. [mono] draws a
+ * white card with its shapes in black, for black-and-white screens.
+ */
+internal fun DrawScope.drawCardBackground(type: CardType, flat: Boolean, mono: Boolean = false) {
+    val d = design(type)
+    if (mono) {
+        drawRect(Color.White)
+    } else if (flat) {
+        // The middle of a three-stop metallic base is its typical tone; two stops are averaged.
+        val base = if (d.base.size == 3) d.base[1] else androidx.compose.ui.graphics.lerp(d.base.first(), d.base.last(), 0.5f)
+        // A silver with a faint tint would round to a pastel colour; keep it grey.
+        val spread = maxOf(base.red, base.green, base.blue) - minOf(base.red, base.green, base.blue)
+        val grey = (base.red + base.green + base.blue) / 3
+        drawRect(if (spread < 0.08f) Color(grey, grey, grey) else base)
+    } else {
+        drawRect(Brush.linearGradient(d.base, start = Offset.Zero, end = Offset(size.width, size.height)))
+        // Soft sheen like a metallic print.
+        drawRect(
+            Brush.radialGradient(
+                listOf(Color.White.copy(alpha = 0.45f), Color.Transparent),
+                center = Offset(size.width * 0.3f, size.height * 0.2f),
+                radius = size.width * 0.6f,
+            ),
+        )
+    }
+    val shapes = when {
+        mono -> d.copy(accent = d.accent.map { Color.Black })
+        flat && d.flatAccent != null -> d.copy(accent = d.accent.map { d.flatAccent })
+        else -> d
+    }
+    drawMotif(shapes, flat || mono)
+    // Tap-direction arrow found at the top-left of most IC cards.
+    if (d.brandAlign != Alignment.TopStart && d.motif != Motif.BUBBLES) {
+        val y = size.height * 0.09f
+        val x0 = size.width * 0.05f
+        val c = if (mono) Color.Black else Color(0xFF2B5FA8)
+        val stroke = size.height * if (flat) 0.02f else 0.012f
+        drawLine(c, Offset(x0, y), Offset(x0 + size.width * 0.06f, y), stroke)
+        drawLine(c, Offset(x0, y), Offset(x0 + size.width * 0.015f, y - size.height * 0.02f), stroke)
+    }
+}
+
+private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
     val w = size.width
     val h = size.height
-    val accent = if (d.accent.size > 1) Brush.linearGradient(d.accent, Offset(0f, 0f), Offset(w, h)) else null
+    val accent = if (d.accent.size > 1 && !flat) Brush.linearGradient(d.accent, Offset(0f, 0f), Offset(w, h)) else null
     val solid = d.accent.first()
     fun fill(path: Path) = if (accent != null) drawPath(path, accent) else drawPath(path, solid)
 
@@ -196,7 +227,7 @@ private fun DrawScope.drawMotif(d: Design) {
             listOf(
                 Triple(0.80f, 0.30f, 0.22f), Triple(0.62f, 0.72f, 0.14f), Triple(0.90f, 0.80f, 0.10f),
                 Triple(0.45f, 0.35f, 0.07f), Triple(0.72f, 0.08f, 0.06f),
-            ).forEach { (x, y, r) -> drawCircle(c.copy(alpha = 0.35f), h * r, Offset(w * x, h * y)) }
+            ).forEach { (x, y, r) -> drawCircle(c.copy(alpha = if (flat) 0.6f else 0.35f), h * r, Offset(w * x, h * y)) }
         }
         Motif.WAVE_BOTTOM -> fill(
             Path().apply {

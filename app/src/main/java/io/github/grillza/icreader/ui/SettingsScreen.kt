@@ -9,7 +9,10 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -18,6 +21,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -32,6 +37,10 @@ fun SettingsScreen(
     stationLanguage: StationLanguage,
     onStationLanguage: (StationLanguage) -> Unit,
     onIcons: () -> Unit,
+    pebble: AppViewModel.PebbleState,
+    onInstallWatchApp: () -> Unit,
+    onOpenOnWatch: () -> Unit,
+    snackbar: SnackbarHostState,
     onBack: () -> Unit,
 ) {
     Scaffold(
@@ -41,6 +50,7 @@ fun SettingsScreen(
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
             )
         },
+        snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())) {
             SectionHeader("Station names")
@@ -72,8 +82,52 @@ fun SettingsScreen(
                 leadingContent = { Icon(Icons.Default.Palette, null) },
                 modifier = Modifier.selectable(selected = false, onClick = onIcons),
             )
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            PebbleSection(pebble, onInstallWatchApp, onOpenOnWatch)
         }
     }
+}
+
+@Composable
+private fun PebbleSection(pebble: AppViewModel.PebbleState, onInstall: () -> Unit, onOpen: () -> Unit) {
+    SectionHeader("Pebble watch")
+    val status = when {
+        !pebble.pebbleApp -> "Pebble app not installed"
+        pebble.watches.isEmpty() -> "No watch connected"
+        pebble.watchAppOpen -> "${pebble.watches.joinToString()} · IC Reader open"
+        else -> "Connected to ${pebble.watches.joinToString()}"
+    }
+    ListItem(
+        headlineContent = { Text(status) },
+        supportingContent = {
+            Text(
+                if (pebble.pebbleApp) {
+                    "Your watch shows each card's balance, when it was last scanned and its history."
+                } else {
+                    "Install the Pebble app and pair your watch to see your cards on it."
+                },
+            )
+        },
+        leadingContent = { Icon(Icons.Default.Watch, null) },
+    )
+    ListItem(
+        headlineContent = { Text("Install on watch") },
+        supportingContent = { Text("Adds IC Reader to your watch through the Pebble app") },
+        leadingContent = { Icon(Icons.Default.Download, null) },
+        modifier = Modifier.selectable(selected = false, enabled = pebble.pebbleApp, onClick = onInstall),
+    )
+    ListItem(
+        headlineContent = { Text("Open on watch") },
+        supportingContent = { Text("UP and DOWN switch cards; SELECT shows the history") },
+        leadingContent = { Icon(Icons.Default.PlayArrow, null) },
+        modifier = Modifier.selectable(selected = false, enabled = pebble.watches.isNotEmpty(), onClick = onOpen),
+    )
+    Text(
+        "Station names on the watch are in English: its fonts have no Japanese.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
 }
 
 private fun example(language: StationLanguage) = when (language) {

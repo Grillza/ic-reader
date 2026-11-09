@@ -39,6 +39,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
     val scan by vm.scan.collectAsStateWithLifecycle()
     val pending by vm.pendingCard.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
+    val pebble by vm.pebble.collectAsStateWithLifecycle()
     val iconId by vm.iconId.collectAsStateWithLifecycle()
     val stationLanguage by vm.stationLanguage.collectAsStateWithLifecycle()
     vm.stationsReady.collectAsStateWithLifecycle().value // recompose once names are loaded
@@ -141,6 +142,10 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                 stationLanguage = stationLanguage,
                 onStationLanguage = vm::setStationLanguage,
                 onIcons = { vm.navigate(Screen.Icons) },
+                pebble = pebble,
+                onInstallWatchApp = { installWatchApp(context, vm::showMessage) },
+                onOpenOnWatch = { vm.openOnWatch() },
+                snackbar = snackbar,
                 onBack = { vm.back() },
             )
             Screen.Icons -> IconsScreen(iconId, snackbar, onBack = { vm.back() }, onSelect = { vm.selectIcon(it.id) })
@@ -201,6 +206,31 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
 }
 
 /** Keeps a queued icon change from closing the app while the user is in another screen. */
+/**
+ * Hands the bundled watch app (assets/watch/ic-reader.pbw, built from watchapp/) to the Pebble
+ * app, which installs it on the watch.
+ */
+private fun installWatchApp(context: Context, message: (String) -> Unit) {
+    val dir = File(context.cacheDir, "exports").apply { mkdirs() }
+    val file = File(dir, "IC-Reader.pbw")
+    context.assets.open("watch/ic-reader.pbw").use { input -> file.outputStream().use { input.copyTo(it) } }
+    val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.files", file)
+    val pebbleApp = io.rebble.pebblekit2.client.DefaultPebbleAndroidAppPicker.getInstance(context).getAllEligibleApps().firstOrNull()
+    val view = Intent(Intent.ACTION_VIEW)
+        .setDataAndType(uri, "application/octet-stream")
+        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    holdIcon(context)
+    try {
+        context.startActivity(if (pebbleApp != null) Intent(view).setPackage(pebbleApp) else view)
+    } catch (e: android.content.ActivityNotFoundException) {
+        try {
+            context.startActivity(Intent.createChooser(view, "Install with"))
+        } catch (e: android.content.ActivityNotFoundException) {
+            message("Couldn't open the Pebble app. Install it from Google Play first.")
+        }
+    }
+}
+
 private fun holdIcon(context: Context) {
     (context.applicationContext as io.github.grillza.icreader.IcReaderApp).icons.hold = true
 }

@@ -274,35 +274,6 @@ private fun DayHeader(date: LocalDate) {
     )
 }
 
-/** Title and subtitle for a history row. */
-private fun describe(tx: Transaction, family: CardFamily, station: (StationRef) -> Station?): Pair<String, String> {
-    val time = tx.secondOfDay?.let(::formatTime)
-    return when (family) {
-        CardFamily.EDY -> Codes.edyType(tx.process) to listOfNotNull(time).joinToString()
-        CardFamily.NANACO -> Codes.nanacoType(tx.process) to listOfNotNull(time).joinToString()
-        CardFamily.WAON -> "Transaction" to ""
-        CardFamily.TRANSIT -> when (tx.kind) {
-            TxKind.TRAIN -> {
-                val inSt = tx.entry?.let(station)
-                val outSt = tx.exit?.let(station)
-                val title = when {
-                    inSt != null && outSt != null -> "${inSt.name} → ${outSt.name}"
-                    inSt != null -> inSt.name
-                    outSt != null -> outSt.name
-                    else -> Codes.process(tx.process)
-                }
-                val sub = listOfNotNull(
-                    Codes.process(tx.process).takeIf { inSt != null || outSt != null },
-                    listOfNotNull(inSt?.line, outSt?.line?.takeIf { it != inSt?.line }).joinToString(" / ").ifEmpty { null },
-                ).joinToString(" · ")
-                title to sub
-            }
-            TxKind.BUS -> Codes.process(tx.process).let { if (it.startsWith("Process")) "Bus" else it } to
-                listOfNotNull(Codes.terminal(tx.terminal), time).joinToString(" · ")
-            else -> Codes.process(tx.process) to listOfNotNull(Codes.terminal(tx.terminal), time).joinToString(" · ")
-        }
-    }
-}
 
 private fun icon(kind: TxKind): ImageVector = when (kind) {
     TxKind.TRAIN -> Icons.Default.Train
@@ -314,7 +285,7 @@ private fun icon(kind: TxKind): ImageVector = when (kind) {
 
 @Composable
 private fun TransactionRow(tx: Transaction, family: CardFamily, station: (StationRef) -> Station?, onClick: () -> Unit) {
-    val (title, subtitle) = describe(tx, family, station)
+    val (title, subtitle) = describeTransaction(tx, family, station)
     val green = if (isSystemInDarkTheme()) ChargeGreenDark else ChargeGreen
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 20.dp, vertical = 10.dp),
@@ -356,7 +327,7 @@ private fun TransactionRow(tx: Transaction, family: CardFamily, station: (Statio
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TransactionSheet(tx: Transaction, family: CardFamily, station: (StationRef) -> Station?, onDismiss: () -> Unit) {
-    val (title, _) = describe(tx, family, station)
+    val (title, _) = describeTransaction(tx, family, station)
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(start = 24.dp, end = 24.dp, bottom = 32.dp)) {
             Text(title, style = MaterialTheme.typography.titleLarge)

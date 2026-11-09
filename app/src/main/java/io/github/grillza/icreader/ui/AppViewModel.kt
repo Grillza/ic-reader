@@ -15,7 +15,15 @@ import io.github.grillza.icreader.data.StationRef
 import io.github.grillza.icreader.data.localized
 import io.github.grillza.icreader.nfc.CardReader
 import kotlinx.coroutines.Dispatchers
+import io.rebble.pebblekit2.client.DefaultPebbleAndroidAppPicker
+import io.rebble.pebblekit2.client.DefaultPebbleInfoRetriever
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -74,6 +82,37 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     fun setStationLanguage(language: io.github.grillza.icreader.data.StationLanguage) {
         _stationLanguage.value = language
         prefs.edit().putString("station_language", language.name).apply()
+    }
+
+    /** What the Settings screen shows about the Pebble watch. */
+    data class PebbleState(
+        /** The Pebble phone app (with PebbleKit 2) is installed. */
+        val pebbleApp: Boolean = false,
+        /** Names of the watches it has connected. */
+        val watches: List<String> = emptyList(),
+        /** IC Reader is open on a watch right now. */
+        val watchAppOpen: Boolean = false,
+    )
+
+    val pebble: StateFlow<PebbleState> = combine(
+        flow { emit(DefaultPebbleAndroidAppPicker.getInstance(app).getAllEligibleApps().isNotEmpty()) },
+        DefaultPebbleInfoRetriever(app).getConnectedWatches()
+            .map { list -> list.map { it.name } }
+            .catch { emit(emptyList()) },
+        container.watchSync.watchOpen,
+    ) { installed, watches, open -> PebbleState(installed, watches, open) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PebbleState())
+
+    fun openOnWatch() = viewModelScope.launch {
+        _message.value = if (container.watchSync.openOnWatch()) {
+            "Opening IC Reader on your watch"
+        } else {
+            "Couldn't reach your watch. Check it's connected in the Pebble app."
+        }
+    }
+
+    fun showMessage(text: String) {
+        _message.value = text
     }
 
     private val _stationsReady = MutableStateFlow(false)

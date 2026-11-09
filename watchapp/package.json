@@ -1,0 +1,28 @@
+{
+  "name": "ic-reader-watch",
+  "author": "Grillza",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "IC Reader",
+    "uuid": "c54c8b91-69f7-45b4-85b8-02522fc73be5",
+    "sdkVersion": "3",
+    "enableMultiJS": false,
+    "targetPlatforms": ["emery", "gabbro", "basalt", "chalk", "diorite", "flint", "aplite"],
+    "watchapp": { "watchface": false },
+    "companionApp": {
+      "android": {
+        "url": "https://github.com/Grillza/ic-reader",
+        "apps": [{ "package": "io.github.grillza.icreader" }]
+      }
+    },
+    "messageKeys": ["Type", "Index", "Count", "Offset", "Total", "Width", "Height", "Data", "Version"],
+    "resources": {
+      "media": [
+        { "type": "bitmap", "name": "IMAGE_MENU_ICON", "file": "images/menu_icon.png", "menuIcon": true }
+      ]
+    }
+  }
+}

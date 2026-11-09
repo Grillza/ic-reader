@@ -1,0 +1,4 @@
+#!/bin/sh
+# Host C compiler for unit tests: system cc if present, otherwise zig's clang via uv.
+if command -v cc >/dev/null 2>&1; then exec cc "$@"; fi
+exec uvx --quiet --from ziglang python -m ziglang cc "$@"
