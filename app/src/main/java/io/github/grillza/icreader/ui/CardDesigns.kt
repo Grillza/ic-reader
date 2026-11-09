@@ -142,15 +142,6 @@ internal fun DrawScope.drawCardBackground(type: CardType, flat: Boolean, mono: B
         else -> d
     }
     drawMotif(shapes, flat || mono)
-    // Tap-direction arrow found at the top-left of most IC cards.
-    if (d.brandAlign != Alignment.TopStart && d.motif != Motif.BUBBLES) {
-        val y = size.height * 0.09f
-        val x0 = size.width * 0.05f
-        val c = if (mono) Color.Black else Color(0xFF2B5FA8)
-        val stroke = size.height * if (flat) 0.02f else 0.012f
-        drawLine(c, Offset(x0, y), Offset(x0 + size.width * 0.06f, y), stroke)
-        drawLine(c, Offset(x0, y), Offset(x0 + size.width * 0.015f, y - size.height * 0.02f), stroke)
-    }
 }
 
 private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
