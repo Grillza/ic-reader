@@ -40,6 +40,8 @@ fun SettingsScreen(
     onStationLanguage: (StationLanguage) -> Unit,
     onIcons: () -> Unit,
     pebble: AppViewModel.PebbleState,
+    watchStationLanguage: StationLanguage,
+    onWatchStationLanguage: (StationLanguage) -> Unit,
     onInstallWatchApp: () -> Unit,
     onOpenOnWatch: () -> Unit,
     snackbar: SnackbarHostState,
@@ -108,13 +110,19 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
-            PebbleSection(pebble, onInstallWatchApp, onOpenOnWatch)
+            PebbleSection(pebble, watchStationLanguage, onWatchStationLanguage, onInstallWatchApp, onOpenOnWatch)
         }
     }
 }
 
 @Composable
-private fun PebbleSection(pebble: AppViewModel.PebbleState, onInstall: () -> Unit, onOpen: () -> Unit) {
+private fun PebbleSection(
+    pebble: AppViewModel.PebbleState,
+    stationLanguage: StationLanguage,
+    onStationLanguage: (StationLanguage) -> Unit,
+    onInstall: () -> Unit,
+    onOpen: () -> Unit,
+) {
     SectionHeader("Pebble watch")
     val status = when {
         !pebble.pebbleApp -> "Pebble app not installed"
@@ -148,7 +156,27 @@ private fun PebbleSection(pebble: AppViewModel.PebbleState, onInstall: () -> Uni
         modifier = Modifier.selectable(selected = false, enabled = pebble.watches.isNotEmpty(), onClick = onOpen),
     )
     Text(
-        "Station names on the watch are in English: its fonts have no Japanese.",
+        "Station names on the watch",
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
+    )
+    Column(Modifier.selectableGroup()) {
+        StationLanguage.entries.forEach { option ->
+            ListItem(
+                headlineContent = { Text(option.label) },
+                supportingContent = { Text(example(option)) },
+                leadingContent = { RadioButton(selected = option == stationLanguage, onClick = null) },
+                modifier = Modifier.selectable(
+                    selected = option == stationLanguage,
+                    role = Role.RadioButton,
+                    onClick = { onStationLanguage(option) },
+                ),
+            )
+        }
+    }
+    Text(
+        "Japanese needs the Japanese language pack on the watch (Pebble app → watch settings → Language); " +
+            "without it, Japanese names show blank. Takes effect the next time you open a card's history.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

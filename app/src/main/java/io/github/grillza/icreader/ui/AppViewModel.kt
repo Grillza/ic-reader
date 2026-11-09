@@ -3,6 +3,7 @@ package io.github.grillza.icreader.ui
 import android.app.Application
 import android.net.Uri
 import android.nfc.Tag
+import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.grillza.icreader.IcReaderApp
@@ -81,7 +82,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setStationLanguage(language: io.github.grillza.icreader.data.StationLanguage) {
         _stationLanguage.value = language
-        prefs.edit().putString("station_language", language.name).apply()
+        prefs.edit { putString("station_language", language.name) }
     }
 
     /** What the Settings screen shows about the Pebble watch. */
@@ -143,6 +144,21 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun showMessage(text: String) {
         _message.value = text
+    }
+
+    private val _watchStationLanguage = MutableStateFlow(
+        runCatching {
+            io.github.grillza.icreader.data.StationLanguage.valueOf(
+                prefs.getString(io.github.grillza.icreader.pebble.WatchSync.PREF_STATION_LANGUAGE, null)!!,
+            )
+        }.getOrDefault(io.github.grillza.icreader.data.StationLanguage.ENGLISH),
+    )
+    /** Station names in the watch app's history (read by WatchSync when the watch asks). */
+    val watchStationLanguage: StateFlow<io.github.grillza.icreader.data.StationLanguage> = _watchStationLanguage.asStateFlow()
+
+    fun setWatchStationLanguage(language: io.github.grillza.icreader.data.StationLanguage) {
+        _watchStationLanguage.value = language
+        prefs.edit { putString(io.github.grillza.icreader.pebble.WatchSync.PREF_STATION_LANGUAGE, language.name) }
     }
 
     private val _stationsReady = MutableStateFlow(false)

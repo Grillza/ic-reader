@@ -126,8 +126,15 @@ class WatchSync(private val context: Context) {
         return art
     }
 
-    private fun watchName(card: SavedCard): String =
-        card.title.takeUnless { WatchProtocol.needsFallback(it) } ?: card.type.displayName
+    private fun watchName(card: SavedCard): String = WatchProtocol.watchText(card.title)
+
+    /** Station names on the watch: Settings > Pebble watch, English unless chosen otherwise. */
+    private fun stationLanguage(): StationLanguage =
+        runCatching {
+            StationLanguage.valueOf(
+                context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString(PREF_STATION_LANGUAGE, null)!!,
+            )
+        }.getOrDefault(StationLanguage.ENGLISH)
 
     private suspend fun sendCards(watch: WatchIdentifier, session: Session) = sendLock.withLock {
         val cards = cards()
@@ -187,7 +194,8 @@ class WatchSync(private val context: Context) {
     }
 
     private fun historyRecord(card: SavedCard, tx: Transaction): ByteArray {
-        val title = describeTransaction(tx, card.family, ::stationForWatch).first
+        val language = stationLanguage()
+        val title = describeTransaction(tx, card.family) { ref -> stationForWatch(ref, language) }.first
         val time = tx.dateTime?.toLocalTime()?.let { t ->
             if (DateFormat.is24HourFormat(context)) "%d:%02d".format(t.hour, t.minute)
             else "%d:%02d %s".format(if (t.hour % 12 == 0) 12 else t.hour % 12, t.minute, if (t.hour < 12) "AM" else "PM")
@@ -209,12 +217,9 @@ class WatchSync(private val context: Context) {
         )
     }
 
-    /** English names on the watch (its fonts have no Japanese); a code when there's no English name. */
-    private fun stationForWatch(ref: StationRef): Station? {
-        val s = app.stations.lookup(ref) ?: return null
-        val english = s.localized(StationLanguage.ENGLISH)
-        return if (s.nameEn == null) english.copy(name = "Station %02X-%02X".format(ref.line, ref.station)) else english
-    }
+    /** The station in the chosen language; one without an English name stays in Japanese. */
+    private fun stationForWatch(ref: StationRef, language: StationLanguage): Station? =
+        app.stations.lookup(ref)?.localized(language)
 
     /** Sends one message, retrying a NACK or timeout twice. False when it couldn't be delivered. */
     private suspend fun send(watch: WatchIdentifier, data: PebbleDictionary): Boolean {
@@ -254,6 +259,8 @@ class WatchSync(private val context: Context) {
 
     companion object {
         private const val TAG = "WatchSync"
+        /** In the app's "settings" preferences. */
+        const val PREF_STATION_LANGUAGE = "watch_station_language"
         private val DAY: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM", Locale.ENGLISH)
     }
 }

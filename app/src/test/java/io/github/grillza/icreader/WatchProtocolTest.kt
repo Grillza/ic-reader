@@ -3,7 +3,6 @@ package io.github.grillza.icreader
 import io.github.grillza.icreader.pebble.WatchProtocol
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -52,13 +51,11 @@ class WatchProtocolTest {
     }
 
     @Test
-    fun watchTextKeepsLatin1AndFoldsTheRest() {
+    fun watchTextKeepsJapaneseAndFoldsMacrons() {
         assertEquals("Ningyocho > Oshiage", WatchProtocol.watchText("Ningyōchō → Oshiage"))
         assertEquals("¥1,234 - café", WatchProtocol.watchText("¥1,234 − café"))
-        assertEquals("??", WatchProtocol.watchText("渋谷"))
-        assertTrue(WatchProtocol.needsFallback("渋谷 Suica"))
-        assertFalse(WatchProtocol.needsFallback("Ningyōchō"))
-        assertFalse(WatchProtocol.needsFallback("What?"))
+        assertEquals("表参道 > 銀座", WatchProtocol.watchText("表参道 → 銀座"))
+        assertEquals("Omotesando (表参道)", WatchProtocol.watchText("Omotesando (表参道)"))
     }
 
     @Test

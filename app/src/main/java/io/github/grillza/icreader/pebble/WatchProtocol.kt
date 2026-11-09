@@ -103,8 +103,9 @@ object WatchProtocol {
     }
 
     /**
-     * Text the watch's fonts can show: they cover Latin-1, not Japanese or macrons. Accents
-     * outside Latin-1 are dropped (Ningyōchō -> Ningyocho); anything else becomes '?'.
+     * Text for the watch's fonts. Japanese is left as is (it shows with the watch's Japanese
+     * language pack); the arrow and dashes become ASCII, and Latin letters with accents outside
+     * Latin-1 lose them (Ningyōchō -> Ningyocho), as the watch's Latin fonts stop at Latin-1.
      */
     fun watchText(s: String): String = buildString {
         for (ch in s) {
@@ -113,15 +114,13 @@ object WatchProtocol {
                 ch == '→' -> append('>')
                 ch == '−' || ch == '–' || ch == '—' -> append('-')
                 else -> {
-                    val base = Normalizer.normalize(ch.toString(), Normalizer.Form.NFD).filter { it.code < 0x100 }
-                    append(base.ifEmpty { "?" })
+                    val decomposed = Normalizer.normalize(ch.toString(), Normalizer.Form.NFD)
+                    val base = decomposed.first()
+                    append(if (base.code < 0x100 && decomposed.length > 1) base else ch)
                 }
             }
         }
     }
-
-    /** True when [watchText] would lose characters from [s]. */
-    fun needsFallback(s: String): Boolean = watchText(s).count { it == '?' } > s.count { it == '?' }
 
     /** A Pebble colour (GColor8: 0b11rrggbb) for an ARGB colour; fully transparent below half alpha. */
     fun pebbleColor(argb: Int): Int {

@@ -40,6 +40,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
     val pending by vm.pendingCard.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
     val pebble by vm.pebble.collectAsStateWithLifecycle()
+    val watchStationLanguage by vm.watchStationLanguage.collectAsStateWithLifecycle()
     val backupLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/zip"),
     ) { uri -> uri?.let(vm::backup) }
@@ -149,6 +150,8 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                 onStationLanguage = vm::setStationLanguage,
                 onIcons = { vm.navigate(Screen.Icons) },
                 pebble = pebble,
+                watchStationLanguage = watchStationLanguage,
+                onWatchStationLanguage = vm::setWatchStationLanguage,
                 onInstallWatchApp = { installWatchApp(context, vm::showMessage) },
                 onOpenOnWatch = { vm.openOnWatch() },
                 snackbar = snackbar,

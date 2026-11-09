@@ -44,8 +44,9 @@ as in the app), its name, its balance and when you last scanned it ("Scanned tod
   has the route or description, the date and time, and the amount (money in shows green).
 - The watch saves the card list, so balances show straight away and while the phone is away
   ("Offline"). Card faces and history come from the phone each time.
-- Station names are in English on the watch, because its fonts have no Japanese. A station without
-  an English name shows as its code (Station 1A-2B).
+- Station names on the watch can be English (the default), Japanese or both: Settings → Pebble
+  watch → Station names on the watch. Japanese needs the watch's Japanese language pack; without
+  it, Japanese text shows blank.
 
 Set up in the app under **Settings → Pebble watch**:
 
