@@ -98,9 +98,15 @@ Only the unencrypted public areas are read. Gate-entry times and bus stop names 
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Debug builds have **Load demo card** in the menu, which runs a made-up Suica scan through the
-normal flow so you can try the UI on an emulator with no NFC. Release builds leave it and its
-data out (`src/debug` and `src/release` each have their own `DemoData`).
+Debug builds have two extra menu items, for trying things without real cards:
+
+- **Load demo card** runs a made-up Suica scan through the normal flow (preview, then save).
+- **Test cards** adds cards of any type with a balance you choose, and changes any card's
+  balance. The watch updates as it would after a scan, so it's a quick way to check every card
+  face and the watch app. Test cards can be removed from the same dialog; real cards can't.
+
+Release builds leave both out (`src/debug` and `src/release` each have their own `DemoData` and
+`DebugTools`).
 
 The watch app is in `watchapp/`. The Android app bundles it as `assets/watch/ic-reader.pbw`, which
 is committed so the Android build doesn't need the Pebble SDK. After changing the watch app, run

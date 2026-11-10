@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Contactless
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
@@ -78,6 +79,7 @@ fun CardListScreen(
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var menu by remember { mutableStateOf(false) }
     var about by remember { mutableStateOf(false) }
+    var testCards by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
@@ -103,6 +105,13 @@ fun CardListScreen(
                                 text = { Text(DemoData.MENU_LABEL) },
                                 leadingIcon = { Icon(Icons.Default.Contactless, null) },
                                 onClick = { menu = false; onDemo() },
+                            )
+                        }
+                        if (DebugTools.AVAILABLE) {
+                            DropdownMenuItem(
+                                text = { Text(DebugTools.MENU_LABEL) },
+                                leadingIcon = { Icon(Icons.Default.CreditCard, null) },
+                                onClick = { menu = false; testCards = true },
                             )
                         }
                         DropdownMenuItem(
@@ -161,6 +170,7 @@ fun CardListScreen(
             }
         }
     }
+    if (testCards) DebugTools.TestCardsDialog(onDismiss = { testCards = false })
     if (about) {
         AlertDialog(
             onDismissRequest = { about = false },
