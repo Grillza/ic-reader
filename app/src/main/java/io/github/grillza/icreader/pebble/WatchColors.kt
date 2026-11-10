@@ -144,7 +144,13 @@ object WatchColors {
                 r = stretch(r, lo, hi); g = stretch(g, lo, hi); b = stretch(b, lo, hi)
             }
             rgbToHsv(r, g, b, hsv)
-            if (photo) {
+            if (photo && hsv[1] < 0.25f && hsv[2] >= 0.6f) {
+                // Pale, nearly colourless tones are the card's white in shadow or tinted by the
+                // light: the screen's only light grey (170) and its pale greens show them as blotches,
+                // so they go white.
+                hsv[1] = 0f
+                hsv[2] = 1f
+            } else if (photo) {
                 hsv[1] = min(1f, hsv[1] * 1.15f)
             } else if (hsv[1] < 0.12f) {
                 if (hsv[2] >= 0.55f) hsv[2] = 1f
@@ -243,6 +249,65 @@ object WatchColors {
             src = out
         }
         return src
+    }
+
+    /**
+     * Splits ARGB [pixels] into regions of similar colour and paints each region its average,
+     * so a card's panel lit unevenly comes out one flat colour instead of two or three
+     * patches. A pixel joins its neighbour's region when the two differ by less than [step]
+     * (so a gradual change of light stays in one region) and it's within [spread] of where
+     * the region started (so it can't creep across a real edge). Regions smaller than
+     * [minSize] keep their own pixels: that's fine detail such as lettering.
+     */
+    fun regions(pixels: IntArray, width: Int, step: Int = 22, spread: Int = 80, minSize: Int = 12): IntArray {
+        val height = pixels.size / width
+        val label = IntArray(pixels.size) { -1 }
+        val out = pixels.copyOf()
+        val queue = IntArray(pixels.size)
+        val step2 = step * step
+        val spread2 = spread * spread
+        fun dist2(a: Int, b: Int): Int {
+            val dr = ((a shr 16) and 0xFF) - ((b shr 16) and 0xFF)
+            val dg = ((a shr 8) and 0xFF) - ((b shr 8) and 0xFF)
+            val db = (a and 0xFF) - (b and 0xFF)
+            return dr * dr + dg * dg + db * db
+        }
+        var next = 0
+        for (start in pixels.indices) {
+            if (label[start] >= 0 || (pixels[start] ushr 24) < 128) continue
+            val seed = pixels[start]
+            val id = next++
+            var head = 0
+            var tail = 0
+            queue[tail++] = start
+            label[start] = id
+            var sr = 0L
+            var sg = 0L
+            var sb = 0L
+            while (head < tail) {
+                val i = queue[head++]
+                val p = pixels[i]
+                sr += (p shr 16) and 0xFF; sg += (p shr 8) and 0xFF; sb += p and 0xFF
+                val x = i % width
+                val y = i / width
+                for (d in 0 until 4) {
+                    val nx = x + (if (d == 0) 1 else if (d == 1) -1 else 0)
+                    val ny = y + (if (d == 2) 1 else if (d == 3) -1 else 0)
+                    if (nx !in 0 until width || ny !in 0 until height) continue
+                    val j = ny * width + nx
+                    if (label[j] >= 0) continue
+                    val q = pixels[j]
+                    if ((q ushr 24) < 128) continue
+                    if (dist2(p, q) >= step2 || dist2(seed, q) >= spread2) continue
+                    label[j] = id
+                    queue[tail++] = j
+                }
+            }
+            if (tail < minSize) continue
+            val avg = (0xFF shl 24) or ((sr / tail).toInt() shl 16) or ((sg / tail).toInt() shl 8) or (sb / tail).toInt()
+            for (k in 0 until tail) out[queue[k]] = avg
+        }
+        return out
     }
 
     /**

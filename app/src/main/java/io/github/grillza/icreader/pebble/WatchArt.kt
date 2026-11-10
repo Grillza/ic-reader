@@ -91,7 +91,7 @@ object WatchArtRenderer {
             }
             return null
         }
-        val colours = WatchColors.tidy(WatchColors.toPebble(vivid, photo = true), width)
+        val colours = WatchColors.tidy(WatchColors.toPebble(WatchColors.regions(vivid, width), photo = true), width)
         for (threshold in FLATTEN_STEPS) {
             val rle = WatchProtocol.rlePebble(WatchColors.flattenRows(colours, width, threshold))
             if (rle.size <= maxBytes) return rle
