@@ -71,7 +71,7 @@ object WatchArtRenderer {
         val canvas = Canvas(bitmap)
         // Older pictures were saved as plain rectangles, so cut the outline here too.
         canvas.withClip(cardOutlinePath(width.toFloat(), height.toFloat(), type.family == CardFamily.TRANSIT)) {
-            drawBitmap(image, centerCrop(image.width, image.height, width, height), RectF(0f, 0f, width.toFloat(), height.toFloat()), Paint(Paint.FILTER_BITMAP_FLAG))
+            drawBitmap(image, trimEdges(centerCrop(image.width, image.height, width, height)), RectF(0f, 0f, width.toFloat(), height.toFloat()), Paint(Paint.FILTER_BITMAP_FLAG))
         }
         image.recycle()
         return bitmap.pixels().also { bitmap.recycle() }
@@ -123,6 +123,18 @@ object WatchArtRenderer {
     }
 
     private fun Bitmap.pixels(): IntArray = IntArray(width * height).also { getPixels(it, 0, width, 0, 0, width, height) }
+
+    /**
+     * Trims [EDGE_TRIM] off each side. A crop that's slightly off leaves a sliver of what was
+     * behind the card along an edge; invisible on the phone, it fills a whole row on the watch.
+     */
+    private fun trimEdges(r: Rect): Rect {
+        val dx = (r.width() * EDGE_TRIM).toInt()
+        val dy = (r.height() * EDGE_TRIM).toInt()
+        return Rect(r.left + dx, r.top + dy, r.right - dx, r.bottom - dy)
+    }
+
+    private const val EDGE_TRIM = 0.02f
 
     private fun centerCrop(srcW: Int, srcH: Int, dstW: Int, dstH: Int): Rect {
         val scale = maxOf(dstW.toFloat() / srcW, dstH.toFloat() / srcH)
