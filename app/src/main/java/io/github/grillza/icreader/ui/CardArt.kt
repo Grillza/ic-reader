@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
@@ -77,12 +76,8 @@ fun CardArt(
     ) {
         val photo = bitmap
         if (photo != null) {
+            // Shown as is: the balance has its own dark pill, so the photo needn't be darkened.
             Image(photo, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-            Box(
-                Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(0.45f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.55f)),
-                ),
-            )
         } else {
             GeneratedArt(type, showBrand)
         }

@@ -11,6 +11,7 @@ import android.os.Build
 import androidx.compose.ui.Alignment
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
+import androidx.core.graphics.scale
 import androidx.core.graphics.withClip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.asComposePath
@@ -64,7 +65,8 @@ object WatchArtRenderer {
 
     /** The user's card picture (already card-shaped), scaled to the watch, or null if unreadable. */
     private fun drawPhoto(type: CardType, photo: File, width: Int, height: Int): IntArray? {
-        val image = runCatching { BitmapFactory.decodeFile(photo.path) }.getOrNull() ?: return null
+        val image = runCatching { BitmapFactory.decodeFile(photo.path) }.getOrNull()?.let { halveDown(it, width * 2) }
+            ?: return null
         val bitmap = createBitmap(width, height)
         val canvas = Canvas(bitmap)
         // Older pictures were saved as plain rectangles, so cut the outline here too.
@@ -77,17 +79,47 @@ object WatchArtRenderer {
 
     /**
      * A photo in the watch's 64 colours is mostly one- and two-pixel runs, far too big to send.
-     * Smooths it into flat patches, a little more each time, until it fits in [maxBytes].
+     * Flattens it a little more each time until it fits in [maxBytes], keeping strong edges.
      */
     private fun fitPhoto(pixels: IntArray, width: Int, mono: Boolean, maxBytes: Int): ByteArray? {
         val vivid = WatchColors.vivid(pixels, photo = true)
-        val colours = if (mono) WatchColors.mono(vivid) else WatchColors.toPebble(vivid)
-        val patches = WatchColors.majority(colours, width)
-        for (minRun in 1..16) {
-            val rle = WatchProtocol.rlePebble(WatchColors.mergeShortRuns(patches, width, minRun))
+        if (mono) {
+            val bw = WatchColors.mono(vivid)
+            for (minRun in 1..16) {
+                val rle = WatchProtocol.rlePebble(WatchColors.mergeShortRuns(bw, width, minRun))
+                if (rle.size <= maxBytes) return rle
+            }
+            return null
+        }
+        val colours = WatchColors.toPebble(vivid, photo = true)
+        for (threshold in FLATTEN_STEPS) {
+            val rle = WatchProtocol.rlePebble(WatchColors.flattenRows(colours, width, threshold))
+            if (rle.size <= maxBytes) return rle
+        }
+        val flat = WatchColors.flattenRows(colours, width, FLATTEN_STEPS.last())
+        for (minRun in 2..16) {
+            val rle = WatchProtocol.rlePebble(WatchColors.mergeShortRuns(flat, width, minRun))
             if (rle.size <= maxBytes) return rle
         }
         return null
+    }
+
+    /** Thresholds for [WatchColors.flattenRows], gentlest first. */
+    private val FLATTEN_STEPS = intArrayOf(0, 400, 800, 1300, 2000, 3000, 4500, 6500, 9000, 12000)
+
+    /**
+     * Halves [image] until it's less than twice [minWidth] wide. Shrinking a lot in one step
+     * skips most pixels, which breaks up thin lines like a card's lettering.
+     */
+    private fun halveDown(image: Bitmap, minWidth: Int): Bitmap {
+        var current = image
+        while (current.width / 2 >= minWidth) {
+            val half = current.scale(current.width / 2, current.height / 2)
+            if (current !== image) current.recycle()
+            current = half
+        }
+        if (current !== image) image.recycle()
+        return current
     }
 
     private fun Bitmap.pixels(): IntArray = IntArray(width * height).also { getPixels(it, 0, width, 0, 0, width, height) }

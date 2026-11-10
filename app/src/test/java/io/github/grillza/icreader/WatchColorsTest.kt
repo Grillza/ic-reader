@@ -42,13 +42,14 @@ class WatchColorsTest {
     }
 
     @Test
-    fun majorityClearsSpeckle() {
-        val a = 0xC1; val b = 0xFE
-        val grid = IntArray(9) { a }.also { it[4] = b }
-        assertEquals(a, WatchColors.majority(grid, 3)[4])
-        // Transparent pixels stay put.
-        val holes = IntArray(9) { a }.also { it[0] = 0 }
-        assertEquals(0, WatchColors.majority(holes, 3)[0])
+    fun flattenKeepsStrongEdges() {
+        val green = 0xC8      // (0, 170, 0)
+        val green2 = 0xD8     // (85, 170, 0): looks almost the same on screen
+        val white = 0xFF
+        val row = intArrayOf(green, green2, green, white, white, green, green2, 0, green)
+        val flat = WatchColors.flattenRows(row, row.size, 3000)
+        assertArrayEquals(intArrayOf(green, green, green, white, white, green, green, 0, green), flat)
+        assertArrayEquals(row, WatchColors.flattenRows(row, row.size, 0))
     }
 
     @Test

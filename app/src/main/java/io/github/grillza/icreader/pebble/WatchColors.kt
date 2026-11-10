@@ -35,7 +35,7 @@ object WatchColors {
      * Closeness is a weighted RGB distance plus a penalty for changing the hue (or tinting a
      * grey), since the screen can't show strong colours but yellow should still look yellow.
      */
-    fun toPebble(argb: Int): Int {
+    fun toPebble(argb: Int, greyBelow: Float = 0.12f): Int {
         if ((argb ushr 24) < 128) return 0
         val r = (argb shr 16) and 0xFF
         val g = (argb shr 8) and 0xFF
@@ -51,7 +51,7 @@ object WatchColors {
             val db = (b - (d and 0xFF)).toFloat()
             val rm = (r + ((d shr 16) and 0xFF)) / 2f
             var dist = (2f + rm / 256f) * dr * dr + 4f * dg * dg + (2f + (255f - rm) / 256f) * db * db
-            if (sat > 0.12f) {
+            if (sat > greyBelow) {
                 var dh = if (DISPLAY_SAT[i] == 0f) 180f else kotlin.math.abs(hue - DISPLAY_HUE[i])
                 if (dh > 180f) dh = 360f - dh
                 dist += HUE_WEIGHT * dh * dh * min(sat, 1f)
@@ -81,15 +81,54 @@ object WatchColors {
         return hsv[1]
     }
 
-    fun toPebble(pixels: IntArray): IntArray {
+    /**
+     * [toPebble] for every pixel. [photo]: colours that are only faintly tinted count as grey,
+     * as a white card under warm or cool light should still look white.
+     */
+    fun toPebble(pixels: IntArray, photo: Boolean = false): IntArray {
         val cache = HashMap<Int, Int>()
-        return IntArray(pixels.size) { cache.getOrPut(pixels[it]) { toPebble(pixels[it]) } }
+        val greyBelow = if (photo) 0.22f else 0.12f
+        return IntArray(pixels.size) { cache.getOrPut(pixels[it]) { toPebble(pixels[it], greyBelow) } }
+    }
+
+    /** How far apart two Pebble colours look on the screen (squared RGB distance). */
+    fun screenDistance(a: Int, b: Int): Int {
+        val x = DISPLAY[a and 0x3F]
+        val y = DISPLAY[b and 0x3F]
+        val dr = ((x shr 16) and 0xFF) - ((y shr 16) and 0xFF)
+        val dg = ((x shr 8) and 0xFF) - ((y shr 8) and 0xFF)
+        val db = (x and 0xFF) - (y and 0xFF)
+        return dr * dr + dg * dg + db * db
+    }
+
+    /**
+     * Flattens a photo in Pebble colours along each row: a pixel joins the run before it when
+     * the two look less than [threshold] apart ([screenDistance]). Gentle shading and noise
+     * merge into long runs; strong edges, like white lettering on green, stay sharp.
+     * Transparent pixels (0) are left alone.
+     */
+    fun flattenRows(colours: IntArray, width: Int, threshold: Int): IntArray {
+        if (threshold <= 0) return colours
+        val out = colours.copyOf()
+        for (row in out.indices step width) {
+            var run = 0
+            for (x in 0 until width) {
+                val c = out[row + x]
+                if (c == 0 || run == 0 || screenDistance(c, run) >= threshold) {
+                    run = c
+                } else {
+                    out[row + x] = run
+                }
+            }
+        }
+        return out
     }
 
     /**
      * Bolder colours. Designs ([photo] false): near-greys (the silver card base) go to white and
      * colours get stronger. Photos: the brightness range is stretched to full (ignoring the
-     * darkest and lightest 2%) and colours get stronger.
+     * darkest and lightest 1%) and colours get a little stronger (more makes white cards
+     * look tinted).
      */
     fun vivid(pixels: IntArray, photo: Boolean): IntArray {
         val (lo, hi) = if (photo) levels(pixels) else 0 to 255
@@ -105,7 +144,9 @@ object WatchColors {
                 r = stretch(r, lo, hi); g = stretch(g, lo, hi); b = stretch(b, lo, hi)
             }
             rgbToHsv(r, g, b, hsv)
-            if (!photo && hsv[1] < 0.12f) {
+            if (photo) {
+                hsv[1] = min(1f, hsv[1] * 1.15f)
+            } else if (hsv[1] < 0.12f) {
                 if (hsv[2] >= 0.55f) hsv[2] = 1f
             } else {
                 // Not all the way: fully saturated yellow would match the screen's orange.
@@ -115,7 +156,7 @@ object WatchColors {
         }
     }
 
-    /** The 2nd and 98th percentile of opaque pixels' brightness. */
+    /** The 1st and 99th percentile of opaque pixels' brightness. */
     private fun levels(pixels: IntArray): Pair<Int, Int> {
         val hist = IntArray(256)
         var n = 0
@@ -133,8 +174,8 @@ object WatchColors {
             }
             return 255
         }
-        val lo = at(0.02f)
-        val hi = at(0.98f)
+        val lo = at(0.01f)
+        val hi = at(0.99f)
         return if (hi - lo < 32) 0 to 255 else lo to hi
     }
 
@@ -157,37 +198,6 @@ object WatchColors {
                 else -> 0xC0
             }
         }
-    }
-
-    /**
-     * Each Pebble-colour pixel becomes the most common colour around it (3 × 3), which clears
-     * single-pixel speckle. Transparent pixels (0) stay as they are and don't count.
-     */
-    fun majority(colours: IntArray, width: Int): IntArray {
-        val height = colours.size / width
-        val out = colours.copyOf()
-        val seen = IntArray(9)
-        val counts = IntArray(9)
-        for (y in 0 until height) for (x in 0 until width) {
-            val c = colours[y * width + x]
-            if (c == 0) continue
-            var kinds = 0
-            for (dy in -1..1) for (dx in -1..1) {
-                val nx = x + dx
-                val ny = y + dy
-                if (nx !in 0 until width || ny !in 0 until height) continue
-                val n = colours[ny * width + nx]
-                if (n == 0) continue
-                var k = 0
-                while (k < kinds && seen[k] != n) k++
-                if (k == kinds) { seen[k] = n; counts[k] = 0; kinds++ }
-                counts[k]++
-            }
-            var best = -1
-            for (k in 0 until kinds) if (best < 0 || counts[k] > counts[best] || (counts[k] == counts[best] && seen[k] == c)) best = k
-            out[y * width + x] = seen[best]
-        }
-        return out
     }
 
     /**
