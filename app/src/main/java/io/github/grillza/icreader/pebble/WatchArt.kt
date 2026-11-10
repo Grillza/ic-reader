@@ -28,7 +28,9 @@ import io.github.grillza.icreader.ui.SUICA_TEXT_LEFT
 import io.github.grillza.icreader.ui.SUICA_TEXT_SIZE
 import io.github.grillza.icreader.ui.SUICA_TEXT_SPACING
 import io.github.grillza.icreader.ui.cardOutlinePath
+import io.github.grillza.icreader.ui.center
 import io.github.grillza.icreader.ui.design
+import io.github.grillza.icreader.ui.drawLabel
 import io.github.grillza.icreader.ui.drawCardBackground
 import java.io.File
 import java.util.zip.CRC32
@@ -152,6 +154,18 @@ object WatchArtRenderer {
     /** The brand name, placed as GeneratedArt places it. */
     private fun drawBrand(canvas: Canvas, bitmap: Bitmap, type: CardType, w: Float, h: Float, mono: Boolean) {
         val d = design(type)
+        if (d.labels.isNotEmpty()) {
+            d.labels.forEach { label ->
+                val colour = if (mono) {
+                    val (cx, cy) = label.center(w, h)
+                    contrasting(bitmap[cx.toInt().coerceIn(0, bitmap.width - 1), cy.toInt().coerceIn(0, bitmap.height - 1)])
+                } else {
+                    null
+                }
+                canvas.drawLabel(label, w, h, colour, flat = true)
+            }
+            return
+        }
         val scale = when {
             d.motif == Motif.SUICA_PANEL -> SUICA_TEXT_SIZE / 1.15f  // already large
             d.brandShift != 0f -> 0.075f
@@ -184,11 +198,15 @@ object WatchArtRenderer {
             // Black or white, whichever stands out from what's behind the text.
             val cx = (x + textW / 2).toInt().coerceIn(0, bitmap.width - 1)
             val cy = (baseline + (fm.ascent + fm.descent) / 2).toInt().coerceIn(0, bitmap.height - 1)
-            val behind = bitmap[cx, cy]
-            val light = android.graphics.Color.red(behind) + android.graphics.Color.green(behind) + android.graphics.Color.blue(behind) > 384
-            paint.color = if (light) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+            paint.color = contrasting(bitmap[cx, cy])
         }
         canvas.drawText(d.brand, x, baseline, paint)
+    }
+
+    /** Black or white, whichever stands out from [behind]. */
+    private fun contrasting(behind: Int): Int {
+        val light = android.graphics.Color.red(behind) + android.graphics.Color.green(behind) + android.graphics.Color.blue(behind) > 384
+        return if (light) android.graphics.Color.BLACK else android.graphics.Color.WHITE
     }
 
     /** The card's main colour as a Pebble colour, shown until its art arrives. */

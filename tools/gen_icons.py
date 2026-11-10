@@ -22,31 +22,51 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent / "app" / "src" / "main"
 PKG = "io.github.grillza.icreader"
-FONT = pathlib.Path(__file__).resolve().parent / "fonts" / "OpenSans-Bold.ttf"
+FONTS = pathlib.Path(__file__).resolve().parent / "fonts"
+FONT = FONTS / "OpenSans-Bold.ttf"
+SERIF = FONTS / "NotoSerif-Bold-Latin.ttf"  # Noto Serif Bold, Latin only
+KANA = FONTS / "NotoSansJP-Regular-Hayakaken.otf"  # Noto Sans JP, just はやかけん
 DENSITIES = {"mdpi": 108, "hdpi": 162, "xhdpi": 216, "xxhdpi": 324, "xxxhdpi": 432}
 S = 864  # render size (px for 108 dp), downsampled per density
 
 PEARL = ("#F7F8F9", "#E2E5E8")
 SILVER = ("#E7E9EC", "#C5C9CE")
 
-# id, label, base gradient, brand text, text colour, text centre (u, v), text width (fraction), shapes
+# id, label, base gradient, brand text, text colour, text centre (u, v), text width (fraction), shapes.
+# Icons with entries in LETTERING use those instead of the brand text.
 ICONS = [
     ("default", "IC Reader", ("#26324F", "#1A2238"), None, None, None, 0, "default"),
     ("suica", "Suica", PEARL, "Suica", "#FFFFFF", (0.42, 0.66), 0.54, "suica"),
     ("pasmo", "PASMO", SILVER, "PASMO", "#EA5A9C", (0.5, 0.74), 0.74, "pasmo"),
-    ("icoca", "ICOCA", ("#2A66C9", "#4F92E6"), "ICOCA", "#E3EEFF", (0.5, 0.5), 0.74, None),
+    ("icoca", "ICOCA", ("#D5D6D9", "#C3C5C9"), "ICOCA", None, None, 0, "icoca"),
     ("toica", "TOICA", SILVER, "toica", "#FFFFFF", (0.5, 0.76), 0.62, "toica"),
     ("manaca", "manaca", ("#D3D6DF", "#BBC0CC"), "manaca", "#8E95A6", (0.5, 0.5), 0.70, "manaca"),
-    ("kitaca", "Kitaca", PEARL, "Kitaca", "#6FA82B", (0.5, 0.36), 0.66, "kitaca"),
-    ("sugoca", "SUGOCA", PEARL, "SUGOCA", "#E4462E", (0.5, 0.72), 0.78, "sugoca"),
+    ("kitaca", "Kitaca", ("#F8F4E3", "#EFE9D3"), "Kitaca", None, None, 0, "kitaca"),
+    ("sugoca", "SUGOCA", ("#C0D5BB", "#B3CAAE"), "SUGOCA", None, None, 0, "sugoca"),
     ("nimoca", "nimoca", PEARL, "nimoca", "#FFFFFF", (0.5, 0.5), 0.66, "nimoca"),
-    ("hayakaken", "Hayakaken", PEARL, "Hayakaken", "#2E86C1", (0.5, 0.34), 0.84, "hayakaken"),
-    ("pitapa", "PiTaPa", SILVER, "PiTaPa", "#E6E8EC", (0.62, 0.62), 0.58, "pitapa"),
+    ("hayakaken", "Hayakaken", ("#FBFAF8", "#EDECE9"), "Hayakaken", None, None, 0, "hayakaken"),
+    ("pitapa", "PiTaPa", ("#B4BFBD", "#A1ADAB"), "PiTaPa", None, None, 0, "pitapa"),
     ("transit", "Transit IC", SILVER, "IC", "#FFFFFF", (0.5, 0.76), 0.34, "transit"),
     ("edy", "Rakuten Edy", ("#FFFFFF", "#EDEEF0"), "Edy", "#D0000F", (0.42, 0.40), 0.52, "edy"),
     ("nanaco", "nanaco", ("#FFF8E7", "#F7EBCB"), "nanaco", "#E38D00", (0.5, 0.38), 0.70, "nanaco"),
     ("waon", "WAON", ("#CDEBF8", "#86CFEF"), "WAON", "#1C6FD0", (0.5, 0.5), 0.72, "waon"),
 ]
+
+
+# Lettering placed as on the real cards (see Label in ui/CardDesigns.kt): text, colour, centre
+# (u, v), width (fraction of the visible square), and options: font, spacing (ems), per-letter
+# colours, vertical (reads top to bottom; width is then its height).
+LETTERING = {
+    "icoca": [("ICOCA", "#C8C9CB", (0.5, 0.5), 0.66, {"font": SERIF, "spacing": 0.04})],
+    "sugoca": [("SUGOCA", "#E67A93", (0.44, 0.76), 0.60, {"spacing": 0.10})],
+    "kitaca": [("Kitaca", "#7DCB2E", (0.5, 0.76), 0.72, {"spacing": 0.22, "colors": {1: "#AAAAAA"}})],
+    "hayakaken": [
+        ("HAYAKAKEN", "#2B3A93", (0.5, 0.2), 0.62, {"spacing": 0.06}),
+        ("はやか", "#FFFFFF", (0.43, 0.52), 0.62, {"font": KANA}),
+        ("けん", "#FFFFFF", (0.63, 0.75), 0.38, {"font": KANA}),
+    ],
+    "pitapa": [("PiTaPa", "#C3CCCA", (0.50, 0.5), 0.68, {"font": SERIF, "vertical": True})],
+}
 
 
 def px(u: float) -> float:
@@ -108,17 +128,36 @@ def draw_shapes(img: Image.Image, kind: str):
         d.polygon(pts + [P(1.4, 1.4), P(-0.4, 1.4)], fill="#17A9E1")
     elif kind == "manaca":
         d.ellipse(R(0.02, 0.02, 0.98, 0.98), fill="#F1E63B")
-    elif kind in ("kitaca", "hayakaken", "edy"):
-        a, b = {"kitaca": ("#9CCB3B", "#7AB52E"), "hayakaken": ("#7FC3E8", "#3E9ED6"), "edy": ("#E60012", "#BF0000")}[kind]
+    elif kind == "icoca":
+        # A blue panel in a silver border with two opposite corners cut at 45 degrees.
+        panel = rounded_polygon([P(0.30, 0.10), P(0.90, 0.10), P(0.90, 0.66), P(0.66, 0.90), P(0.10, 0.90), P(0.10, 0.34)], px(0.05) - px(0))
+        d.polygon(panel, fill="#0AB5D1")
+    elif kind == "sugoca":
+        # A pale panel in a green border, cut away on the right by a big circle.
+        mask = Image.new("L", (S, S), 0)
+        md = ImageDraw.Draw(mask)
+        md.rounded_rectangle(R(0.10, 0.10, 1.4, 0.90), radius=px(0.05) - px(0), fill=255)
+        md.ellipse(R(1.22 - 0.48, 0.5 - 0.48, 1.22 + 0.48, 0.5 + 0.48), fill=0)
+        img.paste(Image.new("RGBA", (S, S), hex_rgba("#F6FAE9")), (0, 0), mask)
+    elif kind == "kitaca":
+        # Grey sky over a pale forest of treetops.
+        tops = [(0.10, 0.50), (0.15, 0.47), (0.20, 0.50), (0.26, 0.46), (0.32, 0.49), (0.38, 0.45), (0.44, 0.49), (0.50, 0.46),
+                (0.56, 0.49), (0.62, 0.45), (0.68, 0.48), (0.74, 0.43), (0.80, 0.41), (0.86, 0.44), (0.90, 0.42)]
+        edge = []
+        for (u0, v0), (u1, v1) in zip(tops, tops[1:]):
+            edge += [P(u0, v0), P((u0 + u1) / 2, max(v0, v1) + 0.05)]
+        edge.append(P(*tops[-1]))
+        d.polygon(rounded_polygon([P(0.10, 0.10), P(0.90, 0.10)] + edge[::-1], px(0.04) - px(0), steps=4), fill="#B6B9C0")
+    elif kind == "hayakaken":
+        d.rounded_rectangle(R(0.08, 0.32, 0.92, 0.90), radius=px(0.05) - px(0), fill="#4FD2EA")
+    elif kind == "pitapa":
+        d.rounded_rectangle(R(0.30, 0.10, 0.90, 0.90), radius=px(0.06) - px(0), fill="#898CB0")
+    elif kind == "edy":
+        a, b = ("#E60012", "#BF0000")
         d.polygon([P(0.25, 1.3), P(1.3, 0.40), P(1.3, 1.3)], fill=a)
         d.polygon([P(0.0, 1.25), P(0.12, 1.25), P(1.25, 0.28), P(1.25, 0.17)], fill=b)
-    elif kind == "sugoca":
-        d.ellipse(R(0.45, -0.25, 1.25, 0.55), fill="#B7CFA2")
     elif kind == "nimoca":
         d.ellipse(R(0.03, 0.03, 0.97, 0.97), fill="#45A2CB")
-    elif kind == "pitapa":
-        d.rectangle(R(0.30, -0.4, 1.4, 1.4), fill="#8D8EC8")
-        d.ellipse(R(-0.12, 0.10, 0.36, 0.58), fill="#8D8EC8")
     elif kind == "transit":
         d.polygon([P(-0.4, 0.62), P(0.2, 0.44), P(0.6, 0.66), P(1.4, 0.48), P(1.4, 1.4), P(-0.4, 1.4)], fill="#607D8B")
     elif kind == "nanaco":
@@ -212,6 +251,25 @@ def wordmark(text: str, color: str, center, width_frac: float, spacing: float = 
     return img
 
 
+def lettering(img: Image.Image, text: str, color: str, center, width_frac: float, font=FONT, spacing=0.0, colors=None, vertical=False):
+    """[text] with its ink centred at [center] and [width_frac] of the visible square long."""
+    target = (px(1) - px(0)) * width_frac
+    f = ImageFont.truetype(str(font), 200)
+    # Lay out at size 200, letter by letter (for spacing and colours), then scale to fit.
+    layer = Image.new("RGBA", (int(200 * (len(text) + 1) * 1.4), 400), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    x = 20
+    for i, ch in enumerate(text):
+        d.text((x, 300), ch, font=f, fill=(colors or {}).get(i, color), anchor="ls")
+        x += f.getlength(ch) + spacing * 200
+    layer = layer.crop(layer.getbbox())
+    k = target / layer.width
+    layer = layer.resize((max(1, round(layer.width * k)), max(1, round(layer.height * k))), Image.LANCZOS)
+    if vertical:
+        layer = layer.rotate(-90, expand=True)
+    img.alpha_composite(layer, (round(px(center[0]) - layer.width / 2), round(px(center[1]) - layer.height / 2)))
+
+
 def save(img: Image.Image, name: str):
     for dens, size in DENSITIES.items():
         out = ROOT / f"res/mipmap-{dens}/{name}.png"
@@ -246,6 +304,10 @@ def main():
         if shapes == "default":
             fg = Image.new("RGBA", (S, S), (0, 0, 0, 0))
             draw_shapes(fg, "default")
+        elif ident in LETTERING:
+            fg = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+            for t, c, at, wf, opts in LETTERING[ident]:
+                lettering(fg, t, c, at, wf, **opts)
         else:
             fg = wordmark(text, color, center, width, spacing=0.12 if ident == "suica" else 0.0)
         # Themed icons: the system tints this single-colour layer.

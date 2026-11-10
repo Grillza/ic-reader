@@ -140,6 +140,8 @@ object WatchColors {
             var r = (p shr 16) and 0xFF
             var g = (p shr 8) and 0xFF
             var b = p and 0xFF
+            // A design colour that's already one of the watch's was chosen for it (a flat override).
+            if (!photo && r % 85 == 0 && g % 85 == 0 && b % 85 == 0) return@IntArray p
             if (photo) {
                 r = stretch(r, lo, hi); g = stretch(g, lo, hi); b = stretch(b, lo, hi)
             }

@@ -18,6 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.withSave
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,7 +36,8 @@ import io.github.grillza.icreader.data.CardType
  * colour shape) so a card is recognisable at a glance. They deliberately don't reproduce logos
  * or characters; users who want the real thing can attach a photo of their card.
  */
-internal enum class Motif { SUICA_PANEL, CIRCLE_RIGHT, CIRCLE_LEFT, PLAIN, SWOOSH_RIGHT, BARS_LEFT, BUBBLES, WAVE_BOTTOM, CIRCLE, BLOCK_RIGHT, BAND_DIAGONAL, ARC_BOTTOM }
+internal enum class Motif { SUICA_PANEL, CIRCLE_RIGHT, CIRCLE_LEFT, PLAIN, SWOOSH_RIGHT, BARS_LEFT, BUBBLES, WAVE_BOTTOM, CIRCLE, BLOCK_RIGHT, BAND_DIAGONAL, ARC_BOTTOM,
+    ICOCA_PANEL, SUGOCA_PANEL, KITACA_FOREST, HAYAKAKEN_PANEL, PITAPA_PANEL }
 
 internal data class Design(
     val base: List<Color>,
@@ -51,6 +59,31 @@ internal data class Design(
      */
     val flatAccent: Color? = null,
     val flatBrandColor: Color? = null,
+    /** Lettering placed as on the real card. When set, it replaces [brand]. */
+    val labels: List<Label> = emptyList(),
+)
+
+/**
+ * A line of lettering fitted to where it sits on a real card: its ink runs from [start] to [end]
+ * and its lowest ink (the baseline, for text without descenders) is at [bottom]. Across the card,
+ * start/end are fractions of its width and bottom of its height. [vertical] text reads top to
+ * bottom with the letters' tops to the right; start/end are then fractions of the height and
+ * bottom (the left edge of the ink) a fraction of the width. [spacing] is extra space between
+ * letters in ems; [charColors] recolours single letters by index.
+ */
+internal data class Label(
+    val text: String,
+    val color: Color,
+    val start: Float,
+    val end: Float,
+    val bottom: Float,
+    val family: String = "sans-serif",
+    val weight: Int = 700,
+    val spacing: Float = 0f,
+    val charColors: Map<Int, Color> = emptyMap(),
+    val vertical: Boolean = false,
+    /** Colour on the watch, where the usual one would be hard to read. */
+    val flatColor: Color? = null,
 )
 
 private val SILVER = listOf(Color(0xFFE7E9EC), Color(0xFFC5C9CE), Color(0xFFDDE0E3))
@@ -67,17 +100,40 @@ internal const val SUICA_TEXT_LEFT = 0.065f
 internal const val SUICA_TEXT_BOTTOM = 0.05f
 
 internal fun design(type: CardType): Design = when (type) {
-    // References: photos of the cards (Suica, PASMO, TOICA, manaca, PiTaPa, SUGOCA, nimoca, ICOCA).
+    // References: photos of the cards (Suica, PASMO, TOICA, manaca, PiTaPa, SUGOCA, nimoca, ICOCA,
+    // Kitaca, Hayakaken). Panels, colours and lettering are measured from them; logos and characters are left out.
     CardType.SUICA -> Design(PEARL, Motif.SUICA_PANEL, listOf(Color(0xFF62BD2F)), "Suica", Color.White, Alignment.BottomStart)
     CardType.PASMO -> Design(SILVER, Motif.BARS_LEFT, listOf(Color(0xFFEA5A9C)), "PASMO", Color(0xFFEA5A9C), Alignment.BottomStart)
-    CardType.ICOCA -> Design(listOf(Color(0xFF2A66C9), Color(0xFF4F92E6)), Motif.PLAIN, listOf(Color.White), "ICOCA", Color(0xFFDCE9FF), Alignment.Center, brandExact = true)
+    CardType.ICOCA -> Design(
+        listOf(Color(0xFFD5D6D9), Color(0xFFC3C5C9), Color(0xFFCFD0D3)), Motif.ICOCA_PANEL, listOf(Color(0xFF0AB5D1)), "ICOCA", Color(0xFFC8C9CB), Alignment.Center,
+        labels = listOf(Label("ICOCA", Color(0xFFC8C9CB), 0.154f, 0.867f, 0.592f, family = "serif", spacing = 0.04f, flatColor = Color.White)),
+    )
     CardType.TOICA -> Design(SILVER, Motif.WAVE_BOTTOM, listOf(Color(0xFF17A9E1)), "toica", Color.White, Alignment.BottomEnd)
     CardType.MANACA -> Design(listOf(Color(0xFFD3D6DF), Color(0xFFBBC0CC)), Motif.CIRCLE, listOf(Color(0xFFF1E63B)), "manaca", Color(0xFF9DA3B3), Alignment.Center)
-    CardType.KITACA -> Design(PEARL, Motif.BAND_DIAGONAL, listOf(Color(0xFF9CCB3B), Color(0xFF7AB52E)), "Kitaca", Color(0xFF6FA82B), Alignment.TopStart, approximate = true, flatAccent = Color(0xFF55AA55))
-    CardType.SUGOCA -> Design(PEARL, Motif.CIRCLE_RIGHT, listOf(Color(0xFFB7CFA2)), "SUGOCA", Color(0xFFE4462E), Alignment.BottomStart)
+    CardType.KITACA -> Design(
+        listOf(Color(0xFFF8F4E3), Color(0xFFEFE9D3)), Motif.KITACA_FOREST, listOf(Color(0xFFB6B9C0)), "Kitaca", Color(0xFF7DCB2E), Alignment.BottomStart,
+        flatAccent = Color(0xFFAAAAAA),
+        labels = listOf(Label("Kitaca", Color(0xFF7DCB2E), 0.054f, 0.735f, 0.94f, weight = 500, spacing = 0.3f, charColors = mapOf(1 to Color(0xFFAAAAAA)))),
+    )
+    CardType.SUGOCA -> Design(
+        listOf(Color(0xFFC0D5BB), Color(0xFFB3CAAE)), Motif.SUGOCA_PANEL, listOf(Color(0xFFF6FAE9)), "SUGOCA", Color(0xFFE67A93), Alignment.BottomStart,
+        labels = listOf(Label("SUGOCA", Color(0xFFE67A93), 0.045f, 0.589f, 0.93f, weight = 900, spacing = 0.16f)),
+    )
     CardType.NIMOCA -> Design(PEARL, Motif.CIRCLE_LEFT, listOf(Color(0xFF45A2CB)), "nimoca", Color.White, Alignment.Center, brandExact = true, brandShift = -0.13f)
-    CardType.HAYAKAKEN -> Design(PEARL, Motif.BAND_DIAGONAL, listOf(Color(0xFF7FC3E8), Color(0xFF3E9ED6)), "Hayakaken", Color(0xFF2E86C1), Alignment.TopStart, approximate = true)
-    CardType.PITAPA -> Design(SILVER, Motif.BLOCK_RIGHT, listOf(Color(0xFF8D8EC8)), "PiTaPa", Color(0xFFC9CCD2), Alignment.TopEnd, flatAccent = Color(0xFF5555AA), flatBrandColor = Color.White)
+    CardType.HAYAKAKEN -> Design(
+        listOf(Color(0xFFFBFAF8), Color(0xFFEDECE9)), Motif.HAYAKAKEN_PANEL, listOf(Color(0xFF4FD2EA)), "Hayakaken", Color(0xFF2B3A93), Alignment.TopStart,
+        labels = listOf(
+            Label("HAYAKAKEN", Color(0xFF2B3A93), 0.043f, 0.338f, 0.232f, spacing = 0.06f),
+            Label("はやか", Color.White, 0.08f, 0.69f, 0.73f, weight = 400),
+            Label("けん", Color.White, 0.45f, 0.75f, 0.885f, weight = 400),
+        ),
+    )
+    CardType.PITAPA -> Design(
+        listOf(Color(0xFFB4BFBD), Color(0xFFA1ADAB), Color(0xFFAFBAB8)), Motif.PITAPA_PANEL, listOf(Color(0xFF898CB0)), "PiTaPa", Color(0xFFB4BFBD), Alignment.TopEnd,
+        flatAccent = Color(0xFFAA55FF),
+        // Reads top to bottom down the panel, as on the card.
+        labels = listOf(Label("PiTaPa", Color(0xFFB4BFBD), 0.10f, 0.935f, 0.513f, family = "serif", spacing = -0.06f, vertical = true, flatColor = Color.White)),
+    )
     CardType.TRANSIT -> Design(SILVER, Motif.WAVE_BOTTOM, listOf(Color(0xFF607D8B)), "IC", Color.White, Alignment.BottomEnd)
     CardType.EDY -> Design(WHITE, Motif.BAND_DIAGONAL, listOf(Color(0xFFE60012), Color(0xFFBF0000)), "Edy", Color(0xFFD0000F), Alignment.TopStart, approximate = true)
     CardType.NANACO -> Design(listOf(Color(0xFFFFF8E7), Color(0xFFF7EBCB)), Motif.ARC_BOTTOM, listOf(Color(0xFFF7A800), Color(0xFF6CC3E8)), "nanaco", Color(0xFFE38D00), Alignment.TopStart, approximate = true)
@@ -87,8 +143,11 @@ internal fun design(type: CardType): Design = when (type) {
 @Composable
 internal fun BoxScope.GeneratedArt(type: CardType, showBrand: Boolean) {
     val d = design(type)
-    Canvas(Modifier.matchParentSize()) { drawCardBackground(type, flat = false) }
-    if (showBrand) {
+    Canvas(Modifier.matchParentSize()) {
+        drawCardBackground(type, flat = false)
+        if (showBrand) drawIntoCanvas { canvas -> d.labels.forEach { canvas.nativeCanvas.drawLabel(it, size.width, size.height) } }
+    }
+    if (showBrand && d.labels.isEmpty()) {
         BoxWithConstraints(Modifier.matchParentSize()) {
             val w = maxWidth
             val scale = when {
@@ -261,11 +320,118 @@ private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
                 close()
             },
         )
+        Motif.ICOCA_PANEL -> {
+            // Blue panel inside a silver border, with its top-left and bottom-right corners cut
+            // off at 45 degrees (the lower cut clears the notch).
+            rounded(solid, w * 0.02f, polygon(w, h, 0.274f to 0.033f, 0.979f to 0.033f, 0.979f to 0.683f, 0.812f to 0.971f, 0.023f to 0.971f, 0.023f to 0.447f))
+            drawPath(polygon(w, h, 0.036f to 0.047f, 0.066f to 0.030f, 0.066f to 0.064f), solid)
+        }
+        Motif.SUGOCA_PANEL -> {
+            // A pale panel inside the green border, its right side cut away by a big green circle.
+            val panel = Path().apply { addRoundRect(androidx.compose.ui.geometry.RoundRect(w * 0.025f, h * 0.042f, w * 0.99f, h * 0.96f, CornerRadius(w * 0.02f))) }
+            val circle = Path().apply { addOval(androidx.compose.ui.geometry.Rect(Offset(w * 0.899f, h * 0.5f), h * 0.544f)) }
+            drawPath(Path().apply { op(panel, circle, PathOperation.Difference) }, solid)
+            drawPath(polygon(w, h, 0.044f to 0.026f, 0.064f to 0.013f, 0.064f to 0.039f), if (flat) Color.Black else Color(0xFF222222))
+        }
+        Motif.KITACA_FOREST -> {
+            // Grey sky over a pale forest: the panel's lower edge is a line of treetops.
+            val points = mutableListOf(0.034f to 0.047f, 0.964f to 0.047f)
+            KITACA_TREES.reversed().zipWithNext().forEach { (a, b) ->
+                points += a
+                points += (a.first + b.first) / 2 to maxOf(a.second, b.second) + 0.035f
+            }
+            points += KITACA_TREES.first()
+            rounded(solid, w * 0.012f, polygon(w, h, *points.toTypedArray()))
+            val arrow = Color(0xFF2A2A2A)
+            drawRect(arrow, Offset(w * 0.05f, h * 0.068f), Size(w * 0.055f, h * 0.009f))
+            drawPath(polygon(w, h, 0.044f to 0.0725f, 0.058f to 0.06f, 0.058f to 0.085f), arrow)
+        }
+        Motif.HAYAKAKEN_PANEL -> {
+            drawRoundRect(solid, Offset(w * 0.040f, h * 0.275f), Size(w * 0.924f, h * 0.676f), CornerRadius(w * 0.025f))
+            drawRect(solid, Offset(w * 0.051f, h * 0.044f), Size(w * 0.05f, h * 0.012f))
+        }
+        Motif.PITAPA_PANEL -> drawRoundRect(solid, Offset(w * 0.30f, h * 0.055f), Size(w * 0.677f, h * 0.903f), CornerRadius(w * 0.03f))
         Motif.ARC_BOTTOM -> {
             drawCircle(d.accent.last().copy(alpha = 0.9f), h * 0.62f, Offset(w * 0.98f, h * 1.15f))
             drawCircle(d.accent.first(), h * 0.50f, Offset(w * 0.72f, h * 1.12f))
         }
     }
+}
+
+/** Kitaca's treetops, left to right: (x, top) as fractions of the card, measured from a real card. */
+private val KITACA_TREES = listOf(
+    0.034f to 0.62f, 0.06f to 0.60f, 0.085f to 0.585f, 0.11f to 0.555f, 0.135f to 0.59f, 0.16f to 0.575f,
+    0.19f to 0.60f, 0.215f to 0.565f, 0.245f to 0.595f, 0.275f to 0.58f, 0.31f to 0.60f, 0.345f to 0.575f,
+    0.38f to 0.59f, 0.41f to 0.57f, 0.44f to 0.60f, 0.47f to 0.58f, 0.50f to 0.595f, 0.53f to 0.57f,
+    0.56f to 0.59f, 0.60f to 0.565f, 0.635f to 0.585f, 0.67f to 0.57f, 0.70f to 0.585f, 0.74f to 0.56f,
+    0.78f to 0.585f, 0.82f to 0.555f, 0.86f to 0.53f, 0.90f to 0.515f, 0.935f to 0.54f, 0.964f to 0.53f,
+)
+
+/** A closed path through [points] given as fractions of the card's width and height. */
+private fun polygon(w: Float, h: Float, vararg points: Pair<Float, Float>) = Path().apply {
+    points.forEachIndexed { i, (x, y) -> if (i == 0) moveTo(w * x, h * y) else lineTo(w * x, h * y) }
+    close()
+}
+
+/** Fills [path] with its corners rounded to [radius]. */
+private fun DrawScope.rounded(color: Color, radius: Float, path: Path) = drawIntoCanvas {
+    it.drawPath(path, Paint().apply { this.color = color; isAntiAlias = true; pathEffect = PathEffect.cornerPathEffect(radius) })
+}
+
+/**
+ * Draws [label] on a card [w] by [h] (see [Label]). Plain Android canvas text, so the app and the
+ * watch draw lettering identically. [color] overrides the label's colours.
+ */
+internal fun android.graphics.Canvas.drawLabel(label: Label, w: Float, h: Float, color: Int? = null, flat: Boolean = false) {
+    val paint = labelPaint(label)
+    val chars = label.text.map { it.toString() }
+    // Lay out at size 100, then scale so the ink spans start..end.
+    val bounds = android.graphics.Rect()
+    val xs = FloatArray(chars.size)
+    var x = 0f
+    var inkLeft = Float.MAX_VALUE
+    var inkRight = -Float.MAX_VALUE
+    var inkBottom = 0
+    chars.forEachIndexed { i, c ->
+        paint.getTextBounds(c, 0, c.length, bounds)
+        if (!bounds.isEmpty) {
+            inkLeft = minOf(inkLeft, x + bounds.left)
+            inkRight = maxOf(inkRight, x + bounds.right)
+            inkBottom = maxOf(inkBottom, bounds.bottom)
+        }
+        xs[i] = x
+        x += paint.measureText(c) + label.spacing * paint.textSize
+    }
+    if (inkRight <= inkLeft) return
+    val (length, along, across) = if (label.vertical) Triple(h, h * label.start, w * label.bottom) else Triple(w, w * label.start, h * label.bottom)
+    val k = length * (label.end - label.start) / (inkRight - inkLeft)
+    paint.textSize *= k
+    withSave {
+        if (label.vertical) {
+            translate(across, along)
+            rotate(90f)
+        } else {
+            translate(along, across)
+        }
+        chars.forEachIndexed { i, c ->
+            paint.color = color ?: (if (flat) label.flatColor else null)?.toArgb() ?: (label.charColors[i] ?: label.color).toArgb()
+            drawText(c, (xs[i] - inkLeft) * k, -inkBottom * k, paint)
+        }
+    }
+}
+
+/** The middle of [label]'s lettering, roughly, in pixels (to see what's behind it). */
+internal fun Label.center(w: Float, h: Float): Pair<Float, Float> =
+    if (vertical) w * bottom + w * 0.04f to h * (start + end) / 2 else w * (start + end) / 2 to h * bottom - w * 0.04f
+
+private fun labelPaint(label: Label) = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+    val family = android.graphics.Typeface.create(label.family, android.graphics.Typeface.NORMAL)
+    typeface = if (android.os.Build.VERSION.SDK_INT >= 28) {
+        android.graphics.Typeface.create(family, label.weight, false)
+    } else {
+        android.graphics.Typeface.create(family, if (label.weight >= 600) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+    }
+    textSize = 100f
 }
 
 /** Card types whose generated art is a best guess (no reference photo was available). */

@@ -8,6 +8,10 @@ import io.github.grillza.icreader.pebble.WatchArtRenderer
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import androidx.compose.ui.graphics.asComposePath
+import androidx.compose.ui.graphics.drawscope.clipPath
+import io.github.grillza.icreader.ui.drawCardBackground
+import io.github.grillza.icreader.ui.drawLabel
 import org.junit.runner.RunWith
 import java.io.File
 
@@ -77,6 +81,26 @@ class WatchArtTest {
             assertNotNull(name, art)
             assertTrue("$name photo: ${art!!.rle.size} bytes", art.rle.size <= w.maxBytes)
             save(art.rle, w.width, w.height, File(out, "$name-photo.png"))
+        }
+    }
+
+    /** Not a check: saves each card face in full colour (phone-<id>.png) to compare with the watch's. */
+    @Test
+    fun savePhoneDesigns() {
+        val w = 640f
+        val h = w / io.github.grillza.icreader.ui.CARD_RATIO
+        for (type in CardType.entries) {
+            val bitmap = Bitmap.createBitmap(w.toInt(), h.toInt(), Bitmap.Config.ARGB_8888)
+            val canvas = android.graphics.Canvas(bitmap)
+            val outline = io.github.grillza.icreader.ui.cardOutlinePath(w, h, type.family == io.github.grillza.icreader.data.CardFamily.TRANSIT)
+            androidx.compose.ui.graphics.drawscope.CanvasDrawScope().draw(
+                androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr,
+                androidx.compose.ui.graphics.Canvas(canvas), androidx.compose.ui.geometry.Size(w, h),
+            ) {
+                clipPath(outline.asComposePath()) { drawCardBackground(type, flat = false) }
+            }
+            io.github.grillza.icreader.ui.design(type).labels.forEach { canvas.drawLabel(it, w, h) }
+            File(out, "phone-${type.id}.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
         }
     }
 

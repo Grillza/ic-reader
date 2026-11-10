@@ -21,10 +21,10 @@ across scans, lets the launcher icon match your card, and shows your cards on a 
   out the region from your trips and marks that region's cards as likely (Kanto: Suica or PASMO,
   Kansai: ICOCA or PiTaPa, Chubu: TOICA or manaca, Kyushu: SUGOCA, nimoca or Hayakaken).
 - **Artwork**: each brand's colour layout on a silver card with the transit-card notch (Suica's
-  green sweep, TOICA's cyan wave, manaca's yellow circle…). Logos and characters aren't
-  reproduced; add a photo of your own card for the real thing: edit the card, **Choose photo**,
-  then fit it to the card-shaped frame (drag, pinch, twist or the straighten slider, and 90°
-  turns). It's saved cut to the card's outline, notch included. Card info (menu) shows the
+  green panel, ICOCA's cut-corner blue panel, Kitaca's grey sky over a forest…), with the
+  lettering placed as on the real card. Logos and characters aren't reproduced; add a photo of
+  your own card for the real thing: edit the card, **Choose photo**, then fit it to the
+  card-shaped frame (drag, pinch, twist or the straighten slider, and 90° turns). It's saved cut to the card's outline, notch included. Card info (menu) shows the
   card's raw IDm, PMm and attributes block.
 - **App icon**: 15 launcher icons (one per brand plus a default), from the menu or from a card.
   The switch happens when you leave the app, because Android closes the app if its launcher alias
@@ -118,7 +118,8 @@ or the `ICR_*` environment variables. Without either, `assembleRelease` produces
   screens, `cards` holds the list, art and history, `comms` the AppMessage link
 - `tools/gen_icons.py`: renders the launcher icons (a miniature of each card face, as PNG layers
   per density), `IconResources.kt` and the manifest aliases. Needs Pillow; uses the bundled
-  Open Sans Bold (`tools/fonts`, SIL OFL). Edit `ICONS` and re-run to add or change an icon.
+  Open Sans Bold, plus Noto Serif Bold and Noto Sans JP cut down to the letters the icons use
+  (`tools/fonts`, SIL OFL). Edit `ICONS` and re-run to add or change an icon.
 
 Station data (`assets/StationCode.csv`) is the community-maintained Suica station code list that
 circulates in open-source FeliCa readers. English names (`assets/StationNamesEn.csv`) are built from
