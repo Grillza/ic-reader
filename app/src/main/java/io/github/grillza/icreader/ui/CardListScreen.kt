@@ -5,6 +5,8 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Contactless
@@ -73,6 +78,7 @@ fun CardListScreen(
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var menu by remember { mutableStateOf(false) }
     var about by remember { mutableStateOf(false) }
+    val uriHandler = LocalUriHandler.current
     Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
         topBar = {
@@ -99,6 +105,11 @@ fun CardListScreen(
                                 onClick = { menu = false; onDemo() },
                             )
                         }
+                        DropdownMenuItem(
+                            text = { Text("Help") },
+                            leadingIcon = { Icon(Icons.AutoMirrored.Filled.HelpOutline, null) },
+                            onClick = { menu = false; uriHandler.openUri(ISSUES_URL) },
+                        )
                         DropdownMenuItem(
                             text = { Text("About") },
                             leadingIcon = { Icon(Icons.Default.Info, null) },
@@ -154,18 +165,38 @@ fun CardListScreen(
         AlertDialog(
             onDismissRequest = { about = false },
             confirmButton = { TextButton(onClick = { about = false }) { Text("OK") } },
+            dismissButton = { TextButton(onClick = { uriHandler.openUri(SOURCE_URL) }) { Text("Source code") } },
             title = { Text("IC Reader") },
             text = {
-                Text(
-                    "Reads the balance and recent history of Japanese FeliCa IC cards (Suica, PASMO, ICOCA and other " +
-                        "transit cards, Rakuten Edy, nanaco, WAON). Cards keep only their last 20 records, so scanning " +
-                        "regularly builds up a longer history here.\n\nCard artwork is generated in each brand's colours; " +
-                        "add a photo of your own card from the card's edit screen for the real thing.\n\n" +
-                        "Everything stays on this phone.",
-                )
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(
+                        "Version ${versionName()} · Developed by Grillza",
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Text(
+                        "\nReads the balance and recent history of Japanese FeliCa IC cards (Suica, PASMO, ICOCA and other " +
+                            "transit cards, Rakuten Edy, nanaco, WAON). Cards keep only their last 20 records, so scanning " +
+                            "regularly builds up a longer history here.\n\nCard artwork is generated in each brand's colours; " +
+                            "add a photo of your own card from the card's edit screen for the real thing.\n\n" +
+                            "Everything stays on this phone.\n\n" +
+                            "All original IC card artwork, logos and names belong to their respective companies. IC Reader " +
+                            "draws its own simple designs and isn't affiliated with any card issuer. A photo you add of your " +
+                            "own card is only for identifying the card in this app and on your watch: it's never uploaded, " +
+                            "published or used for profit.\n\nFree software under the GNU GPL v3.",
+                    )
+                }
             },
         )
     }
+}
+
+private const val SOURCE_URL = "https://github.com/Grillza/ic-reader"
+private const val ISSUES_URL = "$SOURCE_URL/issues"
+
+@Composable
+private fun versionName(): String {
+    val context = LocalContext.current
+    return remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() ?: "" }
 }
 
 @Composable

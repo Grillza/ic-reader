@@ -4,6 +4,12 @@ Android app for reading Japanese FeliCa IC cards: balance and history for Suica,
 other transit cards, plus Rakuten Edy, nanaco and WAON. Saves multiple cards, builds up history
 across scans, lets the launcher icon match your card, and shows your cards on a Pebble watch.
 
+## Download
+
+Get the APK from [Releases](https://github.com/Grillza/ic-reader/releases) (Android 8 or later,
+with NFC). The Pebble watch app is installed from inside the app (Settings → Pebble watch).
+Found a problem? [Open an issue](https://github.com/Grillza/ic-reader/issues).
+
 ## Features
 
 - **Scan**: hold a card to the back of the phone while the app is open, or tap it with the app
@@ -126,3 +132,17 @@ or the `ICR_*` environment variables. Without either, `assembleRelease` produces
 Station data (`assets/StationCode.csv`) is the community-maintained Suica station code list that
 circulates in open-source FeliCa readers. English names (`assets/StationNamesEn.csv`) are built from
 Wikidata (CC0) by `tools/gen_station_names.py`, which matches on Japanese name and operator.
+
+## Card artwork and photos
+
+All original IC card artwork, logos and names belong to their respective companies. IC Reader
+isn't affiliated with any card issuer and doesn't include their artwork: its card faces are its
+own simple designs in each brand's colours. A photo you add of your own card is only for
+identifying the card in the app and on your watch. It stays on your phone and watch (and in
+backups you make yourself), and is never uploaded, published or used for profit.
+
+## License
+
+IC Reader is developed by Grillza and is free software under the
+[GNU General Public License v3.0](LICENSE). The bundled fonts in `tools/fonts` are under the SIL
+Open Font License.
