@@ -122,11 +122,7 @@ internal fun design(type: CardType): Design = when (type) {
     CardType.NIMOCA -> Design(PEARL, Motif.CIRCLE_LEFT, listOf(Color(0xFF45A2CB)), "nimoca", Color.White, Alignment.Center, brandExact = true, brandShift = -0.13f)
     CardType.HAYAKAKEN -> Design(
         listOf(Color(0xFFFBFAF8), Color(0xFFEDECE9)), Motif.HAYAKAKEN_PANEL, listOf(Color(0xFF4FD2EA)), "Hayakaken", Color(0xFF2B3A93), Alignment.TopStart,
-        labels = listOf(
-            Label("HAYAKAKEN", Color(0xFF2B3A93), 0.043f, 0.338f, 0.232f, spacing = 0.06f),
-            Label("はやか", Color.White, 0.08f, 0.69f, 0.73f, weight = 400),
-            Label("けん", Color.White, 0.45f, 0.75f, 0.885f, weight = 400),
-        ),
+        labels = listOf(Label("HAYAKAKEN", Color(0xFF2B3A93), 0.043f, 0.338f, 0.232f, spacing = 0.06f)),
     )
     CardType.PITAPA -> Design(
         listOf(Color(0xFFB4BFBD), Color(0xFFA1ADAB), Color(0xFFAFBAB8)), Motif.PITAPA_PANEL, listOf(Color(0xFF898CB0)), "PiTaPa", Color(0xFFB4BFBD), Alignment.TopEnd,

@@ -1,8 +1,10 @@
 package io.github.grillza.icreader.pebble
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.text.format.DateFormat
 import android.util.Log
+import androidx.core.content.edit
 import io.github.grillza.icreader.IcReaderApp
 import io.github.grillza.icreader.data.CardFamily
 import io.github.grillza.icreader.data.SavedCard
@@ -58,6 +60,30 @@ class WatchSync(private val context: Context) {
     /** Rendered art by card, so an unchanged card isn't drawn again. */
     private val artCache = ConcurrentHashMap<String, Pair<String, WatchArt?>>()
 
+    private val prefs get() = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+
+    private val _enabled = MutableStateFlow(prefs.getBoolean(PREF_ENABLED, false))
+    /** Pebble watch integration is switched on (Settings). Off by default. */
+    val enabled: StateFlow<Boolean> = _enabled.asStateFlow()
+
+    /**
+     * Switches the integration on or off. Off also disables [PebbleListenerService], so the
+     * Pebble app can't start IC Reader or pass it messages.
+     */
+    fun setEnabled(on: Boolean) {
+        prefs.edit { putBoolean(PREF_ENABLED, on) }
+        _enabled.value = on
+        context.packageManager.setComponentEnabledSetting(
+            android.content.ComponentName(context, PebbleListenerService::class.java),
+            if (on) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            PackageManager.DONT_KILL_APP,
+        )
+        if (!on) {
+            sessions.clear()
+            _watchOpen.value = false
+        }
+    }
+
     private val _watchOpen = MutableStateFlow(false)
     /** True while the watch app is open on a watch that has said hello. */
     val watchOpen: StateFlow<Boolean> = _watchOpen.asStateFlow()
@@ -72,6 +98,7 @@ class WatchSync(private val context: Context) {
     }
 
     fun onHello(watch: WatchIdentifier, data: PebbleDictionary) {
+        if (!_enabled.value) return
         val width = data.int(WatchProtocol.KEY_WIDTH) ?: return
         val height = data.int(WatchProtocol.KEY_HEIGHT) ?: return
         if (width !in 8..400 || height !in 8..400) return
@@ -88,6 +115,7 @@ class WatchSync(private val context: Context) {
     }
 
     fun onHistoryRequest(watch: WatchIdentifier, data: PebbleDictionary) {
+        if (!_enabled.value) return
         val index = data.int(WatchProtocol.KEY_INDEX) ?: return
         val session = sessions[watch] ?: return
         scope.launch { sendHistory(watch, session, index) }
@@ -261,6 +289,7 @@ class WatchSync(private val context: Context) {
         private const val TAG = "WatchSync"
         /** In the app's "settings" preferences. */
         const val PREF_STATION_LANGUAGE = "watch_station_language"
+        const val PREF_ENABLED = "pebble_enabled"
         private val DAY: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM", Locale.ENGLISH)
     }
 }

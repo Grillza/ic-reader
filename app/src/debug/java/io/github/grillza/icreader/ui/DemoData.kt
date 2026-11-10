@@ -5,8 +5,14 @@ import io.github.grillza.icreader.data.ScanResult
 import io.github.grillza.icreader.nfc.TransitParser
 import java.time.LocalDate
 
-/** A plausible Suica history built from real station codes, for trying the UI without a card. */
+/**
+ * A plausible Suica history built from real station codes, for trying the UI without a card.
+ * Debug builds only; release builds have an empty stand-in (src/release).
+ */
 internal object DemoData {
+    const val AVAILABLE = true
+    const val MENU_LABEL = "Load demo card (debug)"
+
     private class Rec(val daysAgo: Long, val terminal: Int, val process: Int, val b6: Int, val b7: Int, val b8: Int, val b9: Int, val balance: Int)
 
     fun scan(): ScanResult {

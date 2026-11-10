@@ -53,8 +53,10 @@ as in the app), its name, its balance and when you last scanned it ("Scanned tod
 Set up in the app under **Settings → Pebble watch**:
 
 1. Install the Pebble app and pair your watch.
-2. Tap **Install on watch**. The Pebble app opens and installs IC Reader on the watch.
-3. Tap **Open on watch**, or open IC Reader from the watch's app menu.
+2. Switch on **Enable Pebble watch integration** (off by default; while it's off the Pebble app
+   can't reach IC Reader at all).
+3. Tap **Install on watch**. The Pebble app opens and installs IC Reader on the watch.
+4. Tap **Open on watch**, or open IC Reader from the watch's app menu.
 
 The phone and watch talk over [PebbleKit 2](https://github.com/pebble-dev/PebbleKitAndroid2).
 When the watch app opens, the Pebble app starts IC Reader's `PebbleListenerService`; the watch
@@ -91,7 +93,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
 Debug builds have **Load demo card** in the menu, which runs a made-up Suica scan through the
-normal flow so you can try the UI on an emulator with no NFC.
+normal flow so you can try the UI on an emulator with no NFC. Release builds leave it and its
+data out (`src/debug` and `src/release` each have their own `DemoData`).
 
 The watch app is in `watchapp/`. The Android app bundles it as `assets/watch/ic-reader.pbw`, which
 is committed so the Android build doesn't need the Pebble SDK. After changing the watch app, run
@@ -118,8 +121,7 @@ or the `ICR_*` environment variables. Without either, `assembleRelease` produces
   screens, `cards` holds the list, art and history, `comms` the AppMessage link
 - `tools/gen_icons.py`: renders the launcher icons (a miniature of each card face, as PNG layers
   per density), `IconResources.kt` and the manifest aliases. Needs Pillow; uses the bundled
-  Open Sans Bold, plus Noto Serif Bold and Noto Sans JP cut down to the letters the icons use
-  (`tools/fonts`, SIL OFL). Edit `ICONS` and re-run to add or change an icon.
+  Open Sans Bold and Noto Serif Bold cut down to Latin letters (`tools/fonts`, SIL OFL). Edit `ICONS` and re-run to add or change an icon.
 
 Station data (`assets/StationCode.csv`) is the community-maintained Suica station code list that
 circulates in open-source FeliCa readers. English names (`assets/StationNamesEn.csv`) are built from

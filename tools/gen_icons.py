@@ -25,7 +25,6 @@ PKG = "io.github.grillza.icreader"
 FONTS = pathlib.Path(__file__).resolve().parent / "fonts"
 FONT = FONTS / "OpenSans-Bold.ttf"
 SERIF = FONTS / "NotoSerif-Bold-Latin.ttf"  # Noto Serif Bold, Latin only
-KANA = FONTS / "NotoSansJP-Regular-Hayakaken.otf"  # Noto Sans JP, just はやかけん
 DENSITIES = {"mdpi": 108, "hdpi": 162, "xhdpi": 216, "xxhdpi": 324, "xxxhdpi": 432}
 S = 864  # render size (px for 108 dp), downsampled per density
 
@@ -60,11 +59,7 @@ LETTERING = {
     "icoca": [("ICOCA", "#C8C9CB", (0.5, 0.5), 0.66, {"font": SERIF, "spacing": 0.04})],
     "sugoca": [("SUGOCA", "#E67A93", (0.44, 0.76), 0.60, {"spacing": 0.10})],
     "kitaca": [("Kitaca", "#7DCB2E", (0.5, 0.76), 0.72, {"spacing": 0.22, "colors": {1: "#AAAAAA"}})],
-    "hayakaken": [
-        ("HAYAKAKEN", "#2B3A93", (0.5, 0.2), 0.62, {"spacing": 0.06}),
-        ("はやか", "#FFFFFF", (0.43, 0.52), 0.62, {"font": KANA}),
-        ("けん", "#FFFFFF", (0.63, 0.75), 0.38, {"font": KANA}),
-    ],
+    "hayakaken": [("HAYAKAKEN", "#2B3A93", (0.5, 0.2), 0.62, {"spacing": 0.06})],
     "pitapa": [("PiTaPa", "#C3CCCA", (0.50, 0.5), 0.68, {"font": SERIF, "vertical": True})],
 }
 

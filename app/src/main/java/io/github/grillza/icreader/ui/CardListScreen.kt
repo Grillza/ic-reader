@@ -94,7 +94,7 @@ fun CardListScreen(
                         )
                         if (onDemo != null) {
                             DropdownMenuItem(
-                                text = { Text("Load demo card (debug)") },
+                                text = { Text(DemoData.MENU_LABEL) },
                                 leadingIcon = { Icon(Icons.Default.Contactless, null) },
                                 onClick = { menu = false; onDemo() },
                             )

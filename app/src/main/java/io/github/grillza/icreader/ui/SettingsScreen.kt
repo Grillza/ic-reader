@@ -1,5 +1,17 @@
 package io.github.grillza.icreader.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Switch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.rotate
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -40,6 +52,8 @@ fun SettingsScreen(
     onStationLanguage: (StationLanguage) -> Unit,
     onIcons: () -> Unit,
     pebble: AppViewModel.PebbleState,
+    pebbleEnabled: Boolean,
+    onPebbleEnabled: (Boolean) -> Unit,
     watchStationLanguage: StationLanguage,
     onWatchStationLanguage: (StationLanguage) -> Unit,
     onInstallWatchApp: () -> Unit,
@@ -110,7 +124,7 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
-            PebbleSection(pebble, watchStationLanguage, onWatchStationLanguage, onInstallWatchApp, onOpenOnWatch)
+            PebbleSection(pebble, pebbleEnabled, onPebbleEnabled, watchStationLanguage, onWatchStationLanguage, onInstallWatchApp, onOpenOnWatch)
         }
     }
 }
@@ -118,12 +132,44 @@ fun SettingsScreen(
 @Composable
 private fun PebbleSection(
     pebble: AppViewModel.PebbleState,
+    enabled: Boolean,
+    onEnabled: (Boolean) -> Unit,
     stationLanguage: StationLanguage,
     onStationLanguage: (StationLanguage) -> Unit,
     onInstall: () -> Unit,
     onOpen: () -> Unit,
 ) {
-    SectionHeader("Pebble watch")
+    // Collapsed by default: most people don't have a Pebble.
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val rotation by animateFloatAsState(if (expanded) 180f else 0f, label = "chevron")
+    ListItem(
+        headlineContent = { Text("Pebble watch") },
+        supportingContent = { Text(if (enabled) "On" else "Off") },
+        leadingContent = { Icon(Icons.Default.Watch, null) },
+        trailingContent = { Icon(Icons.Default.ExpandMore, if (expanded) "Collapse" else "Expand", Modifier.rotate(rotation)) },
+        modifier = Modifier.clickable(onClickLabel = if (expanded) "Collapse" else "Expand") { expanded = !expanded },
+    )
+    AnimatedVisibility(expanded) {
+        Column {
+            ListItem(
+                headlineContent = { Text("Enable Pebble watch integration") },
+                supportingContent = { Text("Show your cards' balances and history on a Pebble watch") },
+                trailingContent = { Switch(checked = enabled, onCheckedChange = null) },
+                modifier = Modifier.toggleable(value = enabled, role = Role.Switch, onValueChange = onEnabled),
+            )
+            if (enabled) PebbleSettings(pebble, stationLanguage, onStationLanguage, onInstall, onOpen)
+        }
+    }
+}
+
+@Composable
+private fun PebbleSettings(
+    pebble: AppViewModel.PebbleState,
+    stationLanguage: StationLanguage,
+    onStationLanguage: (StationLanguage) -> Unit,
+    onInstall: () -> Unit,
+    onOpen: () -> Unit,
+) {
     val status = when {
         !pebble.pebbleApp -> "Pebble app not installed"
         pebble.watches.isEmpty() -> "No watch connected"
@@ -141,7 +187,7 @@ private fun PebbleSection(
                 },
             )
         },
-        leadingContent = { Icon(Icons.Default.Watch, null) },
+        leadingContent = { Icon(Icons.Default.Info, null) },
     )
     ListItem(
         headlineContent = { Text("Install on watch") },

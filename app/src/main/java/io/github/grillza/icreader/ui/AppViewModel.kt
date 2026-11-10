@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -98,14 +100,26 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         val watchAppOpen: Boolean = false,
     )
 
-    val pebble: StateFlow<PebbleState> = combine(
-        flow { emit(DefaultPebbleAndroidAppPicker.getInstance(app).getAllEligibleApps().isNotEmpty()) },
-        DefaultPebbleInfoRetriever(app).getConnectedWatches()
-            .map { list -> list.map { it.name } }
-            .catch { emit(emptyList()) },
-        container.watchSync.watchOpen,
-    ) { installed, watches, open -> PebbleState(installed, watches, open) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PebbleState())
+    /** Pebble watch integration is switched on. */
+    val pebbleEnabled: StateFlow<Boolean> = container.watchSync.enabled
+
+    fun setPebbleEnabled(on: Boolean) = container.watchSync.setEnabled(on)
+
+    /** Only asks the Pebble app about watches while the integration is on. */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val pebble: StateFlow<PebbleState> = container.watchSync.enabled.flatMapLatest { on ->
+        if (!on) {
+            flowOf(PebbleState())
+        } else {
+            combine(
+                flow { emit(DefaultPebbleAndroidAppPicker.getInstance(app).getAllEligibleApps().isNotEmpty()) },
+                DefaultPebbleInfoRetriever(app).getConnectedWatches()
+                    .map { list -> list.map { it.name } }
+                    .catch { emit(emptyList()) },
+                container.watchSync.watchOpen,
+            ) { installed, watches, open -> PebbleState(installed, watches, open) }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PebbleState())
 
     fun openOnWatch() = viewModelScope.launch {
         _message.value = if (container.watchSync.openOnWatch()) {
@@ -223,8 +237,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Debug builds only: feeds a made-up Suica scan through the normal new-card flow. */
-    val demoAvailable: Boolean =
-        (app.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    val demoAvailable: Boolean = DemoData.AVAILABLE
 
     fun loadDemoCard() {
         if (!demoAvailable) return

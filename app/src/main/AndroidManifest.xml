@@ -29,9 +29,11 @@
                 android:resource="@xml/nfc_tech_filter" />
         </activity>
 
-        <!-- Bound by the Pebble app while the IC Reader watch app is open (PebbleKit 2). -->
+        <!-- Bound by the Pebble app while the IC Reader watch app is open (PebbleKit 2). Off until
+             Pebble watch integration is switched on in Settings (WatchSync.setEnabled). -->
         <service
             android:name=".pebble.PebbleListenerService"
+            android:enabled="false"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
