@@ -32,7 +32,7 @@ SILVER = ("#E7E9EC", "#C5C9CE")
 # id, label, base gradient, brand text, text colour, text centre (u, v), text width (fraction), shapes
 ICONS = [
     ("default", "IC Reader", ("#26324F", "#1A2238"), None, None, None, 0, "default"),
-    ("suica", "Suica", PEARL, "Suica", "#FFFFFF", (0.43, 0.71), 0.56, "suica"),
+    ("suica", "Suica", PEARL, "Suica", "#FFFFFF", (0.42, 0.66), 0.54, "suica"),
     ("pasmo", "PASMO", SILVER, "PASMO", "#EA5A9C", (0.5, 0.74), 0.74, "pasmo"),
     ("icoca", "ICOCA", ("#2A66C9", "#4F92E6"), "ICOCA", "#E3EEFF", (0.5, 0.5), 0.74, None),
     ("toica", "TOICA", SILVER, "toica", "#FFFFFF", (0.5, 0.76), 0.62, "toica"),
@@ -88,10 +88,10 @@ def draw_shapes(img: Image.Image, kind: str):
         for r in (8, 14, 20):
             d.arc([o + 52 * w - r * w, o + 54 * w - r * w, o + 52 * w + r * w, o + 54 * w + r * w], -38, 38, fill="#FFFFFF", width=int(4 * w))
     elif kind == "suica":
-        # As on the real card: a pearl face with a tall green panel, rounded at the top, whose
-        # right edge slants out toward the bottom. Lit from the top-left like the app's art.
+        # As on the real card: a pearl face with a tall green panel, rounded, whose right edge
+        # slants out toward the bottom, and a strip of white below it. Lit from the top-left like the app's art.
         sheen(img, (0.25, 0.15), 0.75)
-        panel = rounded_polygon([P(0.10, 0.13), P(0.58, 0.13), P(1.02, 1.5), P(0.10, 1.5)], px(0.09) - px(0))
+        panel = rounded_polygon([P(0.10, 0.10), P(0.56, 0.10), P(0.80, 0.84), P(0.10, 0.84)], px(0.08) - px(0))
         mask = Image.new("L", (S, S), 0)
         ImageDraw.Draw(mask).polygon(panel, fill=255)
         green = linear(("#7DCB3E", "#4DA62A"), (0.1, 0.1), (0.9, 1.0))
