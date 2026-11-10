@@ -29,6 +29,7 @@ class WatchArtTest {
         // (width, height, max RLE bytes, black and white) as the watch app asks for them.
         val watches = mapOf(
             "emery" to Quad(164, 103, 6144, false),
+            "gabbro" to Quad(170, 107, 6144, false),
             "basalt" to Quad(124, 78, 6144, false),
             "chalk" to Quad(116, 73, 6144, false),
             "diorite" to Quad(124, 78, 6144, true),
