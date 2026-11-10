@@ -42,9 +42,9 @@ static uint16_t num_sections(MenuLayer *menu, void *ctx) {
 
 static void draw_header(GContext *ctx, const Layer *cell, uint16_t section, void *data) {
   GRect b = layer_get_bounds(cell);
-  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack));
+  graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorWhite, GColorBlack));
   graphics_fill_rect(ctx, b, 0, GCornerNone);
-  graphics_context_set_text_color(ctx, GColorWhite);
+  graphics_context_set_text_color(ctx, PBL_IF_COLOR_ELSE(GColorBlack, GColorWhite));
   graphics_draw_text(ctx, s_header, fonts_get_system_font(small_font()),
                      GRect(4, PBL_DISPLAY_WIDTH >= 200 ? 2 : 1, b.size.w - 8, b.size.h),
                      GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
@@ -56,7 +56,7 @@ static void draw_row(GContext *ctx, const Layer *cell, MenuIndex *index, void *d
   GRect b = layer_get_bounds(cell);
   bool selected = menu_cell_layer_is_highlighted(cell);
   GColor fg = selected ? GColorBlack : GColorWhite;
-  GColor sub = selected ? GColorBlack : PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite);
+  GColor sub = fg;
   int16_t pad = PBL_IF_ROUND_ELSE(22, 5);
   int16_t title_h = PBL_DISPLAY_WIDTH >= 200 ? 28 : 22;
   int16_t top = PBL_DISPLAY_WIDTH >= 200 ? 0 : -2;
@@ -114,7 +114,7 @@ static void window_load(Window *window) {
     .draw_row = draw_row,
   });
   menu_layer_set_normal_colors(s_menu, GColorBlack, GColorWhite);
-  menu_layer_set_highlight_colors(s_menu, PBL_IF_COLOR_ELSE(GColorPictonBlue, GColorWhite), GColorBlack);
+  menu_layer_set_highlight_colors(s_menu, PBL_IF_COLOR_ELSE(GColorVividCerulean, GColorWhite), GColorBlack);
   menu_layer_set_click_config_onto_window(s_menu, window);
   layer_add_child(root, menu_layer_get_layer(s_menu));
 

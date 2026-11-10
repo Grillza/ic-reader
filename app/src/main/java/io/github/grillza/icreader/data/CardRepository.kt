@@ -2,6 +2,8 @@ package io.github.grillza.icreader.data
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
@@ -98,16 +100,18 @@ class CardRepository(private val context: Context) {
         }
     }
 
-    /** Copies (and downsizes) a picked photo into app storage and attaches it to the card. */
-    suspend fun setCustomImage(id: String, uri: Uri?) {
+    /**
+     * Saves [bitmap] (already cropped to the card's shape, see PhotoCrop) as the card's picture,
+     * or removes the picture when it's null.
+     */
+    suspend fun setCustomImage(id: String, bitmap: Bitmap?) {
         val old = get(id)?.customImage
-        val name = if (uri == null) null else withContext(Dispatchers.IO) {
-            val bitmap = decodeScaled(uri, 1400) ?: return@withContext null
-            val fileName = "$id-${System.currentTimeMillis()}.jpg"
-            File(imageDir, fileName).outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+        val name = if (bitmap == null) null else withContext(Dispatchers.IO) {
+            val fileName = "$id-${System.currentTimeMillis()}.png"
+            // PNG keeps the transparent corners and notch.
+            File(imageDir, fileName).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             fileName
         }
-        if (uri != null && name == null) return
         edit(id) { it.copy(customImage = name) }
         if (old != null && old != name) File(imageDir, old).delete()
     }
@@ -186,14 +190,44 @@ class CardRepository(private val context: Context) {
         return out.toByteArray()
     }
 
-    private fun decodeScaled(uri: Uri, maxSide: Int): Bitmap? {
-        val resolver = context.contentResolver
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) } ?: return null
-        var sample = 1
-        while (bounds.outWidth / (sample * 2) >= maxSide || bounds.outHeight / (sample * 2) >= maxSide) sample *= 2
-        val opts = BitmapFactory.Options().apply { inSampleSize = sample }
-        return resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
+    /**
+     * Decodes a picked photo, upright (camera photos are often stored sideways with an EXIF
+     * orientation tag) and no larger than about [maxSide] pixels. Null if it can't be read.
+     */
+    suspend fun decodePhoto(uri: Uri, maxSide: Int = 2400): Bitmap? = withContext(Dispatchers.IO) {
+        runCatching {
+            val resolver = context.contentResolver
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            // With inJustDecodeBounds the decoder returns null and only fills in the size.
+            resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return@runCatching null
+            var sample = 1
+            while (bounds.outWidth / (sample * 2) >= maxSide || bounds.outHeight / (sample * 2) >= maxSide) sample *= 2
+            val opts = BitmapFactory.Options().apply { inSampleSize = sample }
+            val bitmap = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
+                ?: return@runCatching null
+            val orientation = resolver.openInputStream(uri)?.use {
+                ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            } ?: ExifInterface.ORIENTATION_NORMAL
+            upright(bitmap, orientation)
+        }.getOrNull()
+    }
+
+    private fun upright(bitmap: Bitmap, orientation: Int): Bitmap {
+        val m = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> m.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270f)
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> m.postScale(-1f, 1f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> m.postScale(1f, -1f)
+            ExifInterface.ORIENTATION_TRANSPOSE -> { m.postRotate(90f); m.postScale(-1f, 1f) }
+            ExifInterface.ORIENTATION_TRANSVERSE -> { m.postRotate(270f); m.postScale(-1f, 1f) }
+            else -> return bitmap
+        }
+        val turned = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+        if (turned !== bitmap) bitmap.recycle()
+        return turned
     }
 
     private suspend fun <T> update(block: (List<SavedCard>) -> Pair<List<SavedCard>, T>): T =

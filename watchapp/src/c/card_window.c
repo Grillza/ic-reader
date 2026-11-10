@@ -39,8 +39,9 @@ static Layout layout(void) {
 #endif
 }
 
+// Secondary text is white too: grey reads as washed out on the Pebble's reflective screen.
 static GColor dim_text(void) {
-  return PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite);
+  return GColorWhite;
 }
 
 static void drop_art(void) {
@@ -81,7 +82,7 @@ static void draw_dots(GContext *ctx, GRect b, int16_t y, uint8_t count) {
   int16_t gap = 10;
   int16_t x = b.size.w / 2 - (count - 1) * gap / 2;
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorWhite));
+  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
   for (uint8_t i = 0; i < count; i++, x += gap) {
     if (i == s_selected) {
       graphics_fill_circle(ctx, GPoint(x, y), 3);

@@ -40,6 +40,46 @@ class WatchArtTest {
         }
     }
 
+    /**
+     * A card photo (files/test-photo.jpg on the device if present, else a made-up noisy one),
+     * cropped as the app saves it, fits on every watch.
+     */
+    @Test
+    fun photoFitsOnEveryWatch() {
+        val supplied = File(out.parentFile, "test-photo.jpg")
+        val source = if (supplied.exists()) {
+            android.graphics.BitmapFactory.decodeFile(supplied.path)
+        } else {
+            val rnd = java.util.Random(1)
+            val px = IntArray(800 * 600) { i ->
+                val x = i % 800
+                val y = i / 800
+                fun ch(base: Int) = (base + rnd.nextInt(40) - 20).coerceIn(0, 255)
+                if ((x - 500) * (x - 500) + (y - 250) * (y - 250) < 150 * 150) {
+                    (0xFF shl 24) or (ch(230) shl 16) or (ch(90) shl 8) or ch(150)
+                } else {
+                    (0xFF shl 24) or (ch(120 + x / 8) shl 16) or (ch(130) shl 8) or ch(140 + y / 8)
+                }
+            }
+            Bitmap.createBitmap(px, 800, 600, Bitmap.Config.ARGB_8888)
+        }
+        val picture = io.github.grillza.icreader.ui.renderCardPhoto(source, io.github.grillza.icreader.ui.CropPlacement(), notched = true)
+        val file = File(out, "photo.png")
+        file.outputStream().use { picture.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        val watches = mapOf(
+            "emery" to Quad(164, 103, 6144, false),
+            "basalt" to Quad(124, 78, 6144, false),
+            "diorite" to Quad(124, 78, 6144, true),
+            "aplite" to Quad(124, 78, 2048, true),
+        )
+        for ((name, w) in watches) {
+            val art = WatchArtRenderer.render(CardType.SUICA, file, w.width, w.height, w.maxBytes, w.mono)
+            assertNotNull(name, art)
+            assertTrue("$name photo: ${art!!.rle.size} bytes", art.rle.size <= w.maxBytes)
+            save(art.rle, w.width, w.height, File(out, "$name-photo.png"))
+        }
+    }
+
     private data class Quad(val width: Int, val height: Int, val maxBytes: Int, val mono: Boolean)
 
     /** Decodes the RLE the way the watch does and saves it with the Pebble's colours. */

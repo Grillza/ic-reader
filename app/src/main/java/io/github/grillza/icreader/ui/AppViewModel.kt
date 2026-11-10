@@ -42,6 +42,9 @@ sealed interface Screen {
     data object Preview : Screen
 }
 
+/** A photo picked for [cardId], decoded and upright, before it's fitted to the card. */
+class PhotoCrop(val cardId: String, val image: android.graphics.Bitmap, val notched: Boolean)
+
 sealed interface ScanStatus {
     data object Idle : ScanStatus
     data object Reading : ScanStatus
@@ -274,7 +277,34 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         repo.edit(id) { it.copy(typeId = type.id, nickname = nickname.trim().ifEmpty { null }) }
     }
 
-    fun setCustomImage(id: String, uri: Uri?) = viewModelScope.launch { repo.setCustomImage(id, uri) }
+    private val _photoCrop = MutableStateFlow<PhotoCrop?>(null)
+
+    /** A picked photo waiting to be fitted to its card (see PhotoCropDialog). */
+    val photoCrop: StateFlow<PhotoCrop?> = _photoCrop.asStateFlow()
+
+    fun startPhotoCrop(id: String, uri: Uri) = viewModelScope.launch {
+        val card = repo.get(id) ?: return@launch
+        val bitmap = repo.decodePhoto(uri)
+        if (bitmap == null) {
+            _message.value = "Couldn't open that photo"
+            return@launch
+        }
+        _photoCrop.value = PhotoCrop(id, bitmap, notched = card.family == CardFamily.TRANSIT)
+    }
+
+    /** Saves the fitted photo as the card's picture ([placement] null: cancelled). */
+    fun finishPhotoCrop(placement: CropPlacement?) {
+        val crop = _photoCrop.value ?: return
+        _photoCrop.value = null
+        if (placement == null) return
+        viewModelScope.launch {
+            val picture = withContext(Dispatchers.Default) { renderCardPhoto(crop.image, placement, crop.notched) }
+            repo.setCustomImage(crop.cardId, picture)
+            picture.recycle()
+        }
+    }
+
+    fun removeCustomImage(id: String) = viewModelScope.launch { repo.setCustomImage(id, null) }
 
     fun deleteCard(id: String) = viewModelScope.launch {
         repo.delete(id)

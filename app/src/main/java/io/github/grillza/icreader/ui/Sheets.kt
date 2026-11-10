@@ -130,7 +130,7 @@ fun CardEditorSheet(
                 Spacer(Modifier.height(20.dp))
                 Text("Card picture", style = MaterialTheme.typography.titleSmall)
                 Text(
-                    "Use a photo of your own card instead of the generated artwork.",
+                    "Use a photo of your own card instead of the generated artwork. You fit it to the card's outline next. It shows on your watch too.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

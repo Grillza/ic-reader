@@ -48,6 +48,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
         androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
     ) { uri -> uri?.let(vm::restore) }
     val iconId by vm.iconId.collectAsStateWithLifecycle()
+    val photoCrop by vm.photoCrop.collectAsStateWithLifecycle()
     val stationLanguage by vm.stationLanguage.collectAsStateWithLifecycle()
     vm.stationsReady.collectAsStateWithLifecycle().value // recompose once names are loaded
 
@@ -79,7 +80,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
 
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         val id = editing
-        if (uri != null && id != null) vm.setCustomImage(id, uri)
+        if (uri != null && id != null) vm.startPhotoCrop(id, uri)
     }
     // A new lambda per language so screens recompose with the new names.
     val station: (StationRef) -> io.github.grillza.icreader.data.Station? = remember(stationLanguage) { { ref -> vm.station(ref) } }
@@ -211,7 +212,7 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                 summary = null,
                 onDismiss = { editing = null },
                 onPickPhoto = { holdIcon(context); photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                onRemovePhoto = { vm.setCustomImage(id, null) },
+                onRemovePhoto = { vm.removeCustomImage(id) },
                 onSave = { type, nickname, useAsIcon ->
                     editing = null
                     vm.updateCard(id, type, nickname)
@@ -219,6 +220,10 @@ fun AppRoot(vm: AppViewModel, nfc: NfcState, onExit: () -> Unit) {
                 },
             )
         }
+    }
+
+    photoCrop?.let { crop ->
+        PhotoCropDialog(crop.image, crop.notched, onDone = vm::finishPhotoCrop)
     }
 }
 

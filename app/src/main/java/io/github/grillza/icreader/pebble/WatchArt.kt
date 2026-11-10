@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import io.github.grillza.icreader.data.CardFamily
 import io.github.grillza.icreader.data.CardType
 import io.github.grillza.icreader.ui.Motif
+import io.github.grillza.icreader.ui.cardOutlinePath
 import io.github.grillza.icreader.ui.design
 import io.github.grillza.icreader.ui.drawCardBackground
 import java.io.File
@@ -42,51 +43,54 @@ object WatchArtRenderer {
     /** [mono]: for a black-and-white screen, a white card with black shapes. */
     fun render(type: CardType, photo: File?, width: Int, height: Int, maxBytes: Int, mono: Boolean): WatchArt? {
         if (photo != null) {
-            val art = draw(type, photo, width, height, mono)
-            // A photo rarely compresses well; fall back to the design if it's too big.
-            if (art != null && art.rle.size <= maxBytes) return art
+            val pixels = drawPhoto(type, photo, width, height)
+            if (pixels != null) fitPhoto(pixels, width, mono, maxBytes)?.let { return WatchArt(it) }
         }
-        return draw(type, null, width, height, mono)?.takeIf { it.rle.size <= maxBytes }
+        val pixels = drawDesign(type, width, height, mono)
+        val colours = WatchColors.vivid(pixels, photo = false).let { if (mono) IntArray(it.size) { i -> WatchProtocol.pebbleColor(it[i]) } else WatchColors.toPebble(it) }
+        return WatchArt(WatchProtocol.rlePebble(colours)).takeIf { it.rle.size <= maxBytes }
     }
 
-    private fun draw(type: CardType, photo: File?, width: Int, height: Int, mono: Boolean): WatchArt? {
+    private fun drawDesign(type: CardType, width: Int, height: Int, mono: Boolean): IntArray {
         val bitmap = createBitmap(width, height)
         val canvas = Canvas(bitmap)
-        val outline = outline(type, width.toFloat(), height.toFloat())
-        val image = photo?.let { runCatching { BitmapFactory.decodeFile(it.path) }.getOrNull() }
+        val outline = cardOutlinePath(width.toFloat(), height.toFloat(), type.family == CardFamily.TRANSIT)
         CanvasDrawScope().draw(Density(1f), LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(canvas), Size(width.toFloat(), height.toFloat())) {
-            clipPath(outline.asComposePath()) {
-                if (image == null) drawCardBackground(type, flat = true, mono = mono)
-            }
+            clipPath(outline.asComposePath()) { drawCardBackground(type, flat = true, mono = mono) }
         }
-        if (image != null) {
-            canvas.withClip(outline) {
-                drawBitmap(image, centerCrop(image.width, image.height, width, height), RectF(0f, 0f, width.toFloat(), height.toFloat()), Paint(Paint.FILTER_BITMAP_FLAG))
-            }
-            image.recycle()
-        } else {
-            drawBrand(canvas, bitmap, type, width.toFloat(), height.toFloat(), mono)
-        }
-        val pixels = IntArray(width * height)
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-        bitmap.recycle()
-        return WatchArt(WatchProtocol.rle(pixels))
+        drawBrand(canvas, bitmap, type, width.toFloat(), height.toFloat(), mono)
+        return bitmap.pixels().also { bitmap.recycle() }
     }
 
-    /** The card's outline with rounded corners, and the notch on transit cards (as in CardArt). */
-    private fun outline(type: CardType, w: Float, h: Float): android.graphics.Path {
-        val r = w * 0.055f
-        val card = android.graphics.Path().apply { addRoundRect(RectF(0f, 0f, w, h), r, r, android.graphics.Path.Direction.CW) }
-        if (type.family != CardFamily.TRANSIT) return card
-        val depth = (w * 0.018f).coerceAtLeast(2f)
-        val notch = android.graphics.Path().apply {
-            moveTo(w + 1f, h * 0.69f)
-            lineTo(w - depth, h * 0.725f)
-            lineTo(w + 1f, h * 0.85f)
-            close()
+    /** The user's card picture (already card-shaped), scaled to the watch, or null if unreadable. */
+    private fun drawPhoto(type: CardType, photo: File, width: Int, height: Int): IntArray? {
+        val image = runCatching { BitmapFactory.decodeFile(photo.path) }.getOrNull() ?: return null
+        val bitmap = createBitmap(width, height)
+        val canvas = Canvas(bitmap)
+        // Older pictures were saved as plain rectangles, so cut the outline here too.
+        canvas.withClip(cardOutlinePath(width.toFloat(), height.toFloat(), type.family == CardFamily.TRANSIT)) {
+            drawBitmap(image, centerCrop(image.width, image.height, width, height), RectF(0f, 0f, width.toFloat(), height.toFloat()), Paint(Paint.FILTER_BITMAP_FLAG))
         }
-        return android.graphics.Path().apply { op(card, notch, android.graphics.Path.Op.DIFFERENCE) }
+        image.recycle()
+        return bitmap.pixels().also { bitmap.recycle() }
     }
+
+    /**
+     * A photo in the watch's 64 colours is mostly one- and two-pixel runs, far too big to send.
+     * Smooths it into flat patches, a little more each time, until it fits in [maxBytes].
+     */
+    private fun fitPhoto(pixels: IntArray, width: Int, mono: Boolean, maxBytes: Int): ByteArray? {
+        val vivid = WatchColors.vivid(pixels, photo = true)
+        val colours = if (mono) WatchColors.mono(vivid) else WatchColors.toPebble(vivid)
+        val patches = WatchColors.majority(colours, width)
+        for (minRun in 1..16) {
+            val rle = WatchProtocol.rlePebble(WatchColors.mergeShortRuns(patches, width, minRun))
+            if (rle.size <= maxBytes) return rle
+        }
+        return null
+    }
+
+    private fun Bitmap.pixels(): IntArray = IntArray(width * height).also { getPixels(it, 0, width, 0, 0, width, height) }
 
     private fun centerCrop(srcW: Int, srcH: Int, dstW: Int, dstH: Int): Rect {
         val scale = maxOf(dstW.toFloat() / srcW, dstH.toFloat() / srcH)
@@ -139,5 +143,5 @@ object WatchArtRenderer {
     }
 
     /** The card's main colour as a Pebble colour, shown until its art arrives. */
-    fun placeholderColor(type: CardType): Int = WatchProtocol.pebbleColor(type.colorStart.toInt())
+    fun placeholderColor(type: CardType): Int = WatchColors.toPebble(WatchColors.vivid(intArrayOf(type.colorStart.toInt()), photo = false)[0])
 }

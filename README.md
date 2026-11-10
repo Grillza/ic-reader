@@ -22,7 +22,9 @@ across scans, lets the launcher icon match your card, and shows your cards on a 
   Kansai: ICOCA or PiTaPa, Chubu: TOICA or manaca, Kyushu: SUGOCA, nimoca or Hayakaken).
 - **Artwork**: each brand's colour layout on a silver card with the transit-card notch (Suica's
   green sweep, TOICA's cyan wave, manaca's yellow circle…). Logos and characters aren't
-  reproduced; add a photo of your own card for the real thing. Card info (menu) shows the
+  reproduced; add a photo of your own card for the real thing: edit the card, **Choose photo**,
+  then fit it to the card-shaped frame (drag, pinch, twist or the straighten slider, and 90°
+  turns). It's saved cut to the card's outline, notch included. Card info (menu) shows the
   card's raw IDm, PMm and attributes block.
 - **App icon**: 15 launcher icons (one per brand plus a default), from the menu or from a card.
   The switch happens when you leave the app, because Android closes the app if its launcher alias
@@ -61,9 +63,11 @@ card's face. A scan while the watch app is open sends the new balance at once. T
 names this app as its companion (`companionApp` in `watchapp/package.json`), so the Pebble app
 only passes its messages to IC Reader.
 
-Card faces are drawn on the phone at the watch's size, in flat colours rounded to the Pebble's
-64, and sent run-length compressed (1-2 KB a card). Black-and-white watches get a black and white
-version.
+Card faces are drawn on the phone at the watch's size, made bolder, and each colour is matched to
+the Pebble colour that *looks* closest on the watch's screen, which shows colours much paler than
+their values (`WatchColors`, using pebble-tool's screen colour table). They're sent run-length
+compressed (1-2 KB a card). A card photo is smoothed into flat patches until it fits (6 KB, 2 KB
+on the original Pebble). Black-and-white watches get a black and white version.
 
 It runs on every Pebble: Time 2, Round 2, Time, Time Round, Pebble 2 and 2 Duo, and the
 original Pebble (6 cards there).

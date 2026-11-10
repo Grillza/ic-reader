@@ -133,13 +133,16 @@ object WatchProtocol {
     }
 
     /** Pebble-colour pixels, row by row, as (run, colour) pairs. See codec_decode_art on the watch. */
-    fun rle(argbPixels: IntArray): ByteArray {
+    fun rle(argbPixels: IntArray): ByteArray = rlePebble(IntArray(argbPixels.size) { pebbleColor(argbPixels[it]) })
+
+    /** [rle] for pixels already in Pebble colours. */
+    fun rlePebble(colours: IntArray): ByteArray {
         val out = ByteArrayOutputStream()
         var i = 0
-        while (i < argbPixels.size) {
-            val c = pebbleColor(argbPixels[i])
+        while (i < colours.size) {
+            val c = colours[i]
             var run = 1
-            while (run < 255 && i + run < argbPixels.size && pebbleColor(argbPixels[i + run]) == c) run++
+            while (run < 255 && i + run < colours.size && colours[i + run] == c) run++
             out.write(run)
             out.write(c)
             i += run
