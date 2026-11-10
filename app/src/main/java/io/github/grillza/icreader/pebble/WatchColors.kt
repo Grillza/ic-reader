@@ -88,7 +88,22 @@ object WatchColors {
     fun toPebble(pixels: IntArray, photo: Boolean = false): IntArray {
         val cache = HashMap<Int, Int>()
         val greyBelow = if (photo) 0.22f else 0.12f
-        return IntArray(pixels.size) { cache.getOrPut(pixels[it]) { toPebble(pixels[it], greyBelow) } }
+        return IntArray(pixels.size) {
+            cache.getOrPut(pixels[it]) { (if (photo) null else exact(pixels[it])) ?: toPebble(pixels[it], greyBelow) }
+        }
+    }
+
+    /**
+     * A design colour that's exactly one of the watch's (a flat override, see Design) is used as
+     * it is, rather than matched by how it looks.
+     */
+    private fun exact(argb: Int): Int? {
+        if ((argb ushr 24) < 128) return null
+        val r = (argb shr 16) and 0xFF
+        val g = (argb shr 8) and 0xFF
+        val b = argb and 0xFF
+        if (r % 85 != 0 || g % 85 != 0 || b % 85 != 0) return null
+        return 0xC0 or ((r / 85) shl 4) or ((g / 85) shl 2) or (b / 85)
     }
 
     /** How far apart two Pebble colours look on the screen (squared RGB distance). */

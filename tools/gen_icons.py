@@ -36,13 +36,13 @@ SILVER = ("#E7E9EC", "#C5C9CE")
 ICONS = [
     ("default", "IC Reader", ("#26324F", "#1A2238"), None, None, None, 0, "default"),
     ("suica", "Suica", PEARL, "Suica", "#FFFFFF", (0.42, 0.66), 0.54, "suica"),
-    ("pasmo", "PASMO", SILVER, "PASMO", "#EA5A9C", (0.5, 0.74), 0.74, "pasmo"),
+    ("pasmo", "PASMO", ("#EDEDED", "#DCDCDC"), "PASMO", "#E4007F", (0.5, 0.76), 0.74, "pasmo"),
     ("icoca", "ICOCA", ("#D5D6D9", "#C3C5C9"), "ICOCA", None, None, 0, "icoca"),
-    ("toica", "TOICA", SILVER, "toica", "#FFFFFF", (0.5, 0.76), 0.62, "toica"),
-    ("manaca", "manaca", ("#D3D6DF", "#BBC0CC"), "manaca", "#8E95A6", (0.5, 0.5), 0.70, "manaca"),
+    ("toica", "TOICA", ("#D4D4CC", "#C2C2B9"), "toica", "#E2E2DA", (0.60, 0.84), 0.46, "toica"),
+    ("manaca", "manaca", ("#E2E2E2", "#D2D2D2"), "manaca", "#8E8E8E", (0.5, 0.5), 0.70, "manaca"),
     ("kitaca", "Kitaca", ("#F8F4E3", "#EFE9D3"), "Kitaca", None, None, 0, "kitaca"),
     ("sugoca", "SUGOCA", ("#C0D5BB", "#B3CAAE"), "SUGOCA", None, None, 0, "sugoca"),
-    ("nimoca", "nimoca", PEARL, "nimoca", "#FFFFFF", (0.5, 0.5), 0.66, "nimoca"),
+    ("nimoca", "nimoca", ("#EAECEE", "#DADDDF"), "nimoca", "#1A2A72", (0.5, 0.5), 0.66, "nimoca"),
     ("hayakaken", "Hayakaken", ("#FBFAF8", "#EDECE9"), "Hayakaken", None, None, 0, "hayakaken"),
     ("pitapa", "PiTaPa", ("#B4BFBD", "#A1ADAB"), "PiTaPa", None, None, 0, "pitapa"),
     ("transit", "Transit IC", SILVER, "IC", "#FFFFFF", (0.5, 0.76), 0.34, "transit"),
@@ -113,16 +113,15 @@ def draw_shapes(img: Image.Image, kind: str):
         img.paste(green, (0, 0), mask)
     elif kind == "pasmo":
         for v in (0.10, 0.34):
-            d.rounded_rectangle(R(0.10, v, 0.66, v + 0.17), radius=(px(0.06) - px(0)), fill="#EA5A9C")
-            d.ellipse(R(0.73, v + 0.02, 0.87, v + 0.16), fill="#EA5A9C")
+            d.rounded_rectangle(R(0.12, v, 0.62, v + 0.17), radius=(px(0.05) - px(0)), fill="#E4007F")
     elif kind == "toica":
-        pts = []
-        for i in range(61):
-            u = -0.4 + 1.8 * i / 60
-            pts.append(P(u, 0.56 + 0.11 * math.sin((u + 0.1) * 2 * math.pi)))
-        d.polygon(pts + [P(1.4, 1.4), P(-0.4, 1.4)], fill="#17A9E1")
+        # The card's wave (measured, as in CardDesigns), stretched a little past the edges.
+        tops = [0.58, 0.543, 0.499, 0.469, 0.451, 0.449, 0.465, 0.509, 0.573, 0.642, 0.698, 0.728,
+                0.736, 0.728, 0.708, 0.68, 0.646, 0.608, 0.571, 0.529, 0.49]
+        pts = [P(-0.1 + 1.2 * i / 20, v) for i, v in enumerate(tops)]
+        d.polygon(pts + [P(1.4, 1.4), P(-0.4, 1.4)], fill="#1EB4EA")
     elif kind == "manaca":
-        d.ellipse(R(0.02, 0.02, 0.98, 0.98), fill="#F1E63B")
+        d.ellipse(R(0.02, 0.02, 0.98, 0.98), fill="#FFE200")
     elif kind == "icoca":
         # A blue panel in a silver border with two opposite corners cut at 45 degrees.
         panel = rounded_polygon([P(0.30, 0.10), P(0.90, 0.10), P(0.90, 0.66), P(0.66, 0.90), P(0.10, 0.90), P(0.10, 0.34)], px(0.05) - px(0))
@@ -152,7 +151,7 @@ def draw_shapes(img: Image.Image, kind: str):
         d.polygon([P(0.25, 1.3), P(1.3, 0.40), P(1.3, 1.3)], fill=a)
         d.polygon([P(0.0, 1.25), P(0.12, 1.25), P(1.25, 0.28), P(1.25, 0.17)], fill=b)
     elif kind == "nimoca":
-        d.ellipse(R(0.03, 0.03, 0.97, 0.97), fill="#45A2CB")
+        d.ellipse(R(0.03, 0.03, 0.97, 0.97), fill="#56C1EE")
     elif kind == "transit":
         d.polygon([P(-0.4, 0.62), P(0.2, 0.44), P(0.6, 0.66), P(1.4, 0.48), P(1.4, 1.4), P(-0.4, 1.4)], fill="#607D8B")
     elif kind == "nanaco":

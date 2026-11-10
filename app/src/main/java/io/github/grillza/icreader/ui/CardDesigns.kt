@@ -37,7 +37,8 @@ import io.github.grillza.icreader.data.CardType
  * or characters; users who want the real thing can attach a photo of their card.
  */
 internal enum class Motif { SUICA_PANEL, CIRCLE_RIGHT, CIRCLE_LEFT, PLAIN, SWOOSH_RIGHT, BARS_LEFT, BUBBLES, WAVE_BOTTOM, CIRCLE, BLOCK_RIGHT, BAND_DIAGONAL, ARC_BOTTOM,
-    ICOCA_PANEL, SUGOCA_PANEL, KITACA_FOREST, HAYAKAKEN_PANEL, PITAPA_PANEL }
+    ICOCA_PANEL, SUGOCA_PANEL, KITACA_FOREST, HAYAKAKEN_PANEL, PITAPA_PANEL,
+    PASMO_ROWS, TOICA_WAVE, MANACA_CIRCLE, NIMOCA_CIRCLE }
 
 internal data class Design(
     val base: List<Color>,
@@ -59,6 +60,8 @@ internal data class Design(
      */
     val flatAccent: Color? = null,
     val flatBrandColor: Color? = null,
+    /** Flat-colour (watch) card body, where the usual one would turn white. */
+    val flatBase: Color? = null,
     /** Lettering placed as on the real card. When set, it replaces [brand]. */
     val labels: List<Label> = emptyList(),
 )
@@ -103,13 +106,24 @@ internal fun design(type: CardType): Design = when (type) {
     // References: photos of the cards (Suica, PASMO, TOICA, manaca, PiTaPa, SUGOCA, nimoca, ICOCA,
     // Kitaca, Hayakaken). Panels, colours and lettering are measured from them; logos and characters are left out.
     CardType.SUICA -> Design(PEARL, Motif.SUICA_PANEL, listOf(Color(0xFF62BD2F)), "Suica", Color.White, Alignment.BottomStart)
-    CardType.PASMO -> Design(SILVER, Motif.BARS_LEFT, listOf(Color(0xFFEA5A9C)), "PASMO", Color(0xFFEA5A9C), Alignment.BottomStart)
+    CardType.PASMO -> Design(
+        listOf(Color(0xFFEDEDED), Color(0xFFDCDCDC), Color(0xFFE8E8E8)), Motif.PASMO_ROWS, listOf(Color(0xFFE4007F)), "PASMO", Color(0xFFE4007F), Alignment.BottomStart,
+        flatAccent = Color(0xFFFF00AA),
+        labels = listOf(Label("PASMO", Color(0xFFE4007F), 0.102f, 0.494f, 0.88f, weight = 900, spacing = 0.06f)),
+    )
     CardType.ICOCA -> Design(
         listOf(Color(0xFFD5D6D9), Color(0xFFC3C5C9), Color(0xFFCFD0D3)), Motif.ICOCA_PANEL, listOf(Color(0xFF0AB5D1)), "ICOCA", Color(0xFFC8C9CB), Alignment.Center,
         labels = listOf(Label("ICOCA", Color(0xFFC8C9CB), 0.154f, 0.867f, 0.592f, family = "serif", spacing = 0.04f, flatColor = Color.White)),
     )
-    CardType.TOICA -> Design(SILVER, Motif.WAVE_BOTTOM, listOf(Color(0xFF17A9E1)), "toica", Color.White, Alignment.BottomEnd)
-    CardType.MANACA -> Design(listOf(Color(0xFFD3D6DF), Color(0xFFBBC0CC)), Motif.CIRCLE, listOf(Color(0xFFF1E63B)), "manaca", Color(0xFF9DA3B3), Alignment.Center)
+    CardType.TOICA -> Design(
+        listOf(Color(0xFFD4D4CC), Color(0xFFC2C2B9), Color(0xFFCFCFC7)), Motif.TOICA_WAVE, listOf(Color(0xFF1EB4EA)), "toica", Color(0xFFC8C8C0), Alignment.BottomEnd,
+        labels = listOf(Label("toica", Color(0xFFCDCDC5), 0.74f, 0.965f, 0.935f, weight = 900, flatColor = Color.White)),
+    )
+    CardType.MANACA -> Design(
+        listOf(Color(0xFFE2E2E2), Color(0xFFD2D2D2), Color(0xFFDDDDDD)), Motif.MANACA_CIRCLE, listOf(Color(0xFFFFE200)), "manaca", Color(0xFF9C9C9C), Alignment.Center,
+        flatAccent = Color(0xFFFFFF00),
+        labels = listOf(Label("manaca", Color(0xFF9C9C9C), 0.271f, 0.732f, 0.557f, weight = 700, spacing = 0.04f, flatColor = Color(0xFF555555))),
+    )
     CardType.KITACA -> Design(
         listOf(Color(0xFFF8F4E3), Color(0xFFEFE9D3)), Motif.KITACA_FOREST, listOf(Color(0xFFB6B9C0)), "Kitaca", Color(0xFF7DCB2E), Alignment.BottomStart,
         flatAccent = Color(0xFFAAAAAA),
@@ -119,7 +133,10 @@ internal fun design(type: CardType): Design = when (type) {
         listOf(Color(0xFFC0D5BB), Color(0xFFB3CAAE)), Motif.SUGOCA_PANEL, listOf(Color(0xFFF6FAE9)), "SUGOCA", Color(0xFFE67A93), Alignment.BottomStart,
         labels = listOf(Label("SUGOCA", Color(0xFFE67A93), 0.045f, 0.589f, 0.93f, weight = 900, spacing = 0.16f)),
     )
-    CardType.NIMOCA -> Design(PEARL, Motif.CIRCLE_LEFT, listOf(Color(0xFF45A2CB)), "nimoca", Color.White, Alignment.Center, brandExact = true, brandShift = -0.13f)
+    CardType.NIMOCA -> Design(
+        listOf(Color(0xFFEAECEE), Color(0xFFDADDDF), Color(0xFFE5E8EA)), Motif.NIMOCA_CIRCLE, listOf(Color(0xFF56C1EE)), "nimoca", Color(0xFF1A2A72), Alignment.Center,
+        labels = listOf(Label("nimoca", Color(0xFF1A2A72), 0.212f, 0.628f, 0.548f, weight = 700, spacing = 0.03f)),
+    )
     CardType.HAYAKAKEN -> Design(
         listOf(Color(0xFFFBFAF8), Color(0xFFEDECE9)), Motif.HAYAKAKEN_PANEL, listOf(Color(0xFF4FD2EA)), "Hayakaken", Color(0xFF2B3A93), Alignment.TopStart,
         labels = listOf(Label("HAYAKAKEN", Color(0xFF2B3A93), 0.043f, 0.338f, 0.232f, spacing = 0.06f)),
@@ -127,6 +144,7 @@ internal fun design(type: CardType): Design = when (type) {
     CardType.PITAPA -> Design(
         listOf(Color(0xFFB4BFBD), Color(0xFFA1ADAB), Color(0xFFAFBAB8)), Motif.PITAPA_PANEL, listOf(Color(0xFF898CB0)), "PiTaPa", Color(0xFFB4BFBD), Alignment.TopEnd,
         flatAccent = Color(0xFFAA55FF),
+        flatBase = Color(0xFFAAAAAA),
         // Reads top to bottom down the panel, as on the card.
         labels = listOf(Label("PiTaPa", Color(0xFFB4BFBD), 0.10f, 0.935f, 0.513f, family = "serif", spacing = -0.06f, vertical = true, flatColor = Color.White)),
     )
@@ -189,7 +207,7 @@ internal fun DrawScope.drawCardBackground(type: CardType, flat: Boolean, mono: B
         // A silver with a faint tint would round to a pastel colour; keep it grey.
         val spread = maxOf(base.red, base.green, base.blue) - minOf(base.red, base.green, base.blue)
         val grey = (base.red + base.green + base.blue) / 3
-        drawRect(if (spread < 0.08f) Color(grey, grey, grey) else base)
+        drawRect(d.flatBase ?: if (spread < 0.08f) Color(grey, grey, grey) else base)
     } else {
         drawRect(Brush.linearGradient(d.base, start = Offset.Zero, end = Offset(size.width, size.height)))
         // Soft sheen like a metallic print.
@@ -247,6 +265,7 @@ private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
                     close()
                 },
             )
+            leftArrow(0.036f, 0.095f, 0.031f, Color(0xFF222222))
         }
         Motif.CIRCLE_RIGHT -> drawCircle(solid, h * 0.37f, Offset(w * 0.76f, h * 0.36f))
         Motif.CIRCLE_LEFT -> drawCircle(solid, h * 0.36f, Offset(w * 0.37f, h * 0.5f))
@@ -334,10 +353,10 @@ private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
             val points = mutableListOf(0.034f to 0.047f, 0.964f to 0.047f)
             KITACA_TREES.reversed().zipWithNext().forEach { (a, b) ->
                 points += a
-                points += (a.first + b.first) / 2 to maxOf(a.second, b.second) + 0.035f
+                points += (a.first + b.first) / 2 to maxOf(a.second, b.second) + 0.04f
             }
             points += KITACA_TREES.first()
-            rounded(solid, w * 0.012f, polygon(w, h, *points.toTypedArray()))
+            rounded(solid, w * 0.018f, polygon(w, h, *points.toTypedArray()))
             val arrow = Color(0xFF2A2A2A)
             drawRect(arrow, Offset(w * 0.05f, h * 0.068f), Size(w * 0.055f, h * 0.009f))
             drawPath(polygon(w, h, 0.044f to 0.0725f, 0.058f to 0.06f, 0.058f to 0.085f), arrow)
@@ -347,6 +366,37 @@ private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
             drawRect(solid, Offset(w * 0.051f, h * 0.044f), Size(w * 0.05f, h * 0.012f))
         }
         Motif.PITAPA_PANEL -> drawRoundRect(solid, Offset(w * 0.30f, h * 0.055f), Size(w * 0.677f, h * 0.903f), CornerRadius(w * 0.03f))
+        Motif.PASMO_ROWS -> {
+            // Two rows (where the card has its train and bus) as plain rounded bars.
+            listOf(0.15f to 0.31f, 0.48f to 0.63f).forEach { (t, b) ->
+                drawRoundRect(solid, Offset(w * 0.102f, h * t), Size(w * 0.235f, h * (b - t)), CornerRadius(h * 0.03f))
+            }
+            // A half arrow, barb on top.
+            drawRect(solid, Offset(w * 0.06f, h * 0.048f), Size(w * 0.055f, h * 0.014f))
+            drawPath(polygon(w, h, 0.047f to 0.062f, 0.078f to 0.035f, 0.078f to 0.062f), solid)
+        }
+        Motif.TOICA_WAVE -> {
+            val tops = listOf(
+                0f to 0.58f, 0.05f to 0.543f, 0.10f to 0.499f, 0.15f to 0.469f, 0.20f to 0.451f, 0.25f to 0.449f,
+                0.30f to 0.465f, 0.35f to 0.509f, 0.40f to 0.573f, 0.45f to 0.642f, 0.50f to 0.698f, 0.55f to 0.728f,
+                0.60f to 0.736f, 0.65f to 0.728f, 0.70f to 0.708f, 0.75f to 0.68f, 0.80f to 0.646f, 0.85f to 0.608f,
+                0.90f to 0.571f, 0.95f to 0.529f, 1f to 0.49f,
+            )
+            drawPath(polygon(w, h, *(tops + listOf(1f to 1f, 0f to 1f)).toTypedArray()), solid)
+            // Three small triangles at the top left.
+            for (i in 0..2) {
+                val x = 0.034f + i * 0.029f
+                drawPath(polygon(w, h, x to 0.095f, x + 0.03f to 0.095f, x + 0.03f to 0.056f), solid)
+            }
+        }
+        Motif.MANACA_CIRCLE -> {
+            drawCircle(solid, h * 0.41f, Offset(w * 0.5035f, h * 0.5f))
+            leftArrow(0.026f, 0.123f, 0.05f, Color(0xFF222222), heavy = true)
+        }
+        Motif.NIMOCA_CIRCLE -> {
+            drawCircle(solid, h * 0.462f, Offset(w * 0.421f, h * 0.502f))
+            drawPath(polygon(w, h, 0.062f to 0.03f, 0.10f to 0.012f, 0.10f to 0.048f), if (flat) Color.Black else Color(0xFF111111))
+        }
         Motif.ARC_BOTTOM -> {
             drawCircle(d.accent.last().copy(alpha = 0.9f), h * 0.62f, Offset(w * 0.98f, h * 1.15f))
             drawCircle(d.accent.first(), h * 0.50f, Offset(w * 0.72f, h * 1.12f))
@@ -356,12 +406,32 @@ private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
 
 /** Kitaca's treetops, left to right: (x, top) as fractions of the card, measured from a real card. */
 private val KITACA_TREES = listOf(
-    0.034f to 0.62f, 0.06f to 0.60f, 0.085f to 0.585f, 0.11f to 0.555f, 0.135f to 0.59f, 0.16f to 0.575f,
-    0.19f to 0.60f, 0.215f to 0.565f, 0.245f to 0.595f, 0.275f to 0.58f, 0.31f to 0.60f, 0.345f to 0.575f,
-    0.38f to 0.59f, 0.41f to 0.57f, 0.44f to 0.60f, 0.47f to 0.58f, 0.50f to 0.595f, 0.53f to 0.57f,
-    0.56f to 0.59f, 0.60f to 0.565f, 0.635f to 0.585f, 0.67f to 0.57f, 0.70f to 0.585f, 0.74f to 0.56f,
-    0.78f to 0.585f, 0.82f to 0.555f, 0.86f to 0.53f, 0.90f to 0.515f, 0.935f to 0.54f, 0.964f to 0.53f,
+    0.034f to 0.60f, 0.075f to 0.565f, 0.12f to 0.585f, 0.165f to 0.55f, 0.215f to 0.58f, 0.265f to 0.555f,
+    0.315f to 0.585f, 0.37f to 0.56f, 0.425f to 0.59f, 0.48f to 0.555f, 0.535f to 0.58f, 0.59f to 0.55f,
+    0.645f to 0.575f, 0.70f to 0.545f, 0.755f to 0.565f, 0.81f to 0.53f, 0.865f to 0.51f, 0.915f to 0.525f,
+    0.964f to 0.51f,
 )
+
+/**
+ * The small arrow near the top-left corner of many transit cards, pointing left: a line from
+ * [x0] to [x1] (fractions of the width) at height [y], with a head on the left.
+ */
+private fun DrawScope.leftArrow(x0: Float, x1: Float, y: Float, color: Color, heavy: Boolean = false) {
+    val w = size.width
+    val h = size.height
+    val t = h * if (heavy) 0.014f else 0.009f
+    val head = h * if (heavy) 0.036f else 0.024f
+    drawRect(color, Offset(w * x0 + head * 0.8f, h * y - t / 2), Size(w * x1 - w * x0 - head * 0.8f, t))
+    drawPath(
+        Path().apply {
+            moveTo(w * x0, h * y)
+            lineTo(w * x0 + head * 1.3f, h * y - head / 2)
+            lineTo(w * x0 + head * 1.3f, h * y + head / 2)
+            close()
+        },
+        color,
+    )
+}
 
 /** A closed path through [points] given as fractions of the card's width and height. */
 private fun polygon(w: Float, h: Float, vararg points: Pair<Float, Float>) = Path().apply {
