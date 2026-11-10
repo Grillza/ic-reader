@@ -82,7 +82,7 @@ object WatchArtRenderer {
      * Flattens it a little more each time until it fits in [maxBytes], keeping strong edges.
      */
     private fun fitPhoto(pixels: IntArray, width: Int, mono: Boolean, maxBytes: Int): ByteArray? {
-        val vivid = WatchColors.vivid(pixels, photo = true)
+        val vivid = WatchColors.vivid(WatchColors.smooth(pixels, width), photo = true)
         if (mono) {
             val bw = WatchColors.mono(vivid)
             for (minRun in 1..16) {
@@ -91,7 +91,7 @@ object WatchArtRenderer {
             }
             return null
         }
-        val colours = WatchColors.toPebble(vivid, photo = true)
+        val colours = WatchColors.tidy(WatchColors.toPebble(vivid, photo = true), width)
         for (threshold in FLATTEN_STEPS) {
             val rle = WatchProtocol.rlePebble(WatchColors.flattenRows(colours, width, threshold))
             if (rle.size <= maxBytes) return rle

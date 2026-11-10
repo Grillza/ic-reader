@@ -127,7 +127,7 @@ object WatchColors {
     /**
      * Bolder colours. Designs ([photo] false): near-greys (the silver card base) go to white and
      * colours get stronger. Photos: the brightness range is stretched to full (ignoring the
-     * darkest and lightest 1%) and colours get a little stronger (more makes white cards
+     * darkest 1% and lightest 8%) and colours get a little stronger (more makes white cards
      * look tinted).
      */
     fun vivid(pixels: IntArray, photo: Boolean): IntArray {
@@ -156,7 +156,7 @@ object WatchColors {
         }
     }
 
-    /** The 1st and 99th percentile of opaque pixels' brightness. */
+    /** The 1st and 92nd percentile of opaque pixels' brightness (the card's white goes white). */
     private fun levels(pixels: IntArray): Pair<Int, Int> {
         val hist = IntArray(256)
         var n = 0
@@ -175,7 +175,7 @@ object WatchColors {
             return 255
         }
         val lo = at(0.01f)
-        val hi = at(0.99f)
+        val hi = at(0.92f)
         return if (hi - lo < 32) 0 to 255 else lo to hi
     }
 
@@ -199,6 +199,92 @@ object WatchColors {
             }
         }
     }
+
+    /**
+     * Edge-preserving smoothing of ARGB [pixels]: each pixel becomes the average of the pixels
+     * within [radius] that are within [range] of its colour, repeated [passes] times. Shading
+     * and grain in a flat area even out (so it doesn't flicker between two Pebble colours),
+     * while edges between different colours, like lettering, stay sharp.
+     */
+    fun smooth(pixels: IntArray, width: Int, radius: Int = 2, range: Int = 40, passes: Int = 3): IntArray {
+        val height = pixels.size / width
+        val range2 = range * range
+        var src = pixels
+        repeat(passes) {
+            val out = src.copyOf()
+            for (y in 0 until height) for (x in 0 until width) {
+                val p = src[y * width + x]
+                if ((p ushr 24) < 128) continue
+                val r0 = (p shr 16) and 0xFF
+                val g0 = (p shr 8) and 0xFF
+                val b0 = p and 0xFF
+                var sr = 0
+                var sg = 0
+                var sb = 0
+                var n = 0
+                for (dy in -radius..radius) {
+                    val ny = y + dy
+                    if (ny !in 0 until height) continue
+                    for (dx in -radius..radius) {
+                        val nx = x + dx
+                        if (nx !in 0 until width) continue
+                        val q = src[ny * width + nx]
+                        if ((q ushr 24) < 128) continue
+                        val r = (q shr 16) and 0xFF
+                        val g = (q shr 8) and 0xFF
+                        val b = q and 0xFF
+                        val d = (r - r0) * (r - r0) + (g - g0) * (g - g0) + (b - b0) * (b - b0)
+                        if (d > range2) continue
+                        sr += r; sg += g; sb += b; n++
+                    }
+                }
+                out[y * width + x] = (0xFF shl 24) or ((sr / n) shl 16) or ((sg / n) shl 8) or (sb / n)
+            }
+            src = out
+        }
+        return src
+    }
+
+    /**
+     * Tidies Pebble-colour [colours]: a pixel takes the most common colour around it (3 × 3)
+     * when that colour looks nearly the same on the screen. Removes stray pixels in flat areas
+     * without touching edges or lettering. Transparent pixels (0) stay and don't count.
+     */
+    fun tidy(colours: IntArray, width: Int, passes: Int = 2): IntArray {
+        val height = colours.size / width
+        var src = colours
+        val seen = IntArray(9)
+        val counts = IntArray(9)
+        repeat(passes) {
+            val out = src.copyOf()
+            for (y in 0 until height) for (x in 0 until width) {
+                val c = src[y * width + x]
+                if (c == 0) continue
+                var kinds = 0
+                for (dy in -1..1) for (dx in -1..1) {
+                    val nx = x + dx
+                    val ny = y + dy
+                    if (nx !in 0 until width || ny !in 0 until height) continue
+                    val n = src[ny * width + nx]
+                    if (n == 0) continue
+                    var k = 0
+                    while (k < kinds && seen[k] != n) k++
+                    if (k == kinds) { seen[k] = n; counts[k] = 0; kinds++ }
+                    counts[k]++
+                }
+                var best = 0
+                for (k in 1 until kinds) if (counts[k] > counts[best]) best = k
+                if (seen[best] != c && counts[best] >= 5 && screenDistance(c, seen[best]) < TIDY_DISTANCE) {
+                    out[y * width + x] = seen[best]
+                }
+            }
+            src = out
+        }
+        return src
+    }
+
+    /** Colours closer than this on the screen count as "nearly the same" for [tidy]. */
+    private const val TIDY_DISTANCE = 4000
 
     /**
      * Within each row, runs of Pebble colour shorter than [minRun] take the colour of the run
