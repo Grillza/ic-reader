@@ -23,6 +23,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import io.github.grillza.icreader.data.CardFamily
 import io.github.grillza.icreader.data.CardType
 import io.github.grillza.icreader.ui.Motif
+import io.github.grillza.icreader.ui.SUICA_TEXT_BOTTOM
+import io.github.grillza.icreader.ui.SUICA_TEXT_LEFT
+import io.github.grillza.icreader.ui.SUICA_TEXT_SIZE
+import io.github.grillza.icreader.ui.SUICA_TEXT_SPACING
 import io.github.grillza.icreader.ui.cardOutlinePath
 import io.github.grillza.icreader.ui.design
 import io.github.grillza.icreader.ui.drawCardBackground
@@ -149,6 +153,7 @@ object WatchArtRenderer {
     private fun drawBrand(canvas: Canvas, bitmap: Bitmap, type: CardType, w: Float, h: Float, mono: Boolean) {
         val d = design(type)
         val scale = when {
+            d.motif == Motif.SUICA_PANEL -> SUICA_TEXT_SIZE / 1.15f  // already large
             d.brandShift != 0f -> 0.075f
             d.brand.length > 7 -> 0.085f
             else -> 0.11f
@@ -161,7 +166,7 @@ object WatchArtRenderer {
             } else {
                 Typeface.create(Typeface.DEFAULT, if (d.italic) Typeface.BOLD_ITALIC else Typeface.BOLD)
             }
-            if (d.motif == Motif.SUICA_PANEL) letterSpacing = 0.12f
+            if (d.motif == Motif.SUICA_PANEL) letterSpacing = SUICA_TEXT_SPACING
         }
         val fm = paint.fontMetrics
         val textW = paint.measureText(d.brand)
@@ -169,7 +174,7 @@ object WatchArtRenderer {
         val (x, baseline) = when {
             d.brandExact || d.brandAlign == Alignment.Center ->
                 (w - textW) / 2 + w * d.brandShift to h / 2 - (fm.ascent + fm.descent) / 2
-            d.motif == Motif.SUICA_PANEL -> w * 0.09f to h - w * 0.045f - fm.descent
+            d.motif == Motif.SUICA_PANEL -> w * SUICA_TEXT_LEFT to h - w * SUICA_TEXT_BOTTOM - fm.descent
             d.brandAlign == Alignment.BottomStart -> pad to h - w * 0.05f - fm.descent
             d.brandAlign == Alignment.BottomEnd -> w - pad - textW to h - w * 0.04f - fm.descent
             d.brandAlign == Alignment.TopEnd -> w - pad - textW to w * 0.04f - fm.ascent

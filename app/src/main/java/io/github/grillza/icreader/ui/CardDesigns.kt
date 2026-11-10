@@ -57,6 +57,15 @@ private val SILVER = listOf(Color(0xFFE7E9EC), Color(0xFFC5C9CE), Color(0xFFDDE0
 private val WHITE = listOf(Color(0xFFFFFFFF), Color(0xFFEDEEF0))
 private val PEARL = listOf(Color(0xFFF7F8F9), Color(0xFFE4E6E9), Color(0xFFF0F1F3))
 
+/**
+ * Suica's wordmark: large, widely spaced, along the bottom of the green panel (fractions of
+ * card width; spacing in ems). Shared with the watch's card faces.
+ */
+internal const val SUICA_TEXT_SIZE = 0.14f
+internal const val SUICA_TEXT_SPACING = 0.18f
+internal const val SUICA_TEXT_LEFT = 0.065f
+internal const val SUICA_TEXT_BOTTOM = 0.05f
+
 internal fun design(type: CardType): Design = when (type) {
     // References: photos of the cards (Suica, PASMO, TOICA, manaca, PiTaPa, SUGOCA, nimoca, ICOCA).
     CardType.SUICA -> Design(PEARL, Motif.SUICA_PANEL, listOf(Color(0xFF62BD2F)), "Suica", Color.White, Alignment.BottomStart)
@@ -83,6 +92,7 @@ internal fun BoxScope.GeneratedArt(type: CardType, showBrand: Boolean) {
         BoxWithConstraints(Modifier.matchParentSize()) {
             val w = maxWidth
             val scale = when {
+                d.motif == Motif.SUICA_PANEL -> SUICA_TEXT_SIZE
                 d.brandShift != 0f -> 0.075f // inside a circle
                 d.brand.length > 7 -> 0.085f
                 else -> 0.11f
@@ -92,7 +102,7 @@ internal fun BoxScope.GeneratedArt(type: CardType, showBrand: Boolean) {
             val modifier = when {
                 d.brandExact || d.brandAlign == Alignment.Center ->
                     Modifier.align(d.brandAlign).offset(x = w * d.brandShift)
-                d.motif == Motif.SUICA_PANEL -> Modifier.align(Alignment.BottomStart).padding(start = w * 0.09f, bottom = w * 0.045f)
+                d.motif == Motif.SUICA_PANEL -> Modifier.align(Alignment.BottomStart).padding(start = w * SUICA_TEXT_LEFT, bottom = w * SUICA_TEXT_BOTTOM)
                 d.brandAlign == Alignment.BottomStart -> Modifier.align(Alignment.BottomStart).padding(start = pad, bottom = w * 0.05f)
                 else -> Modifier.align(d.brandAlign).padding(horizontal = pad, vertical = w * 0.04f)
             }
@@ -102,7 +112,7 @@ internal fun BoxScope.GeneratedArt(type: CardType, showBrand: Boolean) {
                 fontSize = fontSize,
                 fontWeight = FontWeight.Black,
                 fontStyle = if (d.italic) FontStyle.Italic else FontStyle.Normal,
-                letterSpacing = if (d.motif == Motif.SUICA_PANEL) fontSize * 0.12f else androidx.compose.ui.unit.TextUnit.Unspecified,
+                letterSpacing = if (d.motif == Motif.SUICA_PANEL) fontSize * SUICA_TEXT_SPACING else androidx.compose.ui.unit.TextUnit.Unspecified,
                 modifier = modifier,
             )
         }
@@ -153,13 +163,14 @@ private fun DrawScope.drawMotif(d: Design, flat: Boolean) {
 
     when (d.motif) {
         Motif.SUICA_PANEL -> {
-            // Rounded green panel on the left; its right edge slants down toward the bottom-right.
-            val r = w * 0.035f
-            val l = w * 0.045f
-            val t = h * 0.27f
-            val b = h * 0.95f
-            val tr = w * 0.40f
-            val br = w * 0.86f
+            // Tall rounded green panel on the left, almost the card's full height; its right edge
+            // slants out a little toward the bottom (measured from a real card).
+            val r = w * 0.03f
+            val l = w * 0.035f
+            val t = h * 0.06f
+            val b = h * 0.94f
+            val tr = w * 0.43f
+            val br = w * 0.62f
             // Unit vector along the slanted edge, for rounding its two corners.
             val dx = br - tr
             val dy = b - t

@@ -32,7 +32,7 @@ SILVER = ("#E7E9EC", "#C5C9CE")
 # id, label, base gradient, brand text, text colour, text centre (u, v), text width (fraction), shapes
 ICONS = [
     ("default", "IC Reader", ("#26324F", "#1A2238"), None, None, None, 0, "default"),
-    ("suica", "Suica", PEARL, "Suica", "#FFFFFF", (0.45, 0.68), 0.62, "suica"),
+    ("suica", "Suica", PEARL, "Suica", "#FFFFFF", (0.43, 0.71), 0.56, "suica"),
     ("pasmo", "PASMO", SILVER, "PASMO", "#EA5A9C", (0.5, 0.74), 0.74, "pasmo"),
     ("icoca", "ICOCA", ("#2A66C9", "#4F92E6"), "ICOCA", "#E3EEFF", (0.5, 0.5), 0.74, None),
     ("toica", "TOICA", SILVER, "toica", "#FFFFFF", (0.5, 0.76), 0.62, "toica"),
@@ -88,8 +88,14 @@ def draw_shapes(img: Image.Image, kind: str):
         for r in (8, 14, 20):
             d.arc([o + 52 * w - r * w, o + 54 * w - r * w, o + 52 * w + r * w, o + 54 * w + r * w], -38, 38, fill="#FFFFFF", width=int(4 * w))
     elif kind == "suica":
-        # Green panel on the left; its right edge slants down to the bottom-right.
-        d.polygon([P(-0.4, 0.30), P(0.62, 0.30), P(1.30, 1.25), P(-0.4, 1.25)], fill="#62BD2F")
+        # As on the real card: a pearl face with a tall green panel, rounded at the top, whose
+        # right edge slants out toward the bottom. Lit from the top-left like the app's art.
+        sheen(img, (0.25, 0.15), 0.75)
+        panel = rounded_polygon([P(0.10, 0.13), P(0.58, 0.13), P(1.02, 1.5), P(0.10, 1.5)], px(0.09) - px(0))
+        mask = Image.new("L", (S, S), 0)
+        ImageDraw.Draw(mask).polygon(panel, fill=255)
+        green = linear(("#7DCB3E", "#4DA62A"), (0.1, 0.1), (0.9, 1.0))
+        img.paste(green, (0, 0), mask)
     elif kind == "pasmo":
         for v in (0.10, 0.34):
             d.rounded_rectangle(R(0.10, v, 0.66, v + 0.17), radius=(px(0.06) - px(0)), fill="#EA5A9C")
@@ -123,14 +129,86 @@ def draw_shapes(img: Image.Image, kind: str):
             d.ellipse(R(u - r, v - r, u + r, v + r), fill=(255, 255, 255, 120))
 
 
-def wordmark(text: str, color: str, center, width_frac: float) -> Image.Image:
+def rounded_polygon(points, r: float, steps: int = 12):
+    """A polygon with each corner replaced by a circular arc of radius r."""
+    out = []
+    n = len(points)
+    for i in range(n):
+        (x0, y0), (x1, y1), (x2, y2) = points[i - 1], points[i], points[(i + 1) % n]
+        a = (x0 - x1, y0 - y1)
+        b = (x2 - x1, y2 - y1)
+        la, lb = math.hypot(*a), math.hypot(*b)
+        a, b = (a[0] / la, a[1] / la), (b[0] / lb, b[1] / lb)
+        angle = math.acos(max(-1.0, min(1.0, a[0] * b[0] + a[1] * b[1])))
+        cut = min(r / math.tan(angle / 2), la / 2, lb / 2)
+        rr = cut * math.tan(angle / 2)
+        bis = (a[0] + b[0], a[1] + b[1])
+        lbis = math.hypot(*bis)
+        centre = (x1 + bis[0] / lbis * rr / math.sin(angle / 2), y1 + bis[1] / lbis * rr / math.sin(angle / 2))
+        p0 = (x1 + a[0] * cut, y1 + a[1] * cut)
+        p1 = (x1 + b[0] * cut, y1 + b[1] * cut)
+        t0 = math.atan2(p0[1] - centre[1], p0[0] - centre[0])
+        t1 = math.atan2(p1[1] - centre[1], p1[0] - centre[0])
+        dt = (t1 - t0 + math.pi) % (2 * math.pi) - math.pi
+        for k in range(steps + 1):
+            t = t0 + dt * k / steps
+            out.append((centre[0] + rr * math.cos(t), centre[1] + rr * math.sin(t)))
+    return out
+
+
+def linear(colors, start, end) -> Image.Image:
+    """A linear gradient between two colours, from start to end (visible-square coordinates)."""
+    a, b = hex_rgba(colors[0]), hex_rgba(colors[1])
+    sx, sy = px(start[0]), px(start[1])
+    ex, ey = px(end[0]), px(end[1])
+    dx, dy = ex - sx, ey - sy
+    ll = dx * dx + dy * dy
+    small = 216  # computed small and scaled up: it's smooth anyway
+    img = Image.new("RGBA", (small, small))
+    pix = img.load()
+    for y in range(small):
+        for x in range(small):
+            X, Y = x * S / small, y * S / small
+            t = max(0.0, min(1.0, ((X - sx) * dx + (Y - sy) * dy) / ll))
+            pix[x, y] = tuple(int(a[k] + (b[k] - a[k]) * t) for k in range(4))
+    return img.resize((S, S), Image.BILINEAR)
+
+
+def sheen(img: Image.Image, center, radius: float):
+    """A soft white highlight, like the metallic print on the app's card art."""
+    glow = Image.new("RGBA", (S, S), (255, 255, 255, 0))
+    small = 216
+    g = Image.new("L", (small, small))
+    pix = g.load()
+    cx, cy, rad = px(center[0]) * small / S, px(center[1]) * small / S, (px(radius) - px(0)) * small / S
+    for y in range(small):
+        for x in range(small):
+            t = math.hypot(x - cx, y - cy) / rad
+            pix[x, y] = int(150 * max(0.0, 1 - t) ** 2)
+    glow.putalpha(g.resize((S, S), Image.BILINEAR))
+    img.alpha_composite(glow)
+
+
+def wordmark(text: str, color: str, center, width_frac: float, spacing: float = 0.0) -> Image.Image:
+    """[text] centred at [center], [width_frac] of the visible square wide; [spacing] in ems."""
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     target = (px(1) - px(0)) * width_frac
+
+    def width(font):
+        return font.getlength(text) + spacing * font.size * (len(text) - 1)
+
     size = 10
-    while ImageFont.truetype(str(FONT), size + 4).getlength(text) < target:
+    while width(ImageFont.truetype(str(FONT), size + 4)) < target:
         size += 4
     font = ImageFont.truetype(str(FONT), size)
-    ImageDraw.Draw(img).text((px(center[0]), px(center[1])), text, font=font, fill=color, anchor="mm")
+    d = ImageDraw.Draw(img)
+    if spacing == 0:
+        d.text((px(center[0]), px(center[1])), text, font=font, fill=color, anchor="mm")
+        return img
+    x = px(center[0]) - width(font) / 2
+    for ch in text:
+        d.text((x, px(center[1])), ch, font=font, fill=color, anchor="lm")
+        x += font.getlength(ch) + spacing * font.size
     return img
 
 
@@ -169,7 +247,7 @@ def main():
             fg = Image.new("RGBA", (S, S), (0, 0, 0, 0))
             draw_shapes(fg, "default")
         else:
-            fg = wordmark(text, color, center, width)
+            fg = wordmark(text, color, center, width, spacing=0.12 if ident == "suica" else 0.0)
         # Themed icons: the system tints this single-colour layer.
         mono = Image.new("RGBA", (S, S), (0, 0, 0, 0))
         mono.paste((0, 0, 0, 255), mask=fg.split()[3])
