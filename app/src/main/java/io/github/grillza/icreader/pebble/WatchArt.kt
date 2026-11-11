@@ -88,7 +88,8 @@ object WatchArtRenderer {
      * Flattens it a little more each time until it fits in [maxBytes], keeping strong edges.
      */
     private fun fitPhoto(pixels: IntArray, width: Int, mono: Boolean, maxBytes: Int): ByteArray? {
-        val vivid = WatchColors.vivid(WatchColors.smooth(pixels, width), photo = true)
+        // A narrow range: PiTaPa's thin lettering is only a little lighter than the panel behind it.
+        val vivid = WatchColors.vivid(WatchColors.smooth(pixels, width, range = 20), photo = true)
         if (mono) {
             val bw = WatchColors.mono(vivid)
             for (minRun in 1..16) {
@@ -97,7 +98,7 @@ object WatchArtRenderer {
             }
             return null
         }
-        val colours = WatchColors.tidy(WatchColors.toPebble(WatchColors.regions(vivid, width), photo = true), width)
+        val colours = WatchColors.mergeSimilar(WatchColors.tidy(WatchColors.toPebble(WatchColors.regions(vivid, width), photo = true), width), width)
         for (threshold in FLATTEN_STEPS) {
             val rle = WatchProtocol.rlePebble(WatchColors.flattenRows(colours, width, threshold))
             if (rle.size <= maxBytes) return rle

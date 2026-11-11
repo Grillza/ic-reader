@@ -158,13 +158,21 @@ object WatchColors {
             // A design colour that's already one of the watch's was chosen for it (a flat override).
             if (!photo && r % 85 == 0 && g % 85 == 0 && b % 85 == 0) return@IntArray p
             if (photo) {
+                // Stretching the channels also strengthens colours. Good for real colours
+                // (Suica's green), but faint tints would turn into strong ones (a grey-green
+                // silver went cyan, PiTaPa's lavender royal blue), so those keep the saturation they had.
+                rgbToHsv(r, g, b, hsv)
+                val sat = hsv[1]
                 r = stretch(r, lo, hi); g = stretch(g, lo, hi); b = stretch(b, lo, hi)
+                rgbToHsv(r, g, b, hsv)
+                if (sat < FAINT_TINT) hsv[1] = sat
+            } else {
+                rgbToHsv(r, g, b, hsv)
             }
-            rgbToHsv(r, g, b, hsv)
-            if (photo && hsv[1] < 0.25f && hsv[2] >= 0.6f) {
+            if (photo && hsv[1] < WHITE_BELOW_SAT && hsv[2] >= WHITE_FROM) {
                 // Pale, nearly colourless tones are the card's white in shadow or tinted by the
                 // light: the screen's only light grey (170) and its pale greens show them as blotches,
-                // so they go white.
+                // so they go white. Darker ones are left: they're a grey printed on the card (Kitaca's sky).
                 hsv[1] = 0f
                 hsv[2] = 1f
             } else if (photo) {
@@ -178,6 +186,14 @@ object WatchColors {
             hsvToRgb(hsv)
         }
     }
+
+    /**
+     * Photo tones at least [WHITE_FROM] bright (0-1) and less saturated than [WHITE_BELOW_SAT]
+     * go white; see [vivid]. A white card under coloured light reaches about 0.15 (Kitaca's
+     * cream); PiTaPa's lavender, a real print colour, is 0.21.
+     */
+    private const val WHITE_FROM = 0.82f
+    private const val WHITE_BELOW_SAT = 0.18f
 
     /** The 1st and 92nd percentile of opaque pixels' brightness (the card's white goes white). */
     private fun levels(pixels: IntArray): Pair<Int, Int> {
@@ -199,8 +215,19 @@ object WatchColors {
         }
         val lo = at(0.01f)
         val hi = at(0.92f)
-        return if (hi - lo < 32) 0 to 255 else lo to hi
+        // No white on the card (PiTaPa is grey and lavender all over): its colours are as printed.
+        if (hi < WHITE_CARD || hi - lo < 32) return 0 to 255
+        // At most a gain of about 1.6, so a card that's low in contrast (manaca's grey lettering
+        // on light grey) isn't pulled apart into black and white.
+        return min(lo, hi - MIN_RANGE).coerceAtLeast(0) to hi
     }
+
+    /** Photo colours less saturated than this (0-1) aren't made stronger by the stretch; see [vivid]. */
+    private const val FAINT_TINT = 0.3f
+
+    /** A photo whose lightest part is darker than this has no white on it; see [levels]. */
+    private const val WHITE_CARD = 200
+    private const val MIN_RANGE = 160
 
     private fun stretch(v: Int, lo: Int, hi: Int) = ((v - lo) * 255f / (hi - lo)).roundToInt().coerceIn(0, 255)
 
@@ -283,11 +310,21 @@ object WatchColors {
         val queue = IntArray(pixels.size)
         val step2 = step * step
         val spread2 = spread * spread
+        // Between two faint colours, a change in colour counts for more than one in brightness:
+        // two printed tones of about the same brightness (PiTaPa's grey and lavender) differ
+        // mostly in colour, and plain RGB distance would merge them. Not for strong colours,
+        // whose hue drifts a little under uneven light (Suica's green would split in two).
         fun dist2(a: Int, b: Int): Int {
             val dr = ((a shr 16) and 0xFF) - ((b shr 16) and 0xFF)
             val dg = ((a shr 8) and 0xFF) - ((b shr 8) and 0xFF)
             val db = (a and 0xFF) - (b and 0xFF)
-            return dr * dr + dg * dg + db * db
+            val plain = dr * dr + dg * dg + db * db
+            if (satOf(a) >= FAINT_TINT || satOf(b) >= FAINT_TINT) return plain
+            val dl = (dr + dg + db) / 3f
+            val cr = dr - dl
+            val cg = dg - dl
+            val cb = db - dl
+            return (3f * dl * dl + CHROMA_WEIGHT * (cr * cr + cg * cg + cb * cb)).toInt()
         }
         var next = 0
         for (start in pixels.indices) {
@@ -364,6 +401,73 @@ object WatchColors {
         }
         return src
     }
+
+    /** How much more a difference in colour counts than one in brightness between faint colours, in [regions]. */
+    private const val CHROMA_WEIGHT = 8f
+
+    /**
+     * Joins patches of Pebble [colours] that look nearly the same on the screen: each patch
+     * (pixels of one colour, touching) takes the colour of the larger patch it shares most of its
+     * border with, when the two are less than [threshold] apart ([screenDistance]). A slight
+     * change of light across a panel can round to two neighbouring watch colours (Suica's green
+     * got a teal wedge along its top); lettering and real edges differ far more and stay.
+     * Transparent pixels (0) are left alone.
+     */
+    fun mergeSimilar(colours: IntArray, width: Int, threshold: Int = MERGE_DISTANCE): IntArray {
+        val height = colours.size / width
+        val label = IntArray(colours.size) { -1 }
+        val sizes = ArrayList<Int>()
+        val queue = IntArray(colours.size)
+        for (start in colours.indices) {
+            if (label[start] >= 0 || colours[start] == 0) continue
+            val id = sizes.size
+            var head = 0
+            var tail = 0
+            queue[tail++] = start
+            label[start] = id
+            while (head < tail) {
+                val i = queue[head++]
+                val x = i % width
+                val y = i / width
+                for (d in 0 until 4) {
+                    val nx = x + (if (d == 0) 1 else if (d == 1) -1 else 0)
+                    val ny = y + (if (d == 2) 1 else if (d == 3) -1 else 0)
+                    if (nx !in 0 until width || ny !in 0 until height) continue
+                    val j = ny * width + nx
+                    if (label[j] < 0 && colours[j] == colours[start]) {
+                        label[j] = id
+                        queue[tail++] = j
+                    }
+                }
+            }
+            sizes += tail
+        }
+        // For each patch, how much border it shares with each neighbouring patch.
+        val borders = HashMap<Long, Int>()
+        for (y in 0 until height) for (x in 0 until width) {
+            val a = label[y * width + x]
+            if (a < 0) continue
+            if (x + 1 < width) label[y * width + x + 1].let { b -> if (b >= 0 && b != a) { borders.merge(a.toLong() shl 32 or b.toLong(), 1, Int::plus); borders.merge(b.toLong() shl 32 or a.toLong(), 1, Int::plus) } }
+            if (y + 1 < height) label[(y + 1) * width + x].let { b -> if (b >= 0 && b != a) { borders.merge(a.toLong() shl 32 or b.toLong(), 1, Int::plus); borders.merge(b.toLong() shl 32 or a.toLong(), 1, Int::plus) } }
+        }
+        val colourOf = IntArray(sizes.size)
+        for (i in colours.indices) if (label[i] >= 0) colourOf[label[i]] = colours[i]
+        val target = IntArray(sizes.size) { it }
+        val bestBorder = IntArray(sizes.size)
+        for ((key, n) in borders) {
+            val a = (key ushr 32).toInt()
+            val b = (key and 0xFFFFFFFFL).toInt()
+            if (sizes[b] <= sizes[a] || screenDistance(colourOf[a], colourOf[b]) >= threshold) continue
+            if (n > bestBorder[a]) {
+                bestBorder[a] = n
+                target[a] = b
+            }
+        }
+        return IntArray(colours.size) { i -> if (label[i] < 0) colours[i] else colourOf[target[label[i]]] }
+    }
+
+    /** Colours closer than this on the screen count as the same for [mergeSimilar]. */
+    private const val MERGE_DISTANCE = 600
 
     /** Colours closer than this on the screen count as "nearly the same" for [tidy]. */
     private const val TIDY_DISTANCE = 4000
