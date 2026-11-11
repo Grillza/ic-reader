@@ -30,7 +30,8 @@
         </activity>
 
         <!-- Bound by the Pebble app while the IC Reader watch app is open (PebbleKit 2). Off until
-             Pebble watch integration is switched on in Settings (WatchSync.setEnabled). -->
+             Pebble watch integration is switched on, in Settings or automatically on first launch
+             with the Pebble app installed (WatchSync.setEnabled). -->
         <service
             android:name=".pebble.PebbleListenerService"
             android:enabled="false"

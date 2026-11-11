@@ -15,6 +15,7 @@ import io.github.grillza.icreader.data.Transaction
 import io.github.grillza.icreader.data.localized
 import io.github.grillza.icreader.ui.describeTransaction
 import io.github.grillza.icreader.ui.formatYen
+import io.rebble.pebblekit2.client.DefaultPebbleAndroidAppPicker
 import io.rebble.pebblekit2.client.DefaultPebbleSender
 import io.rebble.pebblekit2.common.model.PebbleDictionary
 import io.rebble.pebblekit2.common.model.PebbleDictionaryItem
@@ -81,6 +82,21 @@ class WatchSync(private val context: Context) {
         if (!on) {
             sessions.clear()
             _watchOpen.value = false
+        }
+    }
+
+    /**
+     * Switches the integration on if the Pebble app is installed and the user has never set the
+     * switch either way. Once the switch has a value (from here or from Settings) this does nothing,
+     * so turning it off sticks.
+     */
+    fun autoEnableIfPebbleInstalled() {
+        if (prefs.contains(PREF_ENABLED)) return
+        scope.launch {
+            val installed = runCatching {
+                DefaultPebbleAndroidAppPicker.getInstance(context.applicationContext).getAllEligibleApps().isNotEmpty()
+            }.getOrDefault(false)
+            if (installed && !prefs.contains(PREF_ENABLED)) setEnabled(true)
         }
     }
 

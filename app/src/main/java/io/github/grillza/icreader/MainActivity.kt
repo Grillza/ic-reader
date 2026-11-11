@@ -43,6 +43,8 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         (application as IcReaderApp).icons.hold = false
+        // Checked on every resume so installing the Pebble app later is picked up too.
+        (application as IcReaderApp).watchSync.autoEnableIfPebbleInstalled()
         val nfc = adapter
         nfcState.value = when {
             nfc == null -> NfcState.Unsupported
